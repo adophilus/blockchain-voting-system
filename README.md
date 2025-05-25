@@ -1,47 +1,66 @@
-# Blockchain Based Voting System
+## Foundry
 
-## Overview
+**Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**
 
-This project is a demonstration of how smart contracts can be employed in voting processes.
+Foundry consists of:
 
-## Contracts
+-   **Forge**: Ethereum testing framework (like Truffle, Hardhat and DappTools).
+-   **Cast**: Swiss army knife for interacting with EVM smart contracts, sending transactions and getting chain data.
+-   **Anvil**: Local Ethereum node, akin to Ganache, Hardhat Network.
+-   **Chisel**: Fast, utilitarian, and verbose solidity REPL.
 
-## Requirements
+## Documentation
 
-### In general
-- [A web browser](https://www.google.com/chrome/)
+https://book.getfoundry.sh/
 
-### For Linux/WSL
-- [direnv](https://direnv.net)
-- [nix](https://github.com/DeterminateSystems/nix-installer)
+## Usage
 
-### For Windows
-- [nodejs](https://nodejs.org/en)
-- [vite](https://vite.dev)
-- [pnpm](https://pnpm.io)
-- [foundry](https://book.getfoundry.sh)
+### Build
 
+```shell
+$ forge build
+```
 
-## Development
+### Test
 
-### On Linux/WSL
-- Install nix
-- Install direnv
-- Run the following command in the terminal
-  ```bash
-  cd '<project directory>'
-  direnv allow # Only required the first time
-  # Direnv should auto run
-  pnpm install
-  pnpm dev
-  ```
+```shell
+$ forge test
+```
 
-### On Windows
-- Install nodejs
-- Install pnpm
-- Install foundry
-- Run the following in powershell
-  ```powershell
-  pnpm install
-  pnpm dev
-  ```
+### Format
+
+```shell
+$ forge fmt
+```
+
+### Gas Snapshots
+
+```shell
+$ forge snapshot
+```
+
+### Anvil
+
+```shell
+$ anvil
+```
+
+### Deploy
+
+```shell
+$ forge script script/Counter.s.sol:CounterScript --rpc-url <your_rpc_url> --private-key <your_private_key>
+```
+
+### Cast
+
+```shell
+$ cast <subcommand>
+```
+
+### Help
+
+```shell
+$ forge --help
+$ anvil --help
+$ cast --help
+```
