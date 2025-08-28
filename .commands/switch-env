@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+# Check if argument is provided
+if [[ $# -ne 1 ]]; then
+  echo "Usage: switch-env <environment>"
+  echo "Environments: prod, staging, dev, test"
+  exit 1
+fi
+
+# Check if argument is empty
+if [[ -z "$1" ]]; then
+  echo "Error: Environment cannot be empty"
+  echo "Usage: switch-env <environment>"
+  echo "Environments: prod, staging, dev, test"
+  exit 1
+fi
+
+# Check if argument contains only valid characters (letters and numbers)
+if [[ ! "$1" =~ ^[a-zA-Z0-9]+$ ]]; then
+  echo "Error: Environment must contain only letters and numbers"
+  echo "Usage: switch-env <environment>"
+  echo "Environments: prod, staging, dev, test"
+  exit 1
+fi
+
+env=$1
+node_env=
+
+case $env in
+  prod)
+    node_env="production"
+    ;;
+  staging)
+    node_env="staging"
+    ;;
+  dev)
+    node_env="development"
+    ;;
+  test)
+    node_env="test"
+    ;;
+  *)
+    echo "Invalid environment. Use: prod, staging, dev, or test"
+    exit 1
+    ;;
+esac
+
+env_file=$(dirname $0)/../.env
+
+# Update .env file
+echo "NODE_ENV=\"$node_env\"" > $env_file
+echo "VITE_NODE_ENV=\"\$NODE_ENV\"" >> $env_file
+
+echo "Switched to $node_env environment"
