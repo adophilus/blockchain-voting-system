@@ -1,3 +1,64 @@
+# Blockchain Voting System
+
+A decentralized voting system built on blockchain technology.
+
+## Development Environment
+
+This project uses Process Compose to manage the local development environment. It orchestrates multiple services including:
+
+1. IPFS Node (via Nix package)
+2. Smart Contracts Development Environment
+3. Web Application Development Server
+
+### Prerequisites
+
+- [Nix](https://nixos.org/download.html) with flakes enabled
+- [direnv](https://direnv.net/)
+- [Process Compose](https://github.com/F1bonacc1/process-compose)
+
+### Setup
+
+1. Clone the repository:
+   ```bash
+   git clone <repository-url>
+   cd blockchain-voting-system
+   ```
+
+2. Enable direnv:
+   ```bash
+   direnv allow
+   ```
+
+3. Install dependencies:
+   ```bash
+   ./scripts/install.sh
+   ```
+
+### Running the Development Environment
+
+To start all services in development mode:
+
+```bash
+pnpm dev
+```
+
+This will start:
+- IPFS node
+- Smart contract development environment
+- Web application development server
+
+### Running Individual Services
+
+You can also run individual services:
+
+```bash
+# Run only the smart contracts development environment
+pnpm dev:contracts
+
+# Run only the web application development server
+pnpm dev:webapp
+```
+
 ## Foundry
 
 **Foundry is a blazing fast, portable and modular toolkit for Ethereum application development written in Rust.**

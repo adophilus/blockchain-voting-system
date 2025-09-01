@@ -1,0 +1,25 @@
+{
+  "name": "blockchain-voting-system",
+  "version": "1.0.0",
+  "description": "A blockchain-based voting system",
+  "scripts": {
+    "dev": "process-compose up",
+    "dev:contracts": "pnpm --filter contracts dev",
+    "dev:webapp": "pnpm --filter webapp dev",
+    "test": "pnpm --filter contracts test && pnpm --filter webapp test",
+    "build": "pnpm --filter contracts build && pnpm --filter webapp build",
+    "install:env": "bash ./scripts/install.sh"
+  },
+  "keywords": [
+    "blockchain",
+    "voting",
+    "ethereum",
+    "solidity"
+  ],
+  "author": "Blockchain Voting System Team",
+  "license": "MIT",
+  "engines": {
+    "node": ">=18.0.0"
+  },
+  "packageManager": "pnpm@8.15.0"
+}

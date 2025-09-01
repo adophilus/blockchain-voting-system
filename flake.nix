@@ -25,6 +25,9 @@
 
             nodejs_22
             pnpm_10
+            
+            # IPFS for decentralized storage
+            go-ipfs
           ];
 
           # Decorative prompt override so we know when we're in a dev shell

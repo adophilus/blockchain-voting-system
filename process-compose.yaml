@@ -1,0 +1,28 @@
+version: "0.5"
+
+processes:
+  ipfs:
+    command: "ipfs daemon"
+    availability:
+      restart: "always"
+    depends_on:
+      initialize-ipfs:
+        condition: "process_completed"
+  
+  initialize-ipfs:
+    command: "bash -c 'if [ ! -d ~/.ipfs ]; then ipfs init; fi'"
+    availability:
+      restart: "exit_on_failure"
+  
+  contracts:
+    command: "pnpm --filter contracts dev"
+    availability:
+      restart: "always"
+  
+  webapp:
+    command: "pnpm --filter webapp dev"
+    availability:
+      restart: "always"
+    depends_on:
+      contracts:
+        condition: "process_started"

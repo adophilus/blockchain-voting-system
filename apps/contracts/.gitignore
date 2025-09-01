@@ -1,0 +1,25 @@
+# Cache and build artifacts
+/cache/
+/out/
+
+# Dependencies
+/lib/
+
+# Test report files and coverage data
+# This assumes you are running `forge test --gas-report` or similar commands
+# If you don't use these features, you can omit these lines
+/gas-report.txt
+/coverage.json
+/coverage.lcov
+/test-results.json
+
+# Environment files, which contain sensitive keys
+.env
+.env.*.local
+.env.local
+
+# Operating system and editor files
+.DS_Store
+.vscode/
+.idea/
+
