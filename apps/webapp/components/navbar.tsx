@@ -1,12 +1,14 @@
 "use client"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import Link from "next/link"
 import { Button } from "@/components/ui/button"
-import { Vote, Menu, X } from "lucide-react"
+import { Vote, Menu, X, User, LogOut, BarChart3 } from "lucide-react"
+import { useAuth } from "@/context/auth-context"
 
 export function Navbar() {
   const [isMenuOpen, setIsMenuOpen] = useState(false)
+  const { isAuthenticated, userRole, logout } = useAuth()
 
   return (
     <header className="bg-white border-b border-gray-100 sticky top-0 z-40">
@@ -25,16 +27,34 @@ export function Navbar() {
             <Link href="/documentation" className="text-gray-600 hover:text-blue-600 transition-colors">
               Documentation
             </Link>
+            <Link href="/results" className="text-gray-600 hover:text-blue-600 transition-colors flex items-center">
+              <BarChart3 className="h-4 w-4 mr-1" />
+              Results
+            </Link>
           </nav>
 
           {/* Desktop CTA */}
           <div className="hidden md:flex items-center space-x-4">
-            <Link href="/dashboard">
-              <Button variant="outline">Dashboard</Button>
-            </Link>
-            <Link href="/login">
-              <Button>Login</Button>
-            </Link>
+            {isAuthenticated ? (
+              <>
+                <Link href={userRole === "admin" ? "/admin/dashboard" : "/voter/dashboard"}>
+                  <Button variant="outline">Dashboard</Button>
+                </Link>
+                <Button variant="ghost" onClick={logout}>
+                  <LogOut className="h-4 w-4 mr-2" />
+                  Logout
+                </Button>
+              </>
+            ) : (
+              <>
+                <Link href="/dashboard">
+                  <Button variant="outline">Dashboard</Button>
+                </Link>
+                <Link href="/login">
+                  <Button>Login</Button>
+                </Link>
+              </>
+            )}
           </div>
 
           {/* Mobile Menu Button */}
@@ -61,15 +81,45 @@ export function Navbar() {
             >
               Documentation
             </Link>
+            <Link
+              href="/results"
+              className="block py-2 text-gray-600 hover:text-blue-600 flex items-center"
+              onClick={() => setIsMenuOpen(false)}
+            >
+              <BarChart3 className="h-4 w-4 mr-2" />
+              Results
+            </Link>
             <div className="pt-4 space-y-3">
-              <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
-                <Button variant="outline" className="w-full">
-                  Dashboard
-                </Button>
-              </Link>
-              <Link href="/login" onClick={() => setIsMenuOpen(false)}>
-                <Button className="w-full">Login</Button>
-              </Link>
+              {isAuthenticated ? (
+                <>
+                  <Link 
+                    href={userRole === "admin" ? "/admin/dashboard" : "/voter/dashboard"} 
+                    onClick={() => setIsMenuOpen(false)}
+                  >
+                    <Button variant="outline" className="w-full">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Button variant="ghost" className="w-full justify-start" onClick={() => {
+                    logout()
+                    setIsMenuOpen(false)
+                  }}>
+                    <LogOut className="h-4 w-4 mr-2" />
+                    Logout
+                  </Button>
+                </>
+              ) : (
+                <>
+                  <Link href="/dashboard" onClick={() => setIsMenuOpen(false)}>
+                    <Button variant="outline" className="w-full">
+                      Dashboard
+                    </Button>
+                  </Link>
+                  <Link href="/login" onClick={() => setIsMenuOpen(false)}>
+                    <Button className="w-full">Login</Button>
+                  </Link>
+                </>
+              )}
             </div>
           </div>
         </div>

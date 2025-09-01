@@ -11,8 +11,9 @@ import { Label } from "@/components/ui/label"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
 import { Switch } from "@/components/ui/switch"
-import { ArrowLeft, UserCheck, Shield, CheckCircle, AlertCircle } from "lucide-react"
+import { ArrowLeft, UserCheck, Shield, CheckCircle, AlertCircle, Image as ImageIcon } from "lucide-react"
 import { toast } from "sonner"
+import { ImageUpload } from "@/components/image-upload"
 
 interface Election {
   id: string
@@ -37,7 +38,9 @@ export default function VoterRegistration() {
     state: "",
     lga: "",
     ward: "",
+    profileImage: "",
   })
+  const [profileImageUrl, setProfileImageUrl] = useState<string | null>(null)
   const [election, setElection] = useState<Election | null>(null)
   const [simulateEnded, setSimulateEnded] = useState(false)
   const [simulateRegistered, setSimulateRegistered] = useState(false)
@@ -57,6 +60,11 @@ export default function VoterRegistration() {
     }
     setElection(mockElection)
   }, [])
+
+  const handleImageUpload = (ipfsHash: string, imageUrl: string) => {
+    setFormData(prev => ({ ...prev, profileImage: ipfsHash }))
+    setProfileImageUrl(imageUrl)
+  }
 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
@@ -227,6 +235,19 @@ export default function VoterRegistration() {
                     required
                   />
                 </div>
+              </div>
+
+              {/* Profile Image Upload */}
+              <div className="space-y-4">
+                <div className="flex items-center space-x-2 text-sm font-medium text-gray-700">
+                  <ImageIcon className="h-4 w-4" />
+                  <span>Profile Image</span>
+                </div>
+                <ImageUpload 
+                  onUploadComplete={handleImageUpload} 
+                  label="Upload Profile Image"
+                  description="Please upload a clear photo of yourself for verification purposes"
+                />
               </div>
 
               {/* Personal Information Section */}

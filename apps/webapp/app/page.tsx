@@ -3,7 +3,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 import { Navbar } from "@/components/navbar"
 import { Footer } from "@/components/footer"
-import { Vote, Shield, Clock, LineChart, Users, CheckCircle, Lock, Layers, Globe } from "lucide-react"
+import { Vote, Shield, Clock, LineChart, Users, CheckCircle, Lock, Layers, Globe, BarChart3, Image as ImageIcon, UserCheck } from "lucide-react"
 
 export default function LandingPage() {
   return (
@@ -27,7 +27,7 @@ export default function LandingPage() {
                 blockchain technology and smart contracts.
               </p>
               <div className="flex flex-wrap gap-4">
-                <Link href="/dashboard">
+                <Link href="/login">
                   <Button size="lg" className="h-12 px-6">
                     Get Started
                   </Button>
@@ -73,7 +73,12 @@ export default function LandingPage() {
                     </div>
                   </div>
                   <div className="flex justify-center">
-                    <Button className="w-full">View Dashboard</Button>
+                    <Link href="/results">
+                      <Button className="w-full flex items-center">
+                        <BarChart3 className="h-4 w-4 mr-2" />
+                        View Live Results
+                      </Button>
+                    </Link>
                   </div>
                 </div>
               </div>
@@ -294,6 +299,71 @@ export default function LandingPage() {
         </div>
       </section>
 
+      {/* New Features Section */}
+      <section className="py-20 px-4 bg-white">
+        <div className="container mx-auto max-w-6xl">
+          <div className="text-center mb-16">
+            <h2 className="text-3xl md:text-4xl font-bold mb-4">Enhanced Features</h2>
+            <p className="text-lg text-gray-600 max-w-3xl mx-auto">
+              Our latest updates bring even more functionality to the BlockVote platform.
+            </p>
+          </div>
+
+          <div className="grid md:grid-cols-3 gap-8">
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6 text-center">
+                <div className="bg-blue-100 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <ImageIcon className="h-8 w-8 text-blue-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">IPFS Image Storage</h3>
+                <p className="text-gray-600 mb-4">
+                  Securely store voter and candidate images using IPFS decentralized storage.
+                </p>
+                <Link href="/documentation">
+                  <Button variant="outline" size="sm">
+                    Learn More
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6 text-center">
+                <div className="bg-green-100 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <BarChart3 className="h-8 w-8 text-green-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Real-Time Results</h3>
+                <p className="text-gray-600 mb-4">
+                  View live election results as votes are cast with our real-time dashboard.
+                </p>
+                <Link href="/results">
+                  <Button variant="outline" size="sm">
+                    View Results
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+
+            <Card className="border-0 shadow-lg hover:shadow-xl transition-shadow">
+              <CardContent className="pt-6 text-center">
+                <div className="bg-purple-100 p-3 rounded-full w-16 h-16 flex items-center justify-center mx-auto mb-4">
+                  <UserCheck className="h-8 w-8 text-purple-600" />
+                </div>
+                <h3 className="text-xl font-bold mb-2">Voter Verification</h3>
+                <p className="text-gray-600 mb-4">
+                  Admin-controlled voter verification process ensures only eligible voters can participate.
+                </p>
+                <Link href="/documentation">
+                  <Button variant="outline" size="sm">
+                    Learn More
+                  </Button>
+                </Link>
+              </CardContent>
+            </Card>
+          </div>
+        </div>
+      </section>
+
       {/* Team Section */}
       <section id="team" className="py-20 px-4 bg-white">
         <div className="container mx-auto max-w-6xl">
@@ -365,7 +435,7 @@ export default function LandingPage() {
             Experience our blockchain-based electoral system implementation and explore the technical features.
           </p>
           <div className="flex flex-wrap justify-center gap-4">
-            <Link href="/dashboard">
+            <Link href="/login">
               <Button size="lg" variant="secondary" className="h-12 px-6">
                 View Prototype
               </Button>
