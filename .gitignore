@@ -146,4 +146,7 @@ dist
 # SvelteKit build / generate output
 .svelte-kit
 
+# IPFS data directory
+.ipfs/
+
 # End of https://www.toptal.com/developers/gitignore/api/node

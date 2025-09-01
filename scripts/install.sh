@@ -30,10 +30,16 @@ fi
 echo "Initializing Nix flake..."
 nix flake update
 
-# Enter the development environment
-echo "Entering development environment..."
+# Enter the development environment and initialize IPFS
+echo "Initializing IPFS within development environment..."
 direnv allow
 eval "$(direnv export bash)"
+
+# Initialize IPFS if not already initialized
+if [ ! -d ~/.ipfs ]; then
+    echo "Initializing IPFS repository..."
+    ipfs init
+fi
 
 # Install pnpm dependencies
 echo "Installing pnpm dependencies..."
