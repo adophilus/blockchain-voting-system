@@ -6,7 +6,7 @@ import "./Party.sol";
 import "./VoterRegistry.sol";
 import "./CandidateRegistry.sol";
 
-contract ElectionManager {
+contract VotingSystem {
     address public admin;
     uint public electionCount;
     uint public partyCount;

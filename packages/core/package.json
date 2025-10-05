@@ -3,5 +3,8 @@
 	"name": "@blockchain-voting-system/core",
 	"exports": {
 		".": "./src/index.ts"
+	},
+	"dependencies": {
+		"viem": "2.x"
 	}
 }

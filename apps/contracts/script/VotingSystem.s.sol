@@ -2,17 +2,17 @@
 pragma solidity ^0.8.24;
 
 import {Script, console} from "forge-std/Script.sol";
-import {ElectionManager} from "../src/core/ElectionManager.sol";
+import {VotingSystem} from "../src/core/VotingSystem.sol";
 
 contract VotingSystemScript is Script {
-    ElectionManager public electionManager;
+    VotingSystem public votingSystem;
 
     function setUp() public {}
 
     function run() public {
         vm.startBroadcast();
 
-        electionManager = new ElectionManager();
+        votingSystem = new VotingSystem();
 
         vm.stopBroadcast();
     }

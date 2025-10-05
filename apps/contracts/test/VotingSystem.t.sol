@@ -4,7 +4,7 @@ pragma solidity ^0.8.24;
 import {Test, console} from "forge-std/Test.sol";
 import {ElectionManager} from "../src/core/ElectionManager.sol";
 
-contract ElectionManagerTest is Test {
+contract VotingSystemTest is Test {
     ElectionManager public electionManager;
     
     function setUp() public {
