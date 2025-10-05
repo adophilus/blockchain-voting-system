@@ -1,0 +1,10 @@
+version: '3.8'
+
+services:
+  docs:
+    image: fy-blockchain-voting-system-docs
+    # No specific overrides for production for now, as the base docker-compose.yaml is sufficient.
+    # This file exists to allow for future production-specific configurations.
+    # For example, you might add environment variables or resource limits here.
+    # environment:
+    #   NODE_ENV: production

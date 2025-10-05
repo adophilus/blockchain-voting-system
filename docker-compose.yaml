@@ -1,4 +1,3 @@
-
 version: '3.8'
 
 services:
@@ -8,8 +7,6 @@ services:
       dockerfile: Dockerfile
     ports:
       - "5173:5173"
-    volumes:
-      - ./apps/docs:/app
     command: bunx zerv
     networks:
       - blockchain-voting-system

@@ -46,6 +46,10 @@ export default defineConfig({
 					{ text: "Usage", link: "/ipfs/usage" },
 				],
 			},
+			{
+				text: "Further Improvements",
+				items: [{ text: "Token-Based Identity", link: "/further-improvement" }],
+			},
 		],
 	},
 	markdown: {
