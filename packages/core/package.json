@@ -6,6 +6,7 @@
 	},
 	"dependencies": {
 		"viem": "2.x",
-		"true-myth": "^7.0.0"
+		"true-myth": "^7.0.0",
+		"@blockchain-voting-system/contracts": "workspace:^"
 	}
 }

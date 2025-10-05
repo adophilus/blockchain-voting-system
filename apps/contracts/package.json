@@ -1,18 +1,22 @@
 {
-  "name": "@blockchain-voting-system/contracts",
-  "version": "1.0.0",
-  "description": "Smart contracts for the blockchain voting system",
-  "scripts": {
-    "build": "forge build",
-    "test": "forge test",
-    "dev": "anvil"
-  },
-  "keywords": [
-    "blockchain",
-    "voting",
-    "ethereum",
-    "solidity"
-  ],
-  "author": "Blockchain Voting System Team",
-  "license": "MIT"
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "@blockchain-voting-system/contracts",
+	"version": "1.0.0",
+	"description": "Smart contracts for the blockchain voting system",
+	"exports": {
+		"./*": "./out/*"
+	},
+	"scripts": {
+		"build": "forge build",
+		"test": "forge test",
+		"dev": "anvil"
+	},
+	"keywords": [
+		"blockchain",
+		"voting",
+		"ethereum",
+		"solidity"
+	],
+	"author": "Blockchain Voting System Team",
+	"license": "MIT"
 }
