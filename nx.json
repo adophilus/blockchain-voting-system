@@ -1,71 +1,58 @@
 {
-  "$schema": "./node_modules/nx/schemas/nx-schema.json",
-  "targetDefaults": {
-    "build": {
-      "dependsOn": [
-        "^build"
-      ],
-      "outputs": [
-        "{projectRoot}/build"
-      ],
-      "cache": true
-    },
-    "test": {
-      "dependsOn": [
-        "^test"
-      ],
-      "cache": true
-    },
-    "dev": {
-      "dependsOn": [
-        "^dev"
-      ],
-      "cache": true
-    },
-    "lint": {
-      "dependsOn": [
-        "^lint"
-      ],
-      "cache": true
-    },
-    "preview": {
-      "dependsOn": [
-        "^preview"
-      ],
-      "cache": true
-    },
-    "start": {
-      "dependsOn": [
-        "^start"
-      ],
-      "cache": true
-    }
-  },
-  "plugins": [
-    {
-      "plugin": "@nx/vite/plugin",
-      "options": {
-        "buildTargetName": "build",
-        "testTargetName": "test",
-        "serveTargetName": "serve",
-        "devTargetName": "dev",
-        "previewTargetName": "preview",
-        "serveStaticTargetName": "serve-static",
-        "typecheckTargetName": "typecheck",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    },
-    {
-      "plugin": "@nx/next/plugin",
-      "options": {
-        "startTargetName": "next:start",
-        "buildTargetName": "next:build",
-        "devTargetName": "next:dev",
-        "serveStaticTargetName": "serve-static",
-        "buildDepsTargetName": "build-deps",
-        "watchDepsTargetName": "watch-deps"
-      }
-    }
-  ]
+	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"tui": { "enabled": true },
+	"targetDefaults": {
+		"build": {
+			"dependsOn": ["^build"],
+			"outputs": ["{projectRoot}/build"],
+			"cache": true
+		},
+		"test": {
+			"dependsOn": ["^test"],
+			"cache": true
+		},
+		"dev": {
+			"dependsOn": ["^dev"],
+			"cache": true
+		},
+		"lint": {
+			"dependsOn": ["^lint"],
+			"cache": true
+		},
+		"preview": {
+			"dependsOn": ["^preview"],
+			"cache": true
+		},
+		"start": {
+			"dependsOn": ["^start"],
+			"cache": true
+		}
+	},
+	"plugins": [
+		{
+			"plugin": "@nx/vite/plugin",
+			"options": {
+				"buildTargetName": "build",
+				"testTargetName": "test",
+				"serveTargetName": "serve",
+				"devTargetName": "dev",
+				"previewTargetName": "preview",
+				"serveStaticTargetName": "serve-static",
+				"typecheckTargetName": "typecheck",
+				"buildDepsTargetName": "build-deps",
+				"watchDepsTargetName": "watch-deps"
+			}
+		},
+		{
+			"plugin": "@nx/next/plugin",
+			"options": {
+				"startTargetName": "next:start",
+				"buildTargetName": "next:build",
+				"devTargetName": "next:dev",
+				"serveStaticTargetName": "serve-static",
+				"buildDepsTargetName": "build-deps",
+				"watchDepsTargetName": "watch-deps"
+			}
+		}
+	]
 }
