@@ -10,10 +10,13 @@ contract Election {
     uint public endTime;
     bool public electionStarted;
     bool public electionEnded;
+    string public name;
+    string public description;
     string public cid; // IPFS CID for election-related media
     
     // Mapping of parties participating in this election
     mapping(address => bool) public participatingParties;
+    address[] public participatingPartyAddresses;
     mapping(address => mapping(uint => uint)) public partyCandidateVoteCounts; // party => candidateId => voteCount
     
     // Voter management
@@ -53,8 +56,10 @@ contract Election {
         _;
     }
     
-    constructor(address _admin, string memory _cid) {
+    constructor(address _admin, string memory _name, string memory _description, string memory _cid) {
         admin = _admin;
+        name = _name;
+        description = _description;
         cid = _cid;
     }
     
@@ -84,6 +89,7 @@ contract Election {
         require(_party != address(0), "Invalid party address");
         
         participatingParties[_party] = true;
+        participatingPartyAddresses.push(_party);
         emit PartyAdded(_party);
     }
     
@@ -115,22 +121,39 @@ contract Election {
         return partyCandidateVoteCounts[_party][_candidateId];
     }
     
-    function getElectionResults() 
-        external 
-        view 
-        onlyAfterElection 
+    function getElectionResults()
+        external
+        view
+        onlyAfterElection
         returns (
-            address[] memory parties,
-            uint[][] memory candidateIds,
-            uint[][] memory voteCounts
+            address[] memory _parties,
+            uint[][] memory _candidateIds,
+            uint[][] memory _voteCounts
         )
     {
-        // This is a simplified implementation
-        // In a real implementation, we would need to track all parties that participated
-        // and all candidates that received votes
-        // For now, we'll return empty arrays
-        parties = new address[](0);
-        candidateIds = new uint[][](0);
-        voteCounts = new uint[][](0);
+        uint numParties = participatingPartyAddresses.length;
+        _parties = new address[](numParties);
+        _candidateIds = new uint[][](numParties);
+        _voteCounts = new uint[][](numParties);
+
+        for (uint i = 0; i < numParties; i++) {
+            address partyAddress = participatingPartyAddresses[i];
+            Party party = Party(partyAddress);
+            
+            (uint[] memory ids, , , ) = party.getAllCandidates();
+            uint numCandidates = ids.length;
+
+            uint[] memory currentCandidateIds = new uint[](numCandidates);
+            uint[] memory currentVoteCounts = new uint[](numCandidates);
+
+            for (uint j = 0; j < numCandidates; j++) {
+                uint candidateId = ids[j];
+                currentCandidateIds[j] = candidateId;
+                currentVoteCounts[j] = partyCandidateVoteCounts[partyAddress][candidateId];
+            }
+            _parties[i] = partyAddress;
+            _candidateIds[i] = currentCandidateIds;
+            _voteCounts[i] = currentVoteCounts;
+        }
     }
 }

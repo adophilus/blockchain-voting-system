@@ -6,19 +6,19 @@ This document outlines the refined flow of operations for the Blockchain Voting 
 
 During the review of the initial flow, the following questions and considerations were raised:
 
-*   **Election Configuration Details:** Beyond just creating an election, what specific parameters are set? (e.g., Election Name/Title, Description, Start Time, End Time, IPFS CID for election-related media). Should the election define available positions, or do candidates define their own?
-*   **Party Management:** How do political parties fit into the flow? How are they created, and how are candidates associated with them?
-*   **Voter Authentication/Authorization:** What does "authenticate" mean for voters? Is it merely connecting a wallet, or is there a more robust identity verification process (even if simplified for this project)?
-*   **Vote Secrecy:** How is vote secrecy handled on a public blockchain where all transactions are transparent? (Acknowledged as a complex challenge, potentially out of scope for a basic implementation).
-*   **Election Results:** How are results tallied, and when and how are they displayed to users?
-*   **Security/Integrity:** What mechanisms prevent manipulation by the admin or other actors after an election starts?
-*   **User Interface (Web Application):** How does the web application interact with the smart contracts for each step, and how does it present information to users?
+
+
+
+
+
+
+
 
 ## Refined Flow of Operations
 
 Based on the above considerations, here is a refined flow of operations for the Blockchain Voting System:
 
-1.  **Admin creates an election:** The administrator initiates a new election by specifying its name, a detailed description, the official start and end times (Unix timestamps), and an IPFS Content Identifier (CID) for any election-related media or information. Optionally, the election contract could define a set of valid positions for which candidates can run.
+1.  **Admin creates an election:** The administrator initiates a new election by specifying its name, a detailed description, the official start and end times (Unix timestamps), and an IPFS Content Identifier (CID) for any election-related media or information. Candidates define their own positions.
 
 2.  **Admin creates political parties:** For each political entity participating in the election, the administrator creates a new `Party` contract. This involves providing the party's name, a slogan, and an IPFS CID for its logo or other related media.
 
@@ -32,4 +32,4 @@ Based on the above considerations, here is a refined flow of operations for the 
 
 7.  **Admin ends the election:** After the `endTime` of the election has passed, the administrator explicitly calls the `endElection()` function on the `Election` contract to formally conclude the voting period.
 
-8.  **Election results are tallied and displayed:** Once the election has officially ended, the web application retrieves the final vote counts and results by calling the `getElectionResults()` function on the `Election` contract. These results are then presented to the public in a clear and transparent manner.
+8.  **Election results are tallied and displayed:** Once the election has officially ended, the web application retrieves the final vote counts and results by calling the `getElectionResults()` function on the `Election` contract. This function now returns a comprehensive breakdown of votes per candidate within each participating party. These results are then presented to the public in a clear and transparent manner.

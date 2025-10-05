@@ -1,1 +1,1 @@
-export * from "./election-manager";
+export * from "./voting-system";
