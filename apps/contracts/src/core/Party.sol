@@ -2,16 +2,18 @@
 pragma solidity ^0.8.24;
 
 import "./Candidate.sol";
+import "./CandidateRegistry.sol";
 
 contract Party {
     string public name;
     string public slogan;
     string public cid; // IPFS CID for party logo or related media
     address public admin;
+    address public candidateRegistryAddress;
     uint public candidateCount;
     
-    mapping(uint => Candidate) public candidates;
-    mapping(string => bool) private candidateExists; // for duplicate name check
+    uint[] public candidateIds;
+    mapping(uint => bool) private candidateIdExists;
     
     event CandidateRegistered(uint indexed candidateId, string name);
     
@@ -20,34 +22,34 @@ contract Party {
         _;
     }
     
-    constructor(string memory _name, string memory _slogan, string memory _cid) {
+    constructor(string memory _name, string memory _slogan, string memory _cid, address _candidateRegistryAddress) {
         name = _name;
         slogan = _slogan;
         cid = _cid;
         admin = msg.sender;
+        candidateRegistryAddress = _candidateRegistryAddress;
     }
     
-    function registerCandidate(string memory _name, string memory _position, string memory _cid) external onlyAdmin returns (uint) {
-        require(bytes(_name).length > 0, "Candidate name cannot be empty");
-        require(!candidateExists[_name], "Candidate already exists");
+    function registerCandidate(uint _candidateId) external onlyAdmin returns (uint) {
+        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        (uint id, string memory name, , ) = candidateRegistry.getCandidate(_candidateId);
+        require(id == _candidateId, "Invalid candidate ID from registry");
+        require(!candidateIdExists[_candidateId], "Candidate already registered in this party");
         
+        candidateIds.push(_candidateId);
+        candidateIdExists[_candidateId] = true;
         candidateCount++;
-        candidates[candidateCount] = Candidate(candidateCount, _name, _position, _cid);
-        candidateExists[_name] = true;
         
-        emit CandidateRegistered(candidateCount, _name);
-        return candidateCount;
+        emit CandidateRegistered(_candidateId, name);
+        return _candidateId;
     }
     
     function getCandidate(
         uint _candidateId
     ) external view returns (uint id, string memory name, string memory position, string memory cid) {
-        require(
-            _candidateId > 0 && _candidateId <= candidateCount,
-            "Invalid candidate ID"
-        );
-        Candidate memory c = candidates[_candidateId];
-        return (c.id, c.name, c.position, c.cid);
+        require(candidateIdExists[_candidateId], "Candidate not registered in this party");
+        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        return candidateRegistry.getCandidate(_candidateId);
     }
     
     function getAllCandidates()
@@ -60,17 +62,21 @@ contract Party {
             string[] memory cids
         )
     {
-        ids = new uint[](candidateCount);
-        names = new string[](candidateCount);
-        positions = new string[](candidateCount);
-        cids = new string[](candidateCount);
-        
-        for (uint i = 1; i <= candidateCount; i++) {
-            Candidate memory c = candidates[i];
-            ids[i - 1] = c.id;
-            names[i - 1] = c.name;
-            positions[i - 1] = c.position;
-            cids[i - 1] = c.cid;
+        uint numCandidates = candidateIds.length;
+        ids = new uint[](numCandidates);
+        names = new string[](numCandidates);
+        positions = new string[](numCandidates);
+        cids = new string[](numCandidates);
+
+        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+
+        for (uint i = 0; i < numCandidates; i++) {
+            uint candidateId = candidateIds[i];
+            (uint id, string memory name, string memory position, string memory cid) = candidateRegistry.getCandidate(candidateId);
+            ids[i] = id;
+            names[i] = name;
+            positions[i] = position;
+            cids[i] = cid;
         }
     }
 }

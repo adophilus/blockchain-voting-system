@@ -1,2 +1,0 @@
-# This file is deprecated. IPFS is now managed through Nix and process-compose.
-# See process-compose.yaml and flake.nix for the current implementation.

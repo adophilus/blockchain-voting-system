@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "./Voter.sol";
+import "./VoterRegistry.sol";
 import "../core/Party.sol";
 
 contract Election {
@@ -13,6 +14,7 @@ contract Election {
     string public name;
     string public description;
     string public cid; // IPFS CID for election-related media
+    address public voterRegistryAddress;
     
     // Mapping of parties participating in this election
     mapping(address => bool) public participatingParties;
@@ -56,11 +58,12 @@ contract Election {
         _;
     }
     
-    constructor(address _admin, string memory _name, string memory _description, string memory _cid) {
+    constructor(address _admin, string memory _name, string memory _description, string memory _cid, address _voterRegistryAddress) {
         admin = _admin;
         name = _name;
         description = _description;
         cid = _cid;
+        voterRegistryAddress = _voterRegistryAddress;
     }
     
     function startElection(uint _startTime, uint _endTime) external onlyAdmin {
@@ -96,6 +99,8 @@ contract Election {
     function registerVoter(address _voter) external onlyAdmin {
         require(!voters[_voter].registered, "Already registered");
         require(_voter != address(0), "Invalid voter address");
+        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
+        require(voterRegistry.isVoterVerified(_voter), "Voter not verified in registry");
         voters[_voter] = Voter(true, false);
         emit VoterRegistered(_voter);
     }
