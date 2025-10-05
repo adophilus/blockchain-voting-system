@@ -27,6 +27,7 @@ export default defineConfig({
         text: 'Smart Contracts',
         items: [
           { text: 'Overview', link: '/contracts/overview' },
+          { text: 'Technical Details', link: '/contracts/technical-details' },
           { text: 'Deployment', link: '/contracts/deployment' },
           { text: 'Testing', link: '/contracts/testing' },
         ]
