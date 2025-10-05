@@ -24,20 +24,20 @@ if [[ ! "$1" =~ ^[a-zA-Z0-9]+$ ]]; then
 fi
 
 env=$1
-node_env=
+app_env=
 
 case $env in
   prod)
-    node_env="production"
+    app_env="production"
     ;;
   staging)
-    node_env="staging"
+    app_env="staging"
     ;;
   dev)
-    node_env="development"
+    app_env="development"
     ;;
   test)
-    node_env="test"
+    app_env="test"
     ;;
   *)
     echo "Invalid environment. Use: prod, staging, dev, or test"
@@ -48,7 +48,6 @@ esac
 env_file=$(dirname $0)/../.env
 
 # Update .env file
-echo "NODE_ENV=\"$node_env\"" > $env_file
-echo "VITE_NODE_ENV=\"\$NODE_ENV\"" >> $env_file
+echo "APP_ENV=\"$app_env\"" > $env_file
 
-echo "Switched to $node_env environment"
+echo "Switched to $app_env environment"

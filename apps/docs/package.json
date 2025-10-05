@@ -1,0 +1,22 @@
+{
+	"$schema": "https://json.schemastore.org/package.json",
+	"name": "@blockchain-voting-system/docs",
+	"packageManager": "pnpm@10.10.0",
+	"private": true,
+	"version": "0.0.0",
+	"type": "module",
+	"scripts": {
+		"lint": "biome lint . && tsc",
+		"dev": "vitepress dev docs",
+		"build": "./scripts/build.sh",
+		"preview": "vitepress preview docs"
+	},
+	"devDependencies": {
+		"@t3-oss/env-core": "^0.12.0",
+		"@types/node": "^22.7.2",
+		"@types/react": "^18.3.9",
+		"@types/react-dom": "^18.3.0",
+		"vitepress": "^1.6.3",
+		"vitepress-plugin-d2": "^1.0.4"
+	}
+}

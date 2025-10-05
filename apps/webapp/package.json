@@ -3,10 +3,10 @@
 	"version": "0.0.0",
 	"private": true,
 	"scripts": {
-		"build": "next build",
-		"dev": "next dev",
+		"dev": "nx next:dev",
+		"build": "nx next:build",
 		"lint": "next lint",
-		"start": "next start"
+		"start": "nx next:start"
 	},
 	"dependencies": {
 		"@hookform/resolvers": "^3.9.1",
