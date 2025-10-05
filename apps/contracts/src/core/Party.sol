@@ -32,21 +32,21 @@ contract Party {
     
     function registerCandidate(uint _candidateId) external onlyAdmin returns (uint) {
         CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
-        (uint id, string memory name, , ) = candidateRegistry.getCandidate(_candidateId);
-        require(id == _candidateId, "Invalid candidate ID from registry");
+        (uint candidateIdFromReg, string memory candidateNameFromReg, , ) = candidateRegistry.getCandidate(_candidateId);
+        require(candidateIdFromReg == _candidateId, "Invalid candidate ID from registry");
         require(!candidateIdExists[_candidateId], "Candidate already registered in this party");
         
         candidateIds.push(_candidateId);
         candidateIdExists[_candidateId] = true;
         candidateCount++;
         
-        emit CandidateRegistered(_candidateId, name);
+        emit CandidateRegistered(_candidateId, candidateNameFromReg);
         return _candidateId;
     }
     
     function getCandidate(
         uint _candidateId
-    ) external view returns (uint id, string memory name, string memory position, string memory cid) {
+    ) external view returns (uint candidateId_, string memory candidateName_, string memory candidatePosition_, string memory candidateCid_) {
         require(candidateIdExists[_candidateId], "Candidate not registered in this party");
         CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
         return candidateRegistry.getCandidate(_candidateId);
@@ -72,11 +72,11 @@ contract Party {
 
         for (uint i = 0; i < numCandidates; i++) {
             uint candidateId = candidateIds[i];
-            (uint id, string memory name, string memory position, string memory cid) = candidateRegistry.getCandidate(candidateId);
-            ids[i] = id;
-            names[i] = name;
-            positions[i] = position;
-            cids[i] = cid;
+            (uint candidateIdFromReg, string memory candidateNameFromReg, string memory candidatePositionFromReg, string memory candidateCidFromReg) = candidateRegistry.getCandidate(candidateId);
+            ids[i] = candidateIdFromReg;
+            names[i] = candidateNameFromReg;
+            positions[i] = candidatePositionFromReg;
+            cids[i] = candidateCidFromReg;
         }
     }
 }

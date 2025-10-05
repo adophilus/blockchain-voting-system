@@ -16,7 +16,7 @@ contract ElectionManagerTest is Test {
     }
     
     function test_CreateElection() public {
-        uint electionId = electionManager.createElection("QmTestElectionCID");
+        uint electionId = electionManager.createElection("Test Election", "Description", "QmTestElectionCID");
         assertEq(electionId, 1);
         assertEq(electionManager.electionCount(), 1);
         

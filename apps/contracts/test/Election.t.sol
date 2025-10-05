@@ -8,12 +8,14 @@ contract ElectionTest is Test {
     Election public election;
     
     function setUp() public {
-        election = new Election(address(this), "QmTestElectionCID");
+        election = new Election(address(this), "Test Election", "Description", "QmTestElectionCID", address(0));
     }
     
     function test_ElectionCreation() public view {
         assertEq(election.admin(), address(this));
         assertEq(election.cid(), "QmTestElectionCID");
+        assertEq(election.name(), "Test Election");
+        assertEq(election.description(), "Description");
     }
     
     function test_StartElection() public {

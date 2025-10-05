@@ -1,0 +1,19 @@
+
+version: '3.8'
+
+services:
+  docs:
+    build:
+      context: ./apps/docs
+      dockerfile: Dockerfile
+    ports:
+      - "5173:5173"
+    volumes:
+      - ./apps/docs:/app
+    command: bunx zerv
+    networks:
+      - blockchain-voting-system
+
+networks:
+  blockchain-voting-system:
+    driver: bridge
