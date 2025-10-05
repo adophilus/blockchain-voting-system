@@ -5,6 +5,7 @@
 		".": "./src/index.ts"
 	},
 	"dependencies": {
-		"viem": "2.x"
+		"viem": "2.x",
+		"true-myth": "^7.0.0"
 	}
 }

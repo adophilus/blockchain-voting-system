@@ -1,12 +1,16 @@
 import { PublicClient, WalletClient, Address } from "viem";
+import { Result } from "true-myth";
 
+// Define the structure for contract addresses
 export type ContractAddresses = {
 	votingSystem: Address;
 	voterRegistry: Address;
 	candidateRegistry: Address;
 	partyRegistry: Address;
+	// Add other contract addresses as needed
 };
 
+// Placeholder types for data structures
 export type CandidateDetails = {
 	id: number;
 	name: string;
@@ -42,6 +46,52 @@ export type ElectionResults = {
 	voteCount: number;
 }[];
 
+// --- Individual Error Types ---
+export type InvalidAddressError = { type: 'InvalidAddressError' };
+export type UnauthorizedError = { type: 'UnauthorizedError' };
+export type TransactionFailedError = { type: 'TransactionFailedError'; message: string };
+export type ContractCallFailedError = { type: 'ContractCallFailedError'; message: string };
+export type VoterNotVerifiedError = { type: 'VoterNotVerifiedError' };
+export type ElectionNotFoundError = { type: 'ElectionNotFoundError' };
+export type CandidateNotFoundError = { type: 'CandidateNotFoundError' };
+export type PartyNotFoundError = { type: 'PartyNotFoundError' };
+export type ElectionNotActiveError = { type: 'ElectionNotActiveError' };
+export type ElectionAlreadyEndedError = { type: 'ElectionAlreadyEndedError' };
+export type AlreadyVotedError = { type: 'AlreadyVotedError' };
+export type InvalidElectionStateError = { type: 'InvalidElectionStateError' };
+export type UnknownError = { type: 'UnknownError'; message: string };
+
+// --- Method-Specific Error Types ---
+
+// Voter Management
+export type RegisterVoterError = InvalidAddressError | UnauthorizedError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type IsVoterVerifiedError = InvalidAddressError | ContractCallFailedError | UnknownError;
+
+// Candidate Management
+export type RegisterCandidateError = UnauthorizedError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type UpdateCandidateError = UnauthorizedError | CandidateNotFoundError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type GetCandidateError = CandidateNotFoundError | ContractCallFailedError | UnknownError;
+
+// Party Management
+export type RegisterPartyError = UnauthorizedError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type UpdatePartyError = UnauthorizedError | PartyNotFoundError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type GetPartyError = PartyNotFoundError | ContractCallFailedError | UnknownError;
+
+// Election Management
+export type CreateElectionError = UnauthorizedError | InvalidAddressError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type GetElectionError = ElectionNotFoundError | ContractCallFailedError | UnknownError;
+export type StartElectionError = UnauthorizedError | ElectionNotFoundError | InvalidElectionStateError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type EndElectionError = UnauthorizedError | ElectionNotFoundError | InvalidElectionStateError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type GetElectionStatusError = ElectionNotFoundError | ContractCallFailedError | UnknownError;
+
+// Voting
+export type CastVoteError = ElectionNotFoundError | CandidateNotFoundError | VoterNotVerifiedError | ElectionNotActiveError | AlreadyVotedError | TransactionFailedError | ContractCallFailedError | UnknownError;
+export type HasVotedError = ElectionNotFoundError | InvalidAddressError | ContractCallFailedError | UnknownError;
+
+// Results
+export type GetElectionResultsError = ElectionNotFoundError | ContractCallFailedError | UnknownError;
+
+
 abstract class VotingSystem {
 	protected client: PublicClient;
 	protected walletClient: WalletClient;
@@ -58,31 +108,31 @@ abstract class VotingSystem {
 	}
 
 	// Voter Management
-	public abstract registerVoter(voterAddress: Address): Promise<void>;
-	public abstract isVoterVerified(voterAddress: Address): Promise<boolean>;
+	public abstract registerVoter(voterAddress: Address): Promise<Result<void, RegisterVoterError>>;
+	public abstract isVoterVerified(voterAddress: Address): Promise<Result<boolean, IsVoterVerifiedError>>;
 
 	// Candidate Management
 	public abstract registerCandidate(
 		name: string,
 		position: string,
 		cid: string,
-	): Promise<number>;
+	): Promise<Result<number, RegisterCandidateError>>;
 	public abstract updateCandidate(
 		candidateId: number,
 		name: string,
 		position: string,
 		cid: string,
-	): Promise<void>;
-	public abstract getCandidate(candidateId: number): Promise<CandidateDetails>;
+	): Promise<Result<void, UpdateCandidateError>>;
+	public abstract getCandidate(candidateId: number): Promise<Result<CandidateDetails, GetCandidateError>>;
 
 	// Party Management
-	public abstract registerParty(name: string, logoCid: string): Promise<number>;
+	public abstract registerParty(name: string, logoCid: string): Promise<Result<number, RegisterPartyError>>;
 	public abstract updateParty(
 		partyId: number,
 		name: string,
 		logoCid: string,
-	): Promise<void>;
-	public abstract getParty(partyId: number): Promise<PartyDetails>;
+	): Promise<Result<void, UpdatePartyError>>;
+	public abstract getParty(partyId: number): Promise<Result<PartyDetails, GetPartyError>>;
 
 	// Election Management
 	public abstract createElection(
@@ -91,28 +141,28 @@ abstract class VotingSystem {
 		startTime: number,
 		endTime: number,
 		candidateIds: number[],
-	): Promise<number>;
-	public abstract getElection(electionId: number): Promise<ElectionDetails>;
-	public abstract startElection(electionId: number): Promise<void>;
-	public abstract endElection(electionId: number): Promise<void>;
+	): Promise<Result<number, CreateElectionError>>;
+	public abstract getElection(electionId: number): Promise<Result<ElectionDetails, GetElectionError>>;
+	public abstract startElection(electionId: number): Promise<Result<void, StartElectionError>>;
+	public abstract endElection(electionId: number): Promise<Result<void, EndElectionError>>;
 	public abstract getElectionStatus(
 		electionId: number,
-	): Promise<ElectionStatus>;
+	): Promise<Result<ElectionStatus, GetElectionStatusError>>;
 
 	// Voting
 	public abstract castVote(
 		electionId: number,
 		candidateId: number,
-	): Promise<void>;
+	): Promise<Result<void, CastVoteError>>;
 	public abstract hasVoted(
 		electionId: number,
 		voterAddress: Address,
-	): Promise<boolean>;
+	): Promise<Result<boolean, HasVotedError>>;
 
 	// Results
 	public abstract getElectionResults(
 		electionId: number,
-	): Promise<ElectionResults>;
+	): Promise<Result<ElectionResults, GetElectionResultsError>>;
 }
 
 export { VotingSystem };
