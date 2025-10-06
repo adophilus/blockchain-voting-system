@@ -14,7 +14,6 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 	it("should deploy all voting system contracts successfully", async () => {
 		const result = await deployer.deployAll();
 
-		console.log(result.error);
 		expect(result.isOk).toBe(true);
 
 		if (result.isOk) {
@@ -22,7 +21,7 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 			expect(deployedAddresses.votingSystem).toBeDefined();
 			expect(deployedAddresses.voterRegistry).toBeDefined();
 			expect(deployedAddresses.candidateRegistry).toBeDefined();
-			expect(deployedAddresses.partyRegistry).toBeDefined();
+			expect(deployedAddresses.partyAddress).toBeDefined();
 
 			// Basic address format check
 			expect(deployedAddresses.votingSystem).toMatch(/^0x[0-9a-fA-F]{40}$/);
@@ -30,7 +29,7 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 			expect(deployedAddresses.candidateRegistry).toMatch(
 				/^0x[0-9a-fA-F]{40}$/,
 			);
-			expect(deployedAddresses.partyRegistry).toMatch(/^0x[0-9a-fA-F]{40}$/);
+			expect(deployedAddresses.partyAddress).toMatch(/^0x[0-9a-fA-F]{40}$/);
 		}
 	}, 60000); // Increase timeout for deployment
 

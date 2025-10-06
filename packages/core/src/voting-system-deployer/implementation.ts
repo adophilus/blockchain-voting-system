@@ -79,19 +79,29 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		return this.deployContract(CandidateRegistryABI, CandidateRegistryBytecode);
 	}
 
-	private async deployPartyAddress(): Promise<Result<Address, DeployContractError>> {
-		return this.deployContract(PartyABI, PartyBytecode);
+	private async deployPartyAddress(
+		_name: string,
+		_slogan: string,
+		_cid: string,
+		_candidateRegistryAddress: Address,
+	): Promise<Result<Address, DeployContractError>> {
+		return this.deployContract(PartyABI, PartyBytecode, [
+			_name,
+			_slogan,
+			_cid,
+			_candidateRegistryAddress,
+		]);
 	}
 
 	private async deployVotingSystem(
 		voterRegistryAddress: Address,
 		candidateRegistryAddress: Address,
-		partyRegistryAddress: Address,
+		partyAddress: Address, // Changed from partyRegistryAddress
 	): Promise<Result<Address, DeployContractError>> {
 		return this.deployContract(VotingSystemABI, VotingSystemBytecode, [
 			voterRegistryAddress,
 			candidateRegistryAddress,
-			partyRegistryAddress,
+			partyAddress, // Changed from partyRegistryAddress
 		]);
 	}
 
@@ -110,7 +120,17 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 		const candidateRegistryAddress = candidateRegistryResult.value;
 
-		const partyAddressResult = await this.deployPartyAddress();
+		// Placeholder values for Party constructor
+		const partyName = "Default Party";
+		const partySlogan = "Vote for the best!";
+		const partyCid = "QmPlaceholderCidForPartyLogo"; // Replace with actual CID
+
+		const partyAddressResult = await this.deployPartyAddress(
+			partyName,
+			partySlogan,
+			partyCid,
+			candidateRegistryAddress,
+		);
 		if (partyAddressResult.isErr) {
 			return Result.err(partyAddressResult.error);
 		}
@@ -119,7 +139,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		const votingSystemResult = await this.deployVotingSystem(
 			voterRegistryAddress,
 			candidateRegistryAddress,
-			partyRegistryAddress,
+			partyAddress,
 		);
 		if (votingSystemResult.isErr) {
 			return Result.err(votingSystemResult.error);

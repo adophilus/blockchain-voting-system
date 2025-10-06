@@ -22,7 +22,7 @@ export type DeployContractError =
 	| DeploymentFailedError
 	| InvalidDeployerAccountError
 	| UnknownDeployerError;
-export type DeployAllContractsError =
+export type DeploySystemError =
 	| DeploymentFailedError
 	| InvalidDeployerAccountError
 	| UnknownDeployerError;

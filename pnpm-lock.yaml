@@ -281,6 +281,9 @@ importers:
       '@blockchain-voting-system/contracts':
         specifier: workspace:^
         version: link:../../apps/contracts
+      '@helia/dag-cbor':
+        specifier: ^4.1.0
+        version: 4.1.0
       '@t3-oss/env-core':
         specifier: ^0.12.0
         version: 0.12.0(typescript@5.9.3)(zod@3.25.76)
@@ -2978,6 +2981,17 @@ packages:
       multiformats: 13.4.1
       progress-events: 1.0.1
       uint8arraylist: 2.4.8
+    dev: false
+
+  /@helia/dag-cbor@4.1.0:
+    resolution: {integrity: sha512-I4SHn/Uxlx3qgevPwSjwrnZIqXNmnPbpIhV5+lRG1XFCjsgPdRX6KdASAhGHvsVPulLBwWhio+z1jrBxLLCq2Q==}
+    dependencies:
+      '@helia/interface': 5.4.0
+      '@ipld/dag-cbor': 9.2.5
+      '@libp2p/interface': 2.11.0
+      interface-blockstore: 5.3.2
+      multiformats: 13.4.1
+      progress-events: 1.0.1
     dev: false
 
   /@helia/delegated-routing-v1-http-api-client@4.2.5:
