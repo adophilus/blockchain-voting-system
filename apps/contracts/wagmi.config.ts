@@ -17,7 +17,7 @@ import VotingSystem from "@blockchain-voting-system/contracts/VotingSystem.sol/V
 };
 
 export default defineConfig({
-	out: "./build/types.d.ts",
+	out: "./build/types.ts",
 	contracts: [
 		{ name: "CandidateRegistry", abi: CandidateRegistry.abi as Abi },
 		{ name: "Election", abi: Election.abi as Abi },

@@ -4,7 +4,7 @@
 	"version": "1.0.0",
 	"description": "Smart contracts for the blockchain voting system",
 	"exports": {
-		"./types": "./build/types.d.ts",
+		"./types": "./build/types.ts",
 		"./*": "./out/*"
 	},
 	"scripts": {

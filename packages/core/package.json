@@ -5,6 +5,7 @@
 		".": "./src/index.ts"
 	},
 	"scripts": {
+		"lint": "tsc",
 		"test": "vitest"
 	},
 	"dependencies": {
