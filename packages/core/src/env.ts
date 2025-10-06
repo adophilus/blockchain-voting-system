@@ -3,7 +3,7 @@ import { z } from "zod";
 
 const env = createEnv({
 	server: {
-		PRIVATE_KEY: z.string().min(1),
+		PRIVATE_KEY: z.string().startsWith("0x"),
 	},
 	runtimeEnv: process.env,
 });

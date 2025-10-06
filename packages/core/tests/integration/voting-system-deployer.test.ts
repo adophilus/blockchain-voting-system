@@ -1,9 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
-import { createPublicClient, createWalletClient, http, Address } from "viem";
-import { privateKeyToAccount } from "viem/accounts";
-import { foundry } from "viem/chains";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
-import { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
+import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
 import { wallet } from "../setup";
 
 describe("BlockchainVotingSystemDeployer Integration Tests", () => {
@@ -11,13 +8,15 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 	let deployedAddresses: DeployedContractAddresses;
 
 	beforeAll(() => {
-		deployer = new BlockchainVotingSystemDeployer(walletClient, publicClient);
+		deployer = new BlockchainVotingSystemDeployer(wallet);
 	});
 
 	it("should deploy all voting system contracts successfully", async () => {
 		const result = await deployer.deployAll();
 
+		console.log(result.error);
 		expect(result.isOk).toBe(true);
+
 		if (result.isOk) {
 			deployedAddresses = result.value;
 			expect(deployedAddresses.votingSystem).toBeDefined();

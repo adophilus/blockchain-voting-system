@@ -1,11 +1,4 @@
-import type {
-	PublicClient,
-	WalletClient,
-	Address,
-	Hex,
-	Abi,
-	ContractConstructorArgs,
-} from "viem";
+import type { Address, Hex, Abi, ContractConstructorArgs } from "viem";
 import { Result } from "true-myth";
 import type {
 	VotingSystemDeployer,
@@ -17,6 +10,7 @@ import VoterRegistryMetadata from "@blockchain-voting-system/contracts/VoterRegi
 import VotingSystemMetadata from "@blockchain-voting-system/contracts/VotingSystem.sol/VotingSystem.json";
 import CandidateRegistryMetadata from "@blockchain-voting-system/contracts/CandidateRegistry.sol/CandidateRegistry.json";
 import PartyMetadata from "@blockchain-voting-system/contracts/Party.sol/Party.json";
+import { Wallet } from "../wallet";
 
 const VoterRegistryABI = VoterRegistryMetadata.abi as Abi;
 const VoterRegistryBytecode = VoterRegistryMetadata.bytecode.object as Hex;
@@ -32,10 +26,7 @@ const VotingSystemABI = VotingSystemMetadata.abi as Abi;
 const VotingSystemBytecode = VotingSystemMetadata.bytecode.object as Hex;
 
 class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
-	constructor(
-		private readonly walletClient: WalletClient,
-		private readonly publicClient: PublicClient,
-	) {}
+	constructor(private readonly wallet: Wallet) {}
 
 	private async deployContract<A extends Abi>(
 		abi: A,
@@ -43,14 +34,17 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		args?: ContractConstructorArgs<A>,
 	): Promise<Result<Address, DeployContractError>> {
 		try {
-			const account = this.walletClient.account;
-			const chain = this.walletClient.chain;
+			const walletClient = this.wallet.getWalletClient();
+			const publicClient = this.wallet.getPublicClient();
+
+			const account = walletClient.account;
+			const chain = walletClient.chain;
 
 			if (!account) {
 				return Result.err({ type: "InvalidDeployerAccountError" });
 			}
 
-			const hash = await this.walletClient.deployContract({
+			const hash = await walletClient.deployContract({
 				abi,
 				account,
 				bytecode,
@@ -58,7 +52,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 				chain,
 			} as any);
 
-			const receipt = await this.publicClient.waitForTransactionReceipt({
+			const receipt = await publicClient.waitForTransactionReceipt({
 				hash,
 			});
 
@@ -73,23 +67,23 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 	}
 
-	public async deployVoterRegistry(): Promise<
+	private async deployVoterRegistry(): Promise<
 		Result<Address, DeployContractError>
 	> {
 		return this.deployContract(VoterRegistryABI, VoterRegistryBytecode);
 	}
 
-	public async deployCandidateRegistry(): Promise<
+	private async deployCandidateRegistry(): Promise<
 		Result<Address, DeployContractError>
 	> {
 		return this.deployContract(CandidateRegistryABI, CandidateRegistryBytecode);
 	}
 
-	public async deployParty(): Promise<Result<Address, DeployContractError>> {
+	private async deployParty(): Promise<Result<Address, DeployContractError>> {
 		return this.deployContract(PartyABI, PartyBytecode);
 	}
 
-	public async deployVotingSystem(
+	private async deployVotingSystem(
 		voterRegistryAddress: Address,
 		candidateRegistryAddress: Address,
 		partyRegistryAddress: Address,
