@@ -28,8 +28,8 @@ export type DeploySystemError =
 	| UnknownDeployerError;
 
 abstract class VotingSystemDeployer {
-	public abstract deployAll(): Promise<
-		Result<DeployedContractAddresses, DeployAllContractsError>
+	public abstract deploySystem(): Promise<
+		Result<DeployedContractAddresses, DeploySystemError>
 	>;
 }
 

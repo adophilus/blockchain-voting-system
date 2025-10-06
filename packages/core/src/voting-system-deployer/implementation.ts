@@ -4,7 +4,7 @@ import type {
 	VotingSystemDeployer,
 	DeployedContractAddresses,
 	DeployContractError,
-	DeployAllContractsError,
+	DeploySystemError,
 } from "./interface";
 import VoterRegistryMetadata from "@blockchain-voting-system/contracts/VoterRegistry.sol/VoterRegistry.json";
 import VotingSystemMetadata from "@blockchain-voting-system/contracts/VotingSystem.sol/VotingSystem.json";
@@ -93,20 +93,14 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		]);
 	}
 
-	private async deployVotingSystem(
-		voterRegistryAddress: Address,
-		candidateRegistryAddress: Address,
-		partyAddress: Address, // Changed from partyRegistryAddress
-	): Promise<Result<Address, DeployContractError>> {
-		return this.deployContract(VotingSystemABI, VotingSystemBytecode, [
-			voterRegistryAddress,
-			candidateRegistryAddress,
-			partyAddress, // Changed from partyRegistryAddress
-		]);
+	private async deployVotingSystem(): Promise<
+		Result<Address, DeployContractError>
+	> {
+		return this.deployContract(VotingSystemABI, VotingSystemBytecode);
 	}
 
-	public async deployAll(): Promise<
-		Result<DeployedContractAddresses, DeployAllContractsError>
+	public async deploySystem(): Promise<
+		Result<DeployedContractAddresses, DeploySystemError>
 	> {
 		const voterRegistryResult = await this.deployVoterRegistry();
 		if (voterRegistryResult.isErr) {
@@ -136,11 +130,8 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 		const partyAddress = partyAddressResult.value;
 
-		const votingSystemResult = await this.deployVotingSystem(
-			voterRegistryAddress,
-			candidateRegistryAddress,
-			partyAddress,
-		);
+		console.log("about to deploy voting system");
+		const votingSystemResult = await this.deployVotingSystem();
 		if (votingSystemResult.isErr) {
 			return Result.err(votingSystemResult.error);
 		}

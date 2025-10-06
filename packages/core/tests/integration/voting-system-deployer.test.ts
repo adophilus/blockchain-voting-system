@@ -1,6 +1,6 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
-import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
+import type { DeployedContractAddresses, DeploySystemError } from "../../src/voting-system-deployer/interface";
 import { wallet } from "../setup";
 
 describe("BlockchainVotingSystemDeployer Integration Tests", () => {
@@ -12,7 +12,7 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 	});
 
 	it("should deploy all voting system contracts successfully", async () => {
-		const result = await deployer.deployAll();
+		const result = await deployer.deploySystem();
 
 		expect(result.isOk).toBe(true);
 
