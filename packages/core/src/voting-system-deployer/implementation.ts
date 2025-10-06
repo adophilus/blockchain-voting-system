@@ -20,25 +20,23 @@ import type {
 	InvalidDeployerAccountError,
 	UnknownDeployerError,
 } from "./interface";
-import {} from "@blockchain-voting-system/contracts/VotingSystem.sol";
+import VoterRegistryMetadata from "@blockchain-voting-system/contracts/VoterRegistry.sol/VoterRegistry.json";
+import VotingSystemMetadata from "@blockchain-voting-system/contracts/VotingSystem.sol/VotingSystem.json";
+import CandidateRegistryMetadata from "@blockchain-voting-system/contracts/CandidateRegistry.sol/CandidateRegistry.json";
+import PartyRegistryMetadata from "@blockchain-voting-system/contracts/PartyRegistry.sol/PartyRegistry.json";
 
-// Placeholder for contract artifacts - these would typically be imported from compiled contract JSON files
-// For example: import VoterRegistryArtifact from '../../../../apps/contracts/artifacts/VoterRegistry.json';
-// const VoterRegistryABI = VoterRegistryArtifact.abi;
-// const VoterRegistryBytecode = VoterRegistryArtifact.bytecode;
+const VoterRegistryABI = VoterRegistryMetadata.abi;
+const VoterRegistryBytecode = VoterRegistryMetadata.bytecode.object as Hex;
 
-// Assuming these exist for now
-const VoterRegistryABI: any[] = []; // Replace with actual ABI
-const VoterRegistryBytecode: Hex = "0x"; // Replace with actual bytecode
+const CandidateRegistryABI = CandidateRegistryMetadata.abi;
+const CandidateRegistryBytecode = CandidateRegistryMetadata.bytecode
+	.object as Hex;
 
-const CandidateRegistryABI: any[] = []; // Replace with actual ABI
-const CandidateRegistryBytecode: Hex = "0x"; // Replace with actual bytecode
+const PartyRegistryABI = PartyRegistryMetadata.abi;
+const PartyRegistryBytecode = PartyRegistryMetadata.bytecode.object as Hex;
 
-const PartyRegistryABI: any[] = []; // Replace with actual ABI
-const PartyRegistryBytecode: Hex = "0x"; // Replace with actual bytecode
-
-const VotingSystemABI: any[] = []; // Replace with actual ABI
-const VotingSystemBytecode: Hex = "0x"; // Replace with actual bytecode
+const VotingSystemABI = VotingSystemMetadata.abi;
+const VotingSystemBytecode = VotingSystemMetadata.bytecode.object as Hex;
 
 class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 	protected walletClient: WalletClient;
@@ -51,8 +49,8 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 
 	private async deployContract<A extends Abi>(
 		abi: A,
-		args: ContractConstructorArgs<A>,
 		bytecode: Hex,
+		args?: ContractConstructorArgs<A>,
 	): Promise<Result<Address, DeployContractError>> {
 		try {
 			const account = this.walletClient.account;
@@ -66,7 +64,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 				abi,
 				account,
 				bytecode,
-				args,
+				args: args ?? [],
 				chain,
 			} as any);
 

@@ -103,15 +103,15 @@ The `Election` contract manages the lifecycle of a single election, including it
 *   `getVoteCount(address _party, uint _candidateId) external view returns (uint)`: Returns the current vote count for a given candidate in a party.
 *   `getElectionResults() external view onlyAfterElection returns (address[] memory parties, uint[][] memory candidateIds, uint[][] memory voteCounts)`: (Currently a simplified implementation) Returns the results of the election after it has ended.
 
-### `ElectionManager.sol`
+### `VotingSystem.sol`
 
-The `ElectionManager` contract serves as the central hub for creating and managing elections and political parties within the blockchain voting system. It acts as a factory for `Election` and `Party` contracts.
+The `VotingSystem` contract serves as the central hub for creating and managing elections and political parties within the blockchain voting system. It acts as a factory for `Election` and `Party` contracts.
 
 **State Variables:**
 
 *   `admin` (address): The address of the administrator who deployed this contract and has the authority to create new elections and parties.
-*   `electionCount` (uint): A counter for the total number of elections created through this manager.
-*   `partyCount` (uint): A counter for the total number of parties created through this manager.
+*   `electionCount` (uint): A counter for the total number of elections created through this system.
+*   `partyCount` (uint): A counter for the total number of parties created through this system.
 *   `elections` (mapping(uint => Election)): A mapping from an election ID to its corresponding `Election` contract address.
 *   `parties` (mapping(uint => Party)): A mapping from a party ID to its corresponding `Party` contract address.
 
