@@ -5,8 +5,13 @@
 		".": "./src/index.ts"
 	},
 	"dependencies": {
-		"viem": "2.x",
+		"@blockchain-voting-system/contracts": "workspace:^",
+		"@t3-oss/env-core": "^0.12.0",
 		"true-myth": "^7.0.0",
-		"@blockchain-voting-system/contracts": "workspace:^"
+		"viem": "^2.36.0",
+		"zod": "^3.24.1"
+	},
+	"devDependencies": {
+		"vitest": "^3.2.3"
 	}
 }
