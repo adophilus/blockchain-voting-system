@@ -79,7 +79,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		return this.deployContract(CandidateRegistryABI, CandidateRegistryBytecode);
 	}
 
-	private async deployParty(): Promise<Result<Address, DeployContractError>> {
+	private async deployPartyAddress(): Promise<Result<Address, DeployContractError>> {
 		return this.deployContract(PartyABI, PartyBytecode);
 	}
 
@@ -110,11 +110,11 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 		const candidateRegistryAddress = candidateRegistryResult.value;
 
-		const partyRegistryResult = await this.deployParty();
-		if (partyRegistryResult.isErr) {
-			return Result.err(partyRegistryResult.error);
+		const partyAddressResult = await this.deployPartyAddress();
+		if (partyAddressResult.isErr) {
+			return Result.err(partyAddressResult.error);
 		}
-		const partyRegistryAddress = partyRegistryResult.value;
+		const partyAddress = partyAddressResult.value;
 
 		const votingSystemResult = await this.deployVotingSystem(
 			voterRegistryAddress,
@@ -130,7 +130,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 			votingSystem: votingSystemAddress,
 			voterRegistry: voterRegistryAddress,
 			candidateRegistry: candidateRegistryAddress,
-			partyRegistry: partyRegistryAddress,
+			partyAddress: partyAddress,
 		});
 	}
 }

@@ -6,7 +6,7 @@ export type DeployedContractAddresses = {
 	votingSystem: Address;
 	voterRegistry: Address;
 	candidateRegistry: Address;
-	partyRegistry: Address;
+	partyAddress: Address;
 	// Add other contract addresses as needed
 };
 
