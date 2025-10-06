@@ -4,10 +4,11 @@
 	"version": "1.0.0",
 	"description": "Smart contracts for the blockchain voting system",
 	"exports": {
+		"./types": "./build/types.d.ts",
 		"./*": "./out/*"
 	},
 	"scripts": {
-		"build": "forge build",
+		"build": "forge build && wagmi generate",
 		"test": "forge test",
 		"dev": "anvil"
 	},
@@ -18,5 +19,11 @@
 		"solidity"
 	],
 	"author": "Blockchain Voting System Team",
-	"license": "MIT"
+	"license": "MIT",
+	"dependencies": {
+		"@blockchain-voting-system/contracts": "workspace:^",
+		"@wagmi/cli": "^2.6.0",
+		"@wagmi/core": "^2.21.2",
+		"viem": "^2.36.0"
+	}
 }
