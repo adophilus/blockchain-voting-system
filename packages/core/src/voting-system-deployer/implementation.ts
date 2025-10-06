@@ -1,14 +1,10 @@
-import {
+import type {
 	PublicClient,
 	WalletClient,
 	Address,
-	getContractAddress,
-	TransactionReceipt,
 	Hex,
-	type Abi,
-	type ContractConstructorArgs,
-	type Chain,
-	type Account,
+	Abi,
+	ContractConstructorArgs,
 } from "viem";
 import { Result } from "true-myth";
 import type {
@@ -16,36 +12,30 @@ import type {
 	DeployedContractAddresses,
 	DeployContractError,
 	DeployAllContractsError,
-	DeploymentFailedError,
-	InvalidDeployerAccountError,
-	UnknownDeployerError,
 } from "./interface";
 import VoterRegistryMetadata from "@blockchain-voting-system/contracts/VoterRegistry.sol/VoterRegistry.json";
 import VotingSystemMetadata from "@blockchain-voting-system/contracts/VotingSystem.sol/VotingSystem.json";
 import CandidateRegistryMetadata from "@blockchain-voting-system/contracts/CandidateRegistry.sol/CandidateRegistry.json";
-import PartyRegistryMetadata from "@blockchain-voting-system/contracts/PartyRegistry.sol/PartyRegistry.json";
+import PartyMetadata from "@blockchain-voting-system/contracts/Party.sol/Party.json";
 
-const VoterRegistryABI = VoterRegistryMetadata.abi;
+const VoterRegistryABI = VoterRegistryMetadata.abi as Abi;
 const VoterRegistryBytecode = VoterRegistryMetadata.bytecode.object as Hex;
 
-const CandidateRegistryABI = CandidateRegistryMetadata.abi;
+const CandidateRegistryABI = CandidateRegistryMetadata.abi as Abi;
 const CandidateRegistryBytecode = CandidateRegistryMetadata.bytecode
 	.object as Hex;
 
-const PartyRegistryABI = PartyRegistryMetadata.abi;
-const PartyRegistryBytecode = PartyRegistryMetadata.bytecode.object as Hex;
+const PartyABI = PartyMetadata.abi as Abi;
+const PartyBytecode = PartyMetadata.bytecode.object as Hex;
 
-const VotingSystemABI = VotingSystemMetadata.abi;
+const VotingSystemABI = VotingSystemMetadata.abi as Abi;
 const VotingSystemBytecode = VotingSystemMetadata.bytecode.object as Hex;
 
 class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
-	protected walletClient: WalletClient;
-	protected publicClient: PublicClient;
-
-	constructor(walletClient: WalletClient, publicClient: PublicClient) {
-		this.walletClient = walletClient;
-		this.publicClient = publicClient;
-	}
+	constructor(
+		private readonly walletClient: WalletClient,
+		private readonly publicClient: PublicClient,
+	) {}
 
 	private async deployContract<A extends Abi>(
 		abi: A,
@@ -95,10 +85,8 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		return this.deployContract(CandidateRegistryABI, CandidateRegistryBytecode);
 	}
 
-	public async deployPartyRegistry(): Promise<
-		Result<Address, DeployContractError>
-	> {
-		return this.deployContract(PartyRegistryABI, PartyRegistryBytecode);
+	public async deployParty(): Promise<Result<Address, DeployContractError>> {
+		return this.deployContract(PartyABI, PartyBytecode);
 	}
 
 	public async deployVotingSystem(
@@ -128,7 +116,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 		const candidateRegistryAddress = candidateRegistryResult.value;
 
-		const partyRegistryResult = await this.deployPartyRegistry();
+		const partyRegistryResult = await this.deployParty();
 		if (partyRegistryResult.isErr) {
 			return Result.err(partyRegistryResult.error);
 		}
