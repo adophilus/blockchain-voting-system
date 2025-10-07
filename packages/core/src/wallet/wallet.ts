@@ -1,4 +1,5 @@
 import type { PublicClient, WalletClient, Address } from "viem";
+import { assert } from "assertate";
 
 class Wallet {
 	constructor(
@@ -17,6 +18,11 @@ class Wallet {
 
 	public getWalletClient(): WalletClient {
 		return this.walletClient;
+	}
+
+	public getAddress(): Address {
+		assert(this.walletClient.account);
+		return this.walletClient.account?.getAddress() as Address;
 	}
 }
 

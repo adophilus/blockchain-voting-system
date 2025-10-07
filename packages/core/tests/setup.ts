@@ -88,6 +88,7 @@ let voter2Wallet: Wallet;
 }
 
 export {
+	chain,
 	deployerWallet,
 	candidate1Wallet,
 	candidate2Wallet,
