@@ -2,6 +2,6 @@
 	"$schema": "https://json.schemastore.org/package.json",
 	"name": "@blockchain-voting-system/ipfs",
 	"scripts": {
-		"dev": "ipfs daemon"
+		"dev": "ipfs daemon --offline"
 	}
 }
