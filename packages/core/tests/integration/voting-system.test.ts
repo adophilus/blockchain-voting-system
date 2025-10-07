@@ -27,7 +27,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 
 	it("should register a voter successfully", async () => {
 		const result = await votingSystem.registerVoter(voter1Wallet.getAddress());
-		assert(result.isOk, ERR_OPERATION_FAILED);
+		assert(result.isOk, "ERR_OPERATION_FAILED");
 
 		const isVerifiedResult = await votingSystem.isVoterVerified(
 			voter1Wallet.getAddress(),
@@ -225,7 +225,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
-		const candidateId = candidateIds[0];
+		const candidateId = candidateIds[0] as number;
 
 		// Start the election
 		await votingSystem.startElection(electionId);
@@ -278,7 +278,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
 		// Cast votes
-		await votingSystem.castVote(electionId, candidateIds[0]);
+		await votingSystem.castVote(electionId, candidateIds[0] as number);
 
 		// Wait for election to end
 		await new Promise((resolve) =>
