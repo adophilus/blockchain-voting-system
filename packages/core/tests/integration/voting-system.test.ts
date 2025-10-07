@@ -1,11 +1,10 @@
-import { assert, describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll, beforeEach } from "vitest";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
 import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
-import type {
-	DeployedContractAddresses,
-	ElectionStatus,
-} from "../../src/voting-system-deployer/interface";
+import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
+import { ElectionStatus } from "../../src/voting-system/interface";
 import { deployerWallet, voter1Wallet } from "../setup"; // Import the deployer wallet from setup
+import { assert } from "../../src/lib/assert";
 
 describe("BlockchainVotingSystem Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
@@ -16,9 +15,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		// Deploy all contracts
 		deployer = new BlockchainVotingSystemDeployer(deployerWallet);
 		const deployResult = await deployer.deploySystem();
-		if (deployResult.isErr) {
-			throw new Error(`Failed to deploy contracts: ${deployResult.error.type}`);
-		}
+		assert(deployResult.isOk, "ERR_OPERATION_FAILED");
 		contractAddresses = deployResult.value;
 
 		// Initialize VotingSystem with deployer wallet
@@ -30,13 +27,13 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 
 	it("should register a voter successfully", async () => {
 		const result = await votingSystem.registerVoter(voter1Wallet.getAddress());
-		expect(result.isOk).toBe(true);
+		assert(result.isOk, ERR_OPERATION_FAILED);
 
 		const isVerifiedResult = await votingSystem.isVoterVerified(
 			voter1Wallet.getAddress(),
 		);
-		assert(isVerifiedResult.isOk);
-		assert(isVerifiedResult.value);
+		assert(isVerifiedResult.isOk, "ERR_ASSERT_TRUE");
+		assert(isVerifiedResult.value, "ERR_ASSERT_TRUE");
 	});
 
 	it("should register a candidate successfully", async () => {
@@ -45,11 +42,11 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"President",
 			"QmJohnDoeCid",
 		);
-		expect(result.isOk).toBe(true);
+		assert(result.isOk, "ERR_OPERATION_FAILED");
 		expect(result.value).toBe(0); // Assuming first candidate gets ID 0
 
 		const candidate = await votingSystem.getCandidate(0);
-		expect(candidate.isOk).toBe(true);
+		assert(candidate.isOk, "ERR_OPERATION_FAILED");
 		expect(candidate.value.name).toBe("John Doe");
 	});
 
@@ -59,7 +56,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Vice President",
 			"QmJaneDoeCid",
 		);
-		expect(registerResult.isOk).toBe(true);
+		assert(registerResult.isOk, "ERR_OPERATION_FAILED");
 		const candidateId = registerResult.value;
 
 		const updateResult = await votingSystem.updateCandidate(
@@ -68,10 +65,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Vice President",
 			"QmJaneSmithCid",
 		);
-		expect(updateResult.isOk).toBe(true);
+		assert(updateResult.isOk, "ERR_OPERATION_FAILED");
 
 		const candidate = await votingSystem.getCandidate(candidateId);
-		expect(candidate.isOk).toBe(true);
+		assert(candidate.isOk, "ERR_OPERATION_FAILED");
 		expect(candidate.value.name).toBe("Jane Smith");
 	});
 
@@ -80,11 +77,11 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Green Party",
 			"QmGreenPartyLogoCid",
 		);
-		expect(result.isOk).toBe(true);
+		assert(result.isOk, "ERR_OPERATION_FAILED");
 		expect(result.value).toBe(0); // Assuming first party gets ID 0
 
 		const party = await votingSystem.getParty(0);
-		expect(party.isOk).toBe(true);
+		assert(party.isOk, "ERR_OPERATION_FAILED");
 		expect(party.value.name).toBe("Green Party");
 	});
 
@@ -93,7 +90,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Blue Party",
 			"QmBluePartyLogoCid",
 		);
-		expect(registerResult.isOk).toBe(true);
+		assert(registerResult.isOk, "ERR_OPERATION_FAILED");
 		const partyId = registerResult.value;
 
 		const updateResult = await votingSystem.updateParty(
@@ -101,10 +98,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Red Party",
 			"QmRedPartyLogoCid",
 		);
-		expect(updateResult.isOk).toBe(true);
+		assert(updateResult.isOk, "ERR_OPERATION_FAILED");
 
 		const party = await votingSystem.getParty(partyId);
-		expect(party.isOk).toBe(true);
+		assert(party.isOk, "ERR_OPERATION_FAILED");
 		expect(party.value.name).toBe("Red Party");
 	});
 
@@ -119,8 +116,8 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Position 2",
 			"QmCid2",
 		);
-		expect(candidate1Result.isOk).toBe(true);
-		expect(candidate2Result.isOk).toBe(true);
+		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
+		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
 
 		const candidateIds = [candidate1Result.value, candidate2Result.value];
 		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
@@ -133,11 +130,11 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			endTime,
 			candidateIds,
 		);
-		expect(result.isOk).toBe(true);
+		assert(result.isOk, "ERR_OPERATION_FAILED");
 		expect(result.value).toBe(0); // Assuming first election gets ID 0
 
 		const election = await votingSystem.getElection(0);
-		expect(election.isOk).toBe(true);
+		assert(election.isOk, "ERR_OPERATION_FAILED");
 		expect(election.value.name).toBe("General Election");
 		expect(election.value.status).toBe(ElectionStatus.Pending);
 	});
@@ -148,6 +145,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Position A",
 			"QmCidA",
 		);
+		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value];
 		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
@@ -159,14 +157,14 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			endTime,
 			candidateIds,
 		);
-		expect(createResult.isOk).toBe(true);
+		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
 		const startResult = await votingSystem.startElection(electionId);
-		expect(startResult.isOk).toBe(true);
+		assert(startResult.isOk, "ERR_OPERATION_FAILED");
 
 		const statusResult = await votingSystem.getElectionStatus(electionId);
-		expect(statusResult.isOk).toBe(true);
+		assert(statusResult.isOk, "ERR_OPERATION_FAILED");
 		expect(statusResult.value).toBe(ElectionStatus.Active);
 	});
 
@@ -176,6 +174,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Position B",
 			"QmCidB",
 		);
+		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value];
 		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
@@ -187,7 +186,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			endTime,
 			candidateIds,
 		);
-		expect(createResult.isOk).toBe(true);
+		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
 		// Start the election
@@ -199,10 +198,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 
 		const endResult = await votingSystem.endElection(electionId);
-		expect(endResult.isOk).toBe(true);
+		assert(endResult.isOk, "ERR_OPERATION_FAILED");
 
 		const statusResult = await votingSystem.getElectionStatus(electionId);
-		expect(statusResult.isOk).toBe(true);
+		assert(statusResult.isOk, "ERR_OPERATION_FAILED");
 		expect(statusResult.value).toBe(ElectionStatus.Ended);
 	});
 
@@ -212,6 +211,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Position C",
 			"QmCidC",
 		);
+		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value];
 		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
@@ -223,7 +223,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			endTime,
 			candidateIds,
 		);
-		expect(createResult.isOk).toBe(true);
+		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 		const candidateId = candidateIds[0];
 
@@ -231,16 +231,16 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.startElection(electionId);
 
 		// Register voter
-		await votingSystem.registerVoter(voterWallet.address);
+		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
 		const castVoteResult = await votingSystem.castVote(electionId, candidateId);
-		expect(castVoteResult.isOk).toBe(true);
+		assert(castVoteResult.isOk, "ERR_OPERATION_FAILED");
 
 		const hasVotedResult = await votingSystem.hasVoted(
 			electionId,
-			voterWallet.address,
+			voter1Wallet.getAddress(),
 		);
-		expect(hasVotedResult.isOk).toBe(true);
+		assert(hasVotedResult.isOk, "ERR_OPERATION_FAILED");
 		expect(hasVotedResult.value).toBe(true);
 	});
 
@@ -255,6 +255,8 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"Position E",
 			"QmCidE",
 		);
+		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
+		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value, candidate2Result.value];
 		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
@@ -266,14 +268,14 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			endTime,
 			candidateIds,
 		);
-		expect(createResult.isOk).toBe(true);
+		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
 		// Start the election
 		await votingSystem.startElection(electionId);
 
 		// Register voter
-		await votingSystem.registerVoter(voterWallet.address);
+		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
 		// Cast votes
 		await votingSystem.castVote(electionId, candidateIds[0]);
@@ -287,7 +289,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.endElection(electionId);
 
 		const resultsResult = await votingSystem.getElectionResults(electionId);
-		expect(resultsResult.isOk).toBe(true);
+		assert(resultsResult.isOk, "ERR_OPERATION_FAILED");
 		expect(resultsResult.value).toEqual([
 			{ candidateId: candidateIds[0], voteCount: 1 },
 			{ candidateId: candidateIds[1], voteCount: 0 },

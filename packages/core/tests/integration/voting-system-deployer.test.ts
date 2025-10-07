@@ -1,14 +1,14 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
 import type { DeployedContractAddresses, DeploySystemError } from "../../src/voting-system-deployer/interface";
-import { wallet } from "../setup";
+import { deployerWallet } from "../setup";
 
 describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
 	let deployedAddresses: DeployedContractAddresses;
 
 	beforeAll(() => {
-		deployer = new BlockchainVotingSystemDeployer(wallet);
+		deployer = new BlockchainVotingSystemDeployer(deployerWallet);
 	});
 
 	it("should deploy all voting system contracts successfully", async () => {
@@ -31,9 +31,5 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 			);
 			expect(deployedAddresses.partyAddress).toMatch(/^0x[0-9a-fA-F]{40}$/);
 		}
-	}, 60000); // Increase timeout for deployment
-
-	// Add more tests to interact with deployed contracts if needed
-	// For example, verify that the VotingSystem contract has the correct registry addresses set
-	// This would require importing the VotingSystem ABI and creating a contract instance.
+	}, 60000);
 });
