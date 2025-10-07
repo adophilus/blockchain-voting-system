@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
 import {Election} from "../src/core/Election.sol";
+import "../src/core/Errors.sol";
 
 contract ElectionTest is Test {
     Election public election;
@@ -33,7 +34,7 @@ contract ElectionTest is Test {
         uint startTime = block.timestamp + 100;
         uint endTime = block.timestamp + 50; // End time before start time
         
-        vm.expectRevert("End time must be after start time");
+        vm.expectRevert(EndTimeBeforeStartTime.selector);
         election.startElection(startTime, endTime);
     }
     

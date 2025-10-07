@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
 import {VotingSystem} from "../src/core/VotingSystem.sol";
+import "../src/core/Errors.sol";
 
 contract VotingSystemTest is Test {
     VotingSystem public votingSystem;
@@ -42,12 +43,12 @@ contract VotingSystemTest is Test {
     }
 
     function test_RevertWhen_GetInvalidElection() public {
-        vm.expectRevert("Invalid election ID");
+        vm.expectRevert(InvalidElectionId.selector);
         votingSystem.getElection(999);
     }
 
     function test_RevertWhen_GetInvalidParty() public {
-        vm.expectRevert("Invalid party ID");
+        vm.expectRevert(InvalidPartyId.selector);
         votingSystem.getParty(999);
     }
 }

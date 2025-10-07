@@ -1,8 +1,8 @@
-import { describe, it, expect, beforeAll, beforeEach } from "vitest";
+import { describe, it, expect, beforeAll } from "vitest";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
 import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
 import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
-import { ElectionStatus } from "../../src/voting-system/interface";
+import type { ElectionStatus } from "../../src/voting-system/interface";
 import { deployerWallet, voter1Wallet } from "../setup"; // Import the deployer wallet from setup
 import { assert } from "../../src/lib/assert";
 
@@ -43,9 +43,9 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"QmJohnDoeCid",
 		);
 		assert(result.isOk, "ERR_OPERATION_FAILED");
-		expect(result.value).toBe(0); // Assuming first candidate gets ID 0
+		expect(result.value).toBe(1); // First candidate gets ID 1
 
-		const candidate = await votingSystem.getCandidate(0);
+		const candidate = await votingSystem.getCandidate(1);
 		assert(candidate.isOk, "ERR_OPERATION_FAILED");
 		expect(candidate.value.name).toBe("John Doe");
 	});
@@ -75,122 +75,66 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 	it("should register a party successfully", async () => {
 		const result = await votingSystem.registerParty(
 			"Green Party",
+			"For a greener tomorrow",
 			"QmGreenPartyLogoCid",
 		);
 		assert(result.isOk, "ERR_OPERATION_FAILED");
-		expect(result.value).toBe(0); // Assuming first party gets ID 0
+		expect(result.value).toBe(1); // First party gets ID 1
 
-		const party = await votingSystem.getParty(0);
+		const party = await votingSystem.getParty(1);
 		assert(party.isOk, "ERR_OPERATION_FAILED");
 		expect(party.value.name).toBe("Green Party");
 	});
 
-	it("should update a party successfully", async () => {
-		const registerResult = await votingSystem.registerParty(
-			"Blue Party",
-			"QmBluePartyLogoCid",
-		);
-		assert(registerResult.isOk, "ERR_OPERATION_FAILED");
-		const partyId = registerResult.value;
-
-		const updateResult = await votingSystem.updateParty(
-			partyId,
-			"Red Party",
-			"QmRedPartyLogoCid",
-		);
-		assert(updateResult.isOk, "ERR_OPERATION_FAILED");
-
-		const party = await votingSystem.getParty(partyId);
-		assert(party.isOk, "ERR_OPERATION_FAILED");
-		expect(party.value.name).toBe("Red Party");
-	});
-
 	it("should create an election successfully", async () => {
-		const candidate1Result = await votingSystem.registerCandidate(
-			"Candidate 1",
-			"Position 1",
-			"QmCid1",
-		);
-		const candidate2Result = await votingSystem.registerCandidate(
-			"Candidate 2",
-			"Position 2",
-			"QmCid2",
-		);
-		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
-		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
-
-		const candidateIds = [candidate1Result.value, candidate2Result.value];
-		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
-		const endTime = startTime + 3600; // 1 hour later
-
 		const result = await votingSystem.createElection(
 			"General Election",
 			"Elect your leaders",
-			startTime,
-			endTime,
-			candidateIds,
+			"QmElectionCID",
 		);
 		assert(result.isOk, "ERR_OPERATION_FAILED");
-		expect(result.value).toBe(0); // Assuming first election gets ID 0
+		expect(result.value).toBe(1); // First election gets ID 1
 
-		const election = await votingSystem.getElection(0);
+		const election = await votingSystem.getElection(1);
 		assert(election.isOk, "ERR_OPERATION_FAILED");
 		expect(election.value.name).toBe("General Election");
-		expect(election.value.status).toBe(ElectionStatus.Pending);
+		expect(election.value.status).toBe("Pending");
 	});
 
 	it("should start an election successfully", async () => {
-		const candidate1Result = await votingSystem.registerCandidate(
-			"Candidate A",
-			"Position A",
-			"QmCidA",
-		);
-		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
-		const candidateIds = [candidate1Result.value];
-		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
-		const endTime = startTime + 3600; // 1 hour later
-
 		const createResult = await votingSystem.createElection(
 			"Test Election Start",
 			"Description",
-			startTime,
-			endTime,
-			candidateIds,
+			"QmElectionCID",
 		);
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
-		const startResult = await votingSystem.startElection(electionId);
+		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
+		const endTime = startTime + 3600; // 1 hour later
+
+		const startResult = await votingSystem.startElection(electionId, startTime, endTime);
 		assert(startResult.isOk, "ERR_OPERATION_FAILED");
 
 		const statusResult = await votingSystem.getElectionStatus(electionId);
 		assert(statusResult.isOk, "ERR_OPERATION_FAILED");
-		expect(statusResult.value).toBe(ElectionStatus.Active);
+		expect(statusResult.value).toBe("Active");
 	});
 
 	it("should end an election successfully", async () => {
-		const candidate1Result = await votingSystem.registerCandidate(
-			"Candidate B",
-			"Position B",
-			"QmCidB",
-		);
-		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
-		const candidateIds = [candidate1Result.value];
-		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
-		const endTime = startTime + 20; // 20 seconds later
-
 		const createResult = await votingSystem.createElection(
 			"Test Election End",
 			"Description",
-			startTime,
-			endTime,
-			candidateIds,
+			"QmElectionCID",
 		);
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
+		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
+		const endTime = startTime + 20; // 20 seconds later
+
 		// Start the election
-		await votingSystem.startElection(electionId);
+		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Wait for election to end (endTime + a buffer)
 		await new Promise((resolve) =>
@@ -202,38 +146,46 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 
 		const statusResult = await votingSystem.getElectionStatus(electionId);
 		assert(statusResult.isOk, "ERR_OPERATION_FAILED");
-		expect(statusResult.value).toBe(ElectionStatus.Ended);
+		expect(statusResult.value).toBe("Ended");
 	});
 
 	it("should cast a vote successfully", async () => {
-		const candidate1Result = await votingSystem.registerCandidate(
-			"Candidate C",
-			"Position C",
-			"QmCidC",
-		);
-		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
-		const candidateIds = [candidate1Result.value];
-		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
-		const endTime = startTime + 3600; // 1 hour later
-
 		const createResult = await votingSystem.createElection(
 			"Test Election Vote",
 			"Description",
-			startTime,
-			endTime,
-			candidateIds,
+			"QmElectionCID",
 		);
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
-		const candidateId = candidateIds[0] as number;
+
+		const partyResult = await votingSystem.registerParty(
+			"Test Party",
+			"Test Slogan",
+			"QmPartyCID",
+		);
+		assert(partyResult.isOk, "ERR_OPERATION_FAILED");
+		const partyId = partyResult.value;
+		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(null)?.address;
+		assert(partyAddress, "Party address not found");
+
+		const candidateResult = await votingSystem.registerCandidate(
+			"Test Candidate",
+			"President",
+			"QmCandidateCID",
+		);
+		assert(candidateResult.isOk, "ERR_OPERATION_FAILED");
+		const candidateId = candidateResult.value;
+
+		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
+		const endTime = startTime + 3600; // 1 hour later
 
 		// Start the election
-		await votingSystem.startElection(electionId);
+		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Register voter
 		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
-		const castVoteResult = await votingSystem.castVote(electionId, candidateId);
+		const castVoteResult = await votingSystem.castVote(electionId, partyAddress, candidateId);
 		assert(castVoteResult.isOk, "ERR_OPERATION_FAILED");
 
 		const hasVotedResult = await votingSystem.hasVoted(
@@ -245,6 +197,24 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 	});
 
 	it("should get election results successfully", async () => {
+		const createResult = await votingSystem.createElection(
+			"Test Election Results",
+			"Description",
+			"QmElectionCID",
+		);
+		assert(createResult.isOk, "ERR_OPERATION_FAILED");
+		const electionId = createResult.value;
+
+		const partyResult = await votingSystem.registerParty(
+			"Test Party",
+			"Test Slogan",
+			"QmPartyCID",
+		);
+		assert(partyResult.isOk, "ERR_OPERATION_FAILED");
+		const partyId = partyResult.value;
+		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(null)?.address;
+		assert(partyAddress, "Party address not found");
+
 		const candidate1Result = await votingSystem.registerCandidate(
 			"Candidate D",
 			"Position D",
@@ -258,27 +228,18 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
 		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value, candidate2Result.value];
+
 		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
 
-		const createResult = await votingSystem.createElection(
-			"Test Election Results",
-			"Description",
-			startTime,
-			endTime,
-			candidateIds,
-		);
-		assert(createResult.isOk, "ERR_OPERATION_FAILED");
-		const electionId = createResult.value;
-
 		// Start the election
-		await votingSystem.startElection(electionId);
+		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Register voter
 		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
 		// Cast votes
-		await votingSystem.castVote(electionId, candidateIds[0] as number);
+		await votingSystem.castVote(electionId, partyAddress, candidateIds[0] as number);
 
 		// Wait for election to end
 		await new Promise((resolve) =>

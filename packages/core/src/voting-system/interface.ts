@@ -22,14 +22,10 @@ export type PartyDetails = {
 	id: number;
 	name: string;
 	logoCid: string;
+	address: Address;
 };
 
-export enum ElectionStatus {
-	Pending,
-	Active,
-	Ended,
-	Canceled,
-}
+export type ElectionStatus = "Pending" | "Active" | "Ended";
 
 export type ElectionDetails = {
 	id: number;
@@ -47,19 +43,49 @@ export type ElectionResults = {
 }[];
 
 // --- Individual Error Types ---
-export type InvalidAddressError = { type: "InvalidAddressError" };
-export type UnauthorizedError = { type: "UnauthorizedError" };
-export type TransactionFailedError = { type: "TransactionFailedError" };
-export type ContractCallFailedError = { type: "ContractCallFailedError" };
-export type VoterNotVerifiedError = { type: "VoterNotVerifiedError" };
-export type ElectionNotFoundError = { type: "ElectionNotFoundError" };
-export type CandidateNotFoundError = { type: "CandidateNotFoundError" };
-export type PartyNotFoundError = { type: "PartyNotFoundError" };
-export type ElectionNotActiveError = { type: "ElectionNotActiveError" };
-export type ElectionAlreadyEndedError = { type: "ElectionAlreadyEndedError" };
-export type AlreadyVotedError = { type: "AlreadyVotedError" };
-export type InvalidElectionStateError = { type: "InvalidElectionStateError" };
-export type UnknownError = { type: "UnknownError" };
+export type InvalidAddressError = {
+	type: "InvalidAddressError";
+	message: string;
+};
+export type UnauthorizedError = { type: "UnauthorizedError"; message: string };
+export type TransactionFailedError = {
+	type: "TransactionFailedError";
+	message: string;
+};
+export type ContractCallFailedError = {
+	type: "ContractCallFailedError";
+	message: string;
+};
+export type VoterNotVerifiedError = {
+	type: "VoterNotVerifiedError";
+	message: string;
+};
+export type ElectionNotFoundError = {
+	type: "ElectionNotFoundError";
+	message: string;
+};
+export type CandidateNotFoundError = {
+	type: "CandidateNotFoundError";
+	message: string;
+};
+export type PartyNotFoundError = {
+	type: "PartyNotFoundError";
+	message: string;
+};
+export type ElectionNotActiveError = {
+	type: "ElectionNotActiveError";
+	message: string;
+};
+export type ElectionAlreadyEndedError = {
+	type: "ElectionAlreadyEndedError";
+	message: string;
+};
+export type AlreadyVotedError = { type: "AlreadyVotedError"; message: string };
+export type InvalidElectionStateError = {
+	type: "InvalidElectionStateError";
+	message: string;
+};
+export type UnknownError = { type: "UnknownError"; message: string };
 
 // --- Method-Specific Error Types ---
 
@@ -162,80 +188,76 @@ export type GetElectionResultsError =
 	| ContractCallFailedError
 	| UnknownError;
 
-abstract class VotingSystem {
+export interface VotingSystem {
 	// Voter Management
-	public abstract registerVoter(
+	registerVoter(
 		voterAddress: Address,
 	): Promise<Result<void, RegisterVoterError>>;
-	public abstract isVoterVerified(
+	isVoterVerified(
 		voterAddress: Address,
 	): Promise<Result<boolean, IsVoterVerifiedError>>;
 
 	// Candidate Management
-	public abstract registerCandidate(
+	registerCandidate(
 		name: string,
 		position: string,
 		cid: string,
 	): Promise<Result<number, RegisterCandidateError>>;
-	public abstract updateCandidate(
+	updateCandidate(
 		candidateId: number,
 		name: string,
 		position: string,
 		cid: string,
 	): Promise<Result<void, UpdateCandidateError>>;
-	public abstract getCandidate(
+	getCandidate(
 		candidateId: number,
 	): Promise<Result<CandidateDetails, GetCandidateError>>;
 
 	// Party Management
-	public abstract registerParty(
+	registerParty(
 		name: string,
+		slogan: string,
 		logoCid: string,
 	): Promise<Result<number, RegisterPartyError>>;
-	public abstract updateParty(
+	updateParty(
 		partyId: number,
 		name: string,
 		logoCid: string,
 	): Promise<Result<void, UpdatePartyError>>;
-	public abstract getParty(
-		partyId: number,
-	): Promise<Result<PartyDetails, GetPartyError>>;
+	getParty(partyId: number): Promise<Result<PartyDetails, GetPartyError>>;
 
 	// Election Management
-	public abstract createElection(
+	createElection(
 		name: string,
 		description: string,
-		startTime: number,
-		endTime: number,
-		candidateIds: number[],
+		cid: string,
 	): Promise<Result<number, CreateElectionError>>;
-	public abstract getElection(
+	getElection(
 		electionId: number,
 	): Promise<Result<ElectionDetails, GetElectionError>>;
-	public abstract startElection(
+	startElection(
 		electionId: number,
+		startTime: number,
+		endTime: number,
 	): Promise<Result<void, StartElectionError>>;
-	public abstract endElection(
-		electionId: number,
-	): Promise<Result<void, EndElectionError>>;
-	public abstract getElectionStatus(
+	endElection(electionId: number): Promise<Result<void, EndElectionError>>;
+	getElectionStatus(
 		electionId: number,
 	): Promise<Result<ElectionStatus, GetElectionStatusError>>;
 
 	// Voting
-	public abstract castVote(
+	castVote(
 		electionId: number,
+		partyAddress: Address,
 		candidateId: number,
 	): Promise<Result<void, CastVoteError>>;
-	public abstract hasVoted(
+	hasVoted(
 		electionId: number,
 		voterAddress: Address,
 	): Promise<Result<boolean, HasVotedError>>;
 
 	// Results
-	public abstract getElectionResults(
+	getElectionResults(
 		electionId: number,
 	): Promise<Result<ElectionResults, GetElectionResultsError>>;
 }
-
-export { VotingSystem };

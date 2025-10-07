@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Test, console} from "forge-std/Test.sol";
 import {Party} from "../src/core/Party.sol";
 import {CandidateRegistry} from "../src/core/CandidateRegistry.sol";
+import "../src/core/Errors.sol";
 
 contract PartyTest is Test {
     Party public party;
@@ -37,7 +38,7 @@ contract PartyTest is Test {
     function test_RevertWhen_RegisterCandidateDuplicateName() public {
         uint candidateId1 = candidateRegistry.registerCandidate("John Doe", "President", "QmTestCandidateCID1");
         party.registerCandidate(candidateId1);
-        vm.expectRevert("Candidate already registered in this party");
+        vm.expectRevert(CandidateAlreadyRegistered.selector);
         party.registerCandidate(candidateId1);
     }
     
