@@ -1,6 +1,8 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "./Errors.sol";
+
 contract VoterRegistry {
     address public admin;
     mapping(address => bool) public verifiedVoters;
@@ -9,7 +11,7 @@ contract VoterRegistry {
     event VoterUnverified(address indexed voter);
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Not admin");
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
 
@@ -18,15 +20,15 @@ contract VoterRegistry {
     }
 
     function verifyVoter(address _voter) external onlyAdmin {
-        require(_voter != address(0), "Invalid address");
-        require(!verifiedVoters[_voter], "Voter already verified");
+        if (_voter == address(0)) revert InvalidAddress();
+        if (verifiedVoters[_voter]) revert VoterAlreadyVerified();
         verifiedVoters[_voter] = true;
         emit VoterVerified(_voter);
     }
 
     function unverifyVoter(address _voter) external onlyAdmin {
-        require(_voter != address(0), "Invalid address");
-        require(verifiedVoters[_voter], "Voter not verified");
+        if (_voter == address(0)) revert InvalidAddress();
+        if (!verifiedVoters[_voter]) revert VoterNotVerified();
         verifiedVoters[_voter] = false;
         emit VoterUnverified(_voter);
     }

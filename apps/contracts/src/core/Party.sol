@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import "./Candidate.sol";
 import "./CandidateRegistry.sol";
+import "./Errors.sol";
 
 contract Party {
     string public name;
@@ -18,7 +19,7 @@ contract Party {
     event CandidateRegistered(uint indexed candidateId, string name);
     
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Not admin");
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
     
@@ -33,8 +34,8 @@ contract Party {
     function registerCandidate(uint _candidateId) external onlyAdmin returns (uint) {
         CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
         (uint candidateIdFromReg, string memory candidateNameFromReg, , ) = candidateRegistry.getCandidate(_candidateId);
-        require(candidateIdFromReg == _candidateId, "Invalid candidate ID from registry");
-        require(!candidateIdExists[_candidateId], "Candidate already registered in this party");
+        if (candidateIdFromReg != _candidateId) revert InvalidCandidateId();
+        if (candidateIdExists[_candidateId]) revert CandidateAlreadyRegistered();
         
         candidateIds.push(_candidateId);
         candidateIdExists[_candidateId] = true;
@@ -47,7 +48,7 @@ contract Party {
     function getCandidate(
         uint _candidateId
     ) external view returns (uint candidateId_, string memory candidateName_, string memory candidatePosition_, string memory candidateCid_) {
-        require(candidateIdExists[_candidateId], "Candidate not registered in this party");
+        if (!candidateIdExists[_candidateId]) revert CandidateNotRegistered();
         CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
         return candidateRegistry.getCandidate(_candidateId);
     }

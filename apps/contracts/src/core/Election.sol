@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import "./Voter.sol";
 import "./VoterRegistry.sol";
 import "../core/Party.sol";
+import "./Errors.sol";
 
 contract Election {
     address public admin;
@@ -31,30 +32,27 @@ contract Election {
     event ElectionEnded();
     
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Not admin");
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
     
     modifier onlyDuringElection() {
-        require(
-            block.timestamp >= startTime && block.timestamp <= endTime,
-            "Not within election period"
-        );
+        if (block.timestamp < startTime || block.timestamp > endTime) revert NotWithinElectionPeriod();
         _;
     }
     
     modifier onlyRegisteredVoter() {
-        require(voters[msg.sender].registered, "Not a registered voter");
+        if (!voters[msg.sender].registered) revert NotRegisteredVoter();
         _;
     }
     
     modifier hasNotVoted() {
-        require(!voters[msg.sender].voted, "Already voted");
+        if (voters[msg.sender].voted) revert AlreadyVoted();
         _;
     }
     
     modifier onlyAfterElection() {
-        require(block.timestamp > endTime, "Election not ended");
+        if (block.timestamp <= endTime) revert ElectionNotEnded();
         _;
     }
     
@@ -67,12 +65,9 @@ contract Election {
     }
     
     function startElection(uint _startTime, uint _endTime) external onlyAdmin {
-        require(!electionStarted, "Election already started");
-        require(
-            _startTime >= block.timestamp,
-            "Start time must be in the future"
-        );
-        require(_endTime > _startTime, "End time must be after start time");
+        if (electionStarted) revert ElectionAlreadyStarted();
+        if (_startTime < block.timestamp) revert StartTimeNotInFuture();
+        if (_endTime <= _startTime) revert EndTimeBeforeStartTime();
         
         startTime = _startTime;
         endTime = _endTime;
@@ -87,9 +82,9 @@ contract Election {
     }
     
     function addParty(address _party) external onlyAdmin {
-        require(electionStarted, "Election not started");
-        require(!electionEnded, "Election ended");
-        require(_party != address(0), "Invalid party address");
+        if (!electionStarted) revert ElectionNotStarted();
+        if (electionEnded) revert ErrorElectionEnded();
+        if (_party == address(0)) revert InvalidPartyAddress();
         
         participatingParties[_party] = true;
         participatingPartyAddresses.push(_party);
@@ -97,10 +92,10 @@ contract Election {
     }
     
     function registerVoter(address _voter) external onlyAdmin {
-        require(!voters[_voter].registered, "Already registered");
-        require(_voter != address(0), "Invalid voter address");
+        if (voters[_voter].registered) revert VoterAlreadyRegistered();
+        if (_voter == address(0)) revert InvalidVoterAddress();
         VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
-        require(voterRegistry.isVoterVerified(_voter), "Voter not verified in registry");
+        if (!voterRegistry.isVoterVerified(_voter)) revert VoterNotVerified();
         voters[_voter] = Voter(true, false);
         emit VoterRegistered(_voter);
     }
@@ -109,12 +104,12 @@ contract Election {
         address _party,
         uint _candidateId
     ) external onlyRegisteredVoter hasNotVoted onlyDuringElection {
-        require(participatingParties[_party], "Party not participating in this election");
+        if (!participatingParties[_party]) revert PartyNotParticipating();
         
         // Verify that the candidate exists in the party
         Party party = Party(_party);
         (uint id, , , ) = party.getCandidate(_candidateId);
-        require(id == _candidateId, "Invalid candidate");
+        if (id != _candidateId) revert InvalidCandidate();
         
         voters[msg.sender].voted = true;
         partyCandidateVoteCounts[_party][_candidateId]++;

@@ -5,6 +5,7 @@ import "./Election.sol";
 import "./Party.sol";
 import "./VoterRegistry.sol";
 import "./CandidateRegistry.sol";
+import "./Errors.sol";
 
 contract VotingSystem {
     address public admin;
@@ -20,7 +21,7 @@ contract VotingSystem {
     event PartyCreated(uint indexed partyId, address partyAddress);
     
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Not admin");
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
     
@@ -49,12 +50,12 @@ contract VotingSystem {
     }
     
     function getElection(uint _electionId) external view returns (address) {
-        require(_electionId > 0 && _electionId <= electionCount, "Invalid election ID");
+        if (_electionId == 0 || _electionId > electionCount) revert InvalidElectionId();
         return address(elections[_electionId]);
     }
     
     function getParty(uint _partyId) external view returns (address) {
-        require(_partyId > 0 && _partyId <= partyCount, "Invalid party ID");
+        if (_partyId == 0 || _partyId > partyCount) revert InvalidPartyId();
         return address(parties[_partyId]);
     }
 }

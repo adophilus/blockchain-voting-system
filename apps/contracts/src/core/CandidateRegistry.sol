@@ -2,6 +2,7 @@
 pragma solidity ^0.8.24;
 
 import "./Candidate.sol";
+import "./Errors.sol";
 
 contract CandidateRegistry {
     address public admin;
@@ -12,7 +13,7 @@ contract CandidateRegistry {
     event CandidateUpdated(uint indexed candidateId, string name);
 
     modifier onlyAdmin() {
-        require(msg.sender == admin, "Not admin");
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
 
@@ -22,7 +23,7 @@ contract CandidateRegistry {
     }
 
     function registerCandidate(string memory _name, string memory _position, string memory _cid) external onlyAdmin returns (uint) {
-        require(bytes(_name).length > 0, "Candidate name cannot be empty");
+        if (bytes(_name).length == 0) revert EmptyName();
         // In a real system, you might want to check for duplicate names or other unique identifiers
         // For simplicity, we'll allow multiple candidates with the same name for now, but with unique IDs
 
@@ -34,8 +35,8 @@ contract CandidateRegistry {
     }
 
     function updateCandidate(uint _candidateId, string memory _name, string memory _position, string memory _cid) external onlyAdmin {
-        require(_candidateId > 0 && _candidateId < nextCandidateId, "Invalid candidate ID");
-        require(bytes(_name).length > 0, "Candidate name cannot be empty");
+        if (_candidateId == 0 || _candidateId >= nextCandidateId) revert InvalidCandidateId();
+        if (bytes(_name).length == 0) revert EmptyName();
 
         candidates[_candidateId].name = _name;
         candidates[_candidateId].position = _position;
@@ -44,7 +45,7 @@ contract CandidateRegistry {
     }
 
     function getCandidate(uint _candidateId) external view returns (uint id, string memory name, string memory position, string memory cid) {
-        require(_candidateId > 0 && _candidateId < nextCandidateId, "Invalid candidate ID");
+        if (_candidateId == 0 || _candidateId >= nextCandidateId) revert InvalidCandidateId();
         Candidate memory c = candidates[_candidateId];
         return (c.id, c.name, c.position, c.cid);
     }
