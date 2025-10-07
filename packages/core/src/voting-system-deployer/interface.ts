@@ -1,4 +1,4 @@
-import { PublicClient, WalletClient, Address } from "viem";
+import type { PublicClient, WalletClient, Address } from "viem";
 import { Result } from "true-myth";
 
 // Define the structure for contract addresses that will be deployed

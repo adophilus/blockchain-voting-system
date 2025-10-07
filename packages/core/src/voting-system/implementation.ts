@@ -1,16 +1,6 @@
-import {
-	Address,
-	PublicClient,
-	WalletClient,
-	getContract,
-	readContract,
-	writeContract,
-	parseAbiItem,
-	Hex,
-	Abi,
-} from "viem";
-import { Result, ok, err } from "true-myth";
-import { Wallet } from "../../wallet";
+import type { Address, PublicClient, WalletClient, Hex, Abi } from "viem";
+import { Result } from "true-myth";
+import type { Wallet } from "../wallet";
 import type {
 	VotingSystem,
 	ContractAddresses,
@@ -49,18 +39,14 @@ import type {
 	HasVotedError,
 	GetElectionResultsError,
 } from "./interface";
-import { votingSystemAbi } from "@blockchain-voting-system/contracts/types";
 
-// Import contract ABIs
-import VoterRegistryMetadata from "@blockchain-voting-system/contracts/VoterRegistry.sol/VoterRegistry.json";
-import CandidateRegistryMetadata from "@blockchain-voting-system/contracts/CandidateRegistry.sol/CandidateRegistry.json";
-import PartyMetadata from "@blockchain-voting-system/contracts/Party.sol/Party.json";
-import VotingSystemMetadata from "@blockchain-voting-system/contracts/VotingSystem.sol/VotingSystem.json";
-
-const VoterRegistryABI = VoterRegistryMetadata.abi as Abi;
-const CandidateRegistryABI = CandidateRegistryMetadata.abi as Abi;
-const PartyABI = PartyMetadata.abi as Abi;
-const VotingSystemABI = VotingSystemMetadata.abi as Abi;
+import {
+	voterRegistryAbi,
+	candidateRegistryAbi,
+	partyAbi,
+	votingSystemAbi,
+} from "@blockchain-voting-system/contracts/types";
+import { RESPONSE_LIMIT_DEFAULT } from "next/dist/server/api-utils";
 
 class BlockchainVotingSystem implements VotingSystem {
 	constructor(
@@ -93,26 +79,29 @@ class BlockchainVotingSystem implements VotingSystem {
 		errorMap: Record<string, { type: string }> = {},
 	): Promise<Result<T, ContractCallFailedError | UnknownError>> {
 		try {
-			const data = await readContract(this.getPublicClient(), {
+			const data = await this.wallet.getPublicClient().readContract({
 				address,
 				abi,
 				functionName,
 				args,
 			});
-			return ok(data as T);
+			return Result.ok(data as T);
 		} catch (e: any) {
 			console.error(`Read contract call failed for ${functionName}:`, e);
 			// Attempt to map common viem errors to our custom error types
 			if (e.message && e.message.includes("invalid address")) {
-				return err({ type: "InvalidAddressError" } as ContractCallFailedError); // Cast to appropriate error
+				// return Result.err({ type: "InvalidAddressError", });
+				return Result.err({
+					type: "ContractCallFailedError",
+				});
 			}
 			// Check for specific error messages from contract reverts
 			for (const key in errorMap) {
 				if (e.message && e.message.includes(key)) {
-					return err(errorMap[key] as ContractCallFailedError);
+					return Result.err(errorMap[key] as ContractCallFailedError);
 				}
 			}
-			return err({
+			return Result.err({
 				type: "ContractCallFailedError",
 				message: e.message || "Contract call failed",
 			});
@@ -160,35 +149,36 @@ class BlockchainVotingSystem implements VotingSystem {
 						receipt.transactionHash.includes(key)
 					) {
 						// Placeholder for actual revert reason check
-						return err(errorMap[key] as TransactionFailedError);
+						return Result.err(errorMap[key] as TransactionFailedError);
 					}
 				}
-				return err({
+				return Result.err({
 					type: "TransactionFailedError",
 					message: `Transaction reverted: ${receipt.transactionHash}`,
 				});
 			}
 
-			return ok(undefined as T); // Assuming most write operations return void or a simple success
+			return Result.ok(undefined as T); // Assuming most write operations return void or a simple success
 		} catch (e: any) {
 			console.error(`Write contract call failed for ${functionName}:`, e);
 			// Attempt to map common viem errors to our custom error types
 			if (e.message && e.message.includes("invalid address")) {
-				return err({ type: "InvalidAddressError" } as UnauthorizedError); // Cast to appropriate error
+				// return Result.err({ type: "InvalidAddressError" });
+				return Result.err({ type: "UnauthorizedError" });
 			}
 			if (
 				(e.message && e.message.includes("unauthorized")) ||
 				e.message.includes("Not admin")
 			) {
-				return err({ type: "UnauthorizedError" });
+				return Result.err({ type: "UnauthorizedError" });
 			}
 			// Check for specific error messages from contract reverts (simulation errors)
 			for (const key in errorMap) {
 				if (e.message && e.message.includes(key)) {
-					return err(errorMap[key] as TransactionFailedError);
+					return Result.err(errorMap[key] as TransactionFailedError);
 				}
 			}
-			return err({
+			return Result.err({
 				type: "TransactionFailedError",
 				message: e.message || "Transaction failed",
 			});
@@ -201,7 +191,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, RegisterVoterError>> {
 		return this.callWriteContract(
 			this.contractAddresses.voterRegistry,
-			VoterRegistryABI,
+			voterRegistryAbi,
 			"registerVoter",
 			[voterAddress],
 			{
@@ -215,7 +205,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<boolean, IsVoterVerifiedError>> {
 		return this.callReadContract<boolean>(
 			this.contractAddresses.voterRegistry,
-			VoterRegistryABI,
+			voterRegistryAbi,
 			"isVoterVerified",
 			[voterAddress],
 			{
@@ -232,7 +222,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<number, RegisterCandidateError>> {
 		const result = await this.callWriteContract<bigint>(
 			this.contractAddresses.candidateRegistry,
-			CandidateRegistryABI,
+			candidateRegistryAbi,
 			"registerCandidate",
 			[name, position, cid],
 			{
@@ -240,9 +230,9 @@ class BlockchainVotingSystem implements VotingSystem {
 			},
 		);
 		if (result.isOk) {
-			return ok(Number(result.value)); // Convert bigint to number
+			return Result.ok(Number(result.value)); // Convert bigint to number
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	public async updateCandidate(
@@ -253,7 +243,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, UpdateCandidateError>> {
 		return this.callWriteContract(
 			this.contractAddresses.candidateRegistry,
-			CandidateRegistryABI,
+			candidateRegistryAbi,
 			"updateCandidate",
 			[BigInt(candidateId), name, position, cid],
 			{
@@ -270,7 +260,7 @@ class BlockchainVotingSystem implements VotingSystem {
 			[bigint, string, string, string]
 		>(
 			this.contractAddresses.candidateRegistry,
-			CandidateRegistryABI,
+			candidateRegistryAbi,
 			"getCandidate",
 			[BigInt(candidateId)],
 			{
@@ -279,9 +269,9 @@ class BlockchainVotingSystem implements VotingSystem {
 		);
 		if (result.isOk) {
 			const [id, name, position, cid] = result.value;
-			return ok({ id: Number(id), name, position, cid });
+			return Result.ok({ id: Number(id), name, position, cid });
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	// Party Management
@@ -291,7 +281,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<number, RegisterPartyError>> {
 		const result = await this.callWriteContract<bigint>(
 			this.contractAddresses.partyAddress, // Use partyAddress
-			PartyABI,
+			partyAbi,
 			"registerParty",
 			[name, logoCid],
 			{
@@ -299,9 +289,9 @@ class BlockchainVotingSystem implements VotingSystem {
 			},
 		);
 		if (result.isOk) {
-			return ok(Number(result.value)); // Convert bigint to number
+			return Result.ok(Number(result.value)); // Convert bigint to number
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	public async updateParty(
@@ -311,7 +301,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, UpdatePartyError>> {
 		return this.callWriteContract(
 			this.contractAddresses.partyAddress, // Use partyAddress
-			PartyABI,
+			partyAbi,
 			"updateParty",
 			[BigInt(partyId), name, logoCid],
 			{
@@ -326,7 +316,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<PartyDetails, GetPartyError>> {
 		const result = await this.callReadContract<[bigint, string, string]>(
 			this.contractAddresses.partyAddress, // Use partyAddress
-			PartyABI,
+			partyAbi,
 			"getParty",
 			[BigInt(partyId)],
 			{
@@ -335,9 +325,9 @@ class BlockchainVotingSystem implements VotingSystem {
 		);
 		if (result.isOk) {
 			const [id, name, logoCid] = result.value;
-			return ok({ id: Number(id), name, logoCid });
+			return Result.ok({ id: Number(id), name, logoCid });
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	// Election Management
@@ -350,7 +340,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<number, CreateElectionError>> {
 		const result = await this.callWriteContract<bigint>(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"createElection",
 			[
 				name,
@@ -364,9 +354,9 @@ class BlockchainVotingSystem implements VotingSystem {
 			},
 		);
 		if (result.isOk) {
-			return ok(Number(result.value));
+			return Result.ok(Number(result.value));
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	public async getElection(
@@ -376,7 +366,7 @@ class BlockchainVotingSystem implements VotingSystem {
 			[bigint, string, string, bigint, bigint, bigint[], number]
 		>(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"getElection",
 			[BigInt(electionId)],
 			{
@@ -386,7 +376,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		if (result.isOk) {
 			const [id, name, description, startTime, endTime, candidateIds, status] =
 				result.value;
-			return ok({
+			return Result.ok({
 				id: Number(id),
 				name,
 				description,
@@ -396,7 +386,7 @@ class BlockchainVotingSystem implements VotingSystem {
 				status: status as ElectionStatus,
 			});
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	public async startElection(
@@ -404,7 +394,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, StartElectionError>> {
 		return this.callWriteContract(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"startElection",
 			[BigInt(electionId)],
 			{
@@ -420,7 +410,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, EndElectionError>> {
 		return this.callWriteContract(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"endElection",
 			[BigInt(electionId)],
 			{
@@ -436,7 +426,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionStatus, GetElectionStatusError>> {
 		const result = await this.callReadContract<number>(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"getElectionStatus",
 			[BigInt(electionId)],
 			{
@@ -444,9 +434,9 @@ class BlockchainVotingSystem implements VotingSystem {
 			},
 		);
 		if (result.isOk) {
-			return ok(result.value as ElectionStatus);
+			return Result.ok(result.value as ElectionStatus);
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 
 	// Voting
@@ -456,7 +446,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, CastVoteError>> {
 		return this.callWriteContract(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"castVote",
 			[BigInt(electionId), BigInt(candidateId)],
 			{
@@ -475,7 +465,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<boolean, HasVotedError>> {
 		return this.callReadContract<boolean>(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"hasVoted",
 			[BigInt(electionId), voterAddress],
 			{
@@ -491,7 +481,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionResults, GetElectionResultsError>> {
 		const result = await this.callReadContract<[bigint[], bigint[]]>(
 			this.contractAddresses.votingSystem,
-			VotingSystemABI,
+			votingSystemAbi,
 			"getElectionResults",
 			[BigInt(electionId)],
 			{
@@ -506,9 +496,9 @@ class BlockchainVotingSystem implements VotingSystem {
 					voteCount: Number(voteCounts[index]),
 				}),
 			);
-			return ok(electionResults);
+			return Result.ok(electionResults);
 		}
-		return err(result.error);
+		return Result.err(result.error);
 	}
 }
 

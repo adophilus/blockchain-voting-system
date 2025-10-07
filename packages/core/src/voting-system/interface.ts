@@ -1,13 +1,12 @@
-import { Address } from "viem";
-import { Result } from "true-myth";
-import { Wallet } from "../../wallet";
+import type { Address } from "viem";
+import type { Result } from "true-myth";
 
 // Define the structure for contract addresses
 export type ContractAddresses = {
 	votingSystem: Address;
 	voterRegistry: Address;
 	candidateRegistry: Address;
-	partyRegistry: Address;
+	partyAddress: Address;
 	// Add other contract addresses as needed
 };
 
@@ -50,14 +49,8 @@ export type ElectionResults = {
 // --- Individual Error Types ---
 export type InvalidAddressError = { type: "InvalidAddressError" };
 export type UnauthorizedError = { type: "UnauthorizedError" };
-export type TransactionFailedError = {
-	type: "TransactionFailedError";
-	message: string;
-};
-export type ContractCallFailedError = {
-	type: "ContractCallFailedError";
-	message: string;
-};
+export type TransactionFailedError = { type: "TransactionFailedError" };
+export type ContractCallFailedError = { type: "ContractCallFailedError" };
 export type VoterNotVerifiedError = { type: "VoterNotVerifiedError" };
 export type ElectionNotFoundError = { type: "ElectionNotFoundError" };
 export type CandidateNotFoundError = { type: "CandidateNotFoundError" };
@@ -66,7 +59,7 @@ export type ElectionNotActiveError = { type: "ElectionNotActiveError" };
 export type ElectionAlreadyEndedError = { type: "ElectionAlreadyEndedError" };
 export type AlreadyVotedError = { type: "AlreadyVotedError" };
 export type InvalidElectionStateError = { type: "InvalidElectionStateError" };
-export type UnknownError = { type: "UnknownError"; message: string };
+export type UnknownError = { type: "UnknownError" };
 
 // --- Method-Specific Error Types ---
 
@@ -155,6 +148,7 @@ export type CastVoteError =
 	| AlreadyVotedError
 	| TransactionFailedError
 	| ContractCallFailedError
+	| UnauthorizedError
 	| UnknownError;
 export type HasVotedError =
 	| ElectionNotFoundError

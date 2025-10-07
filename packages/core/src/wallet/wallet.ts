@@ -1,4 +1,4 @@
-import { PublicClient, WalletClient, Address } from "viem";
+import type { PublicClient, WalletClient, Address } from "viem";
 
 class Wallet {
 	constructor(

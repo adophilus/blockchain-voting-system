@@ -1,4 +1,4 @@
-import { Address, Hex } from "viem";
+import type { Address, Hex } from "viem";
 import { Result } from "true-myth";
 import { Wallet } from "../wallet";
 
@@ -12,10 +12,7 @@ export type WalletAlreadyExistsError = {
 	type: "WalletAlreadyExistsError";
 	address: Address;
 };
-export type UnknownWalletStoreError = {
-	type: "UnknownWalletStoreError";
-	message: string;
-};
+export type UnknownWalletStoreError = { type: "UnknownWalletStoreError" };
 
 export type CreateWalletError = UnknownWalletStoreError;
 export type StoreWalletError =

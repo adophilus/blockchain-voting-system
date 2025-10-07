@@ -1,4 +1,4 @@
-import { createPublicClient, createWalletClient, http } from "viem";
+import { createPublicClient, createWalletClient, http, type Hex } from "viem";
 import { foundry } from "viem/chains";
 import { env } from "../src/env";
 import { Wallet } from "../src/wallet";
@@ -6,7 +6,7 @@ import { privateKeyToAccount } from "viem/accounts";
 
 const chain = foundry;
 
-const privateKey = env.PRIVATE_KEY;
+const privateKey = env.PRIVATE_KEY as Hex;
 
 const account = privateKeyToAccount(privateKey) as any;
 
