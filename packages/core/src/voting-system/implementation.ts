@@ -54,16 +54,8 @@ class BlockchainVotingSystem implements VotingSystem {
 		private readonly contractAddresses: ContractAddresses,
 	) {}
 
-	private getPublicClient(): PublicClient {
-		return this.wallet.getPublicClient();
-	}
-
-	private getWalletClient(): WalletClient {
-		return this.wallet.getWalletClient();
-	}
-
 	private getAccountAddress(): Address {
-		const account = this.getWalletClient().account;
+		const account = this.wallet.getWalletClient().account;
 		if (!account) {
 			throw new Error("WalletClient account is not defined.");
 		}
@@ -125,9 +117,14 @@ class BlockchainVotingSystem implements VotingSystem {
 		>
 	> {
 		try {
-			const walletClient = this.getWalletClient();
-			const publicClient = this.getPublicClient();
+			const walletClient = this.wallet.getWalletClient();
+			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
+			const walletAddress = this.wallet.getAddress();
+
+			const nonce = await publicClient.getTransactionCount({
+				address: walletAddress,
+			});
 
 			const { request } = await publicClient.simulateContract({
 				address,
@@ -135,6 +132,7 @@ class BlockchainVotingSystem implements VotingSystem {
 				functionName,
 				args,
 				account,
+				nonce,
 			});
 
 			const hash = await walletClient.writeContract(request);
