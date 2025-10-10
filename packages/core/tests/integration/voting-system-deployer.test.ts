@@ -1,11 +1,12 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
-import type { DeployedContractAddresses, DeploySystemError } from "../../src/voting-system-deployer/interface";
 import { deployerWallet } from "../setup";
+import { assert } from "../../src/lib/assert";
+import { isAddress } from "viem";
 
 describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
-	let deployedAddresses: DeployedContractAddresses;
+	let deployedAddress: string;
 
 	beforeAll(() => {
 		deployer = new BlockchainVotingSystemDeployer(deployerWallet);
@@ -17,19 +18,10 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 		expect(result.isOk).toBe(true);
 
 		if (result.isOk) {
-			deployedAddresses = result.value;
-			expect(deployedAddresses.votingSystem).toBeDefined();
-			expect(deployedAddresses.voterRegistry).toBeDefined();
-			expect(deployedAddresses.candidateRegistry).toBeDefined();
-			expect(deployedAddresses.partyAddress).toBeDefined();
+			deployedAddress = result.value;
+			expect(deployedAddress).toBeDefined();
 
-			// Basic address format check
-			expect(deployedAddresses.votingSystem).toMatch(/^0x[0-9a-fA-F]{40}$/);
-			expect(deployedAddresses.voterRegistry).toMatch(/^0x[0-9a-fA-F]{40}$/);
-			expect(deployedAddresses.candidateRegistry).toMatch(
-				/^0x[0-9a-fA-F]{40}$/,
-			);
-			expect(deployedAddresses.partyAddress).toMatch(/^0x[0-9a-fA-F]{40}$/);
+			assert(isAddress(deployedAddress), "ERR_OPERATION_FAILED");
 		}
 	});
 });

@@ -1,28 +1,25 @@
 import { describe, it, expect, beforeAll } from "vitest";
 import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer/implementation";
 import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
-import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
-import type { ElectionStatus } from "../../src/voting-system/interface";
-import { deployerWallet, voter1Wallet, sleep } from "../setup";
+import { deployerWallet, voter1Wallet } from "../setup";
 import { assert } from "../../src/lib/assert";
-import { getUnixTime } from "date-fns";
 
 describe("BlockchainVotingSystem Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
 	let votingSystem: BlockchainVotingSystem;
-	let contractAddresses: DeployedContractAddresses;
+	let votingSystemContractAddress: string;
 
 	beforeAll(async () => {
 		// Deploy all contracts
 		deployer = new BlockchainVotingSystemDeployer(deployerWallet);
 		const deployResult = await deployer.deploySystem();
 		assert(deployResult.isOk, "ERR_OPERATION_FAILED");
-		contractAddresses = deployResult.value;
+		votingSystemContractAddress = deployResult.value;
 
 		// Initialize VotingSystem with deployer wallet
 		votingSystem = new BlockchainVotingSystem(
 			deployerWallet,
-			contractAddresses,
+			votingSystemContractAddress,
 		);
 	});
 
@@ -204,7 +201,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Register voter
-		await votingSystem.registerVoter(voter1Wallet.getAddress());
+		await votingSystem.registerVoterForElection(
+			electionId,
+			voter1Wallet.getAddress(),
+		);
 
 		const castVoteResult = await votingSystem.castVote(
 			electionId,

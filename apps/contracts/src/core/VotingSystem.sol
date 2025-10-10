@@ -48,6 +48,21 @@ contract VotingSystem {
         emit PartyCreated(partyCount, address(parties[partyCount]));
         return partyCount;
     }
+
+    function registerCandidate(string memory _name, string memory _position, string memory _cid) external onlyAdmin returns (uint) {
+        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        return candidateRegistry.registerCandidate(_name, _position, _cid);
+    }
+
+    function updateCandidate(uint _candidateId, string memory _name, string memory _position, string memory _cid) external onlyAdmin {
+        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        candidateRegistry.updateCandidate(_candidateId, _name, _position, _cid);
+    }
+
+    function getCandidate(uint _candidateId) external view returns (uint, string memory, string memory, string memory) {
+        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        return candidateRegistry.getCandidate(_candidateId);
+    }
     
     function getElection(uint _electionId) external view returns (address) {
         if (_electionId == 0 || _electionId > electionCount) revert InvalidElectionId();
