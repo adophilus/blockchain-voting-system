@@ -93,6 +93,9 @@ let voter2Wallet: Wallet;
 	voter2Wallet = new Wallet(privateKey, publicClient, walletClient);
 }
 
+const sleep = (ms: number): Promise<void> =>
+	new Promise((res) => setTimeout(res, ms));
+
 export {
 	chain,
 	deployerWallet,
@@ -100,4 +103,5 @@ export {
 	candidate2Wallet,
 	voter1Wallet,
 	voter2Wallet,
+	sleep,
 };

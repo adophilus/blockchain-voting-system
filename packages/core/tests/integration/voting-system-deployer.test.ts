@@ -31,5 +31,5 @@ describe("BlockchainVotingSystemDeployer Integration Tests", () => {
 			);
 			expect(deployedAddresses.partyAddress).toMatch(/^0x[0-9a-fA-F]{40}$/);
 		}
-	}, 60000);
+	});
 });

@@ -10,6 +10,7 @@ export default defineConfig({
 		bail: 1,
 		cache: false,
 		maxConcurrency: 1,
+		testTimeout: 10000, // Set default test timeout to 10 seconds
 		sequence: {
 			sequencer: class Seqencer extends BaseSequencer {
 				protected override ctx: VitestFromVitestNode;

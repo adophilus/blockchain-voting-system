@@ -134,7 +134,6 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 		const partyAddress = partyAddressResult.value;
 
-		console.log("about to deploy voting system");
 		const votingSystemResult = await this.deployVotingSystem();
 		if (votingSystemResult.isErr) {
 			return Result.err(votingSystemResult.error);

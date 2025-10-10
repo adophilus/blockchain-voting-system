@@ -3,7 +3,7 @@ import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer
 import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
 import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
 import type { ElectionStatus } from "../../src/voting-system/interface";
-import { deployerWallet, voter1Wallet } from "../setup"; // Import the deployer wallet from setup
+import { deployerWallet, voter1Wallet } from "../setup";
 import { assert } from "../../src/lib/assert";
 
 describe("BlockchainVotingSystem Integration Tests", () => {
@@ -23,7 +23,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			deployerWallet,
 			contractAddresses,
 		);
-	}, 120000); // Increased timeout for deployment and setup
+	});
 
 	it("should register a voter successfully", async () => {
 		const result = await votingSystem.registerVoter(voter1Wallet.getAddress());
@@ -151,7 +151,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const statusResult = await votingSystem.getElectionStatus(electionId);
 		assert(statusResult.isOk, "ERR_OPERATION_FAILED");
 		expect(statusResult.value).toBe("Ended");
-	});
+	}, 60000);
 
 	it("should cast a vote successfully", async () => {
 		const createResult = await votingSystem.createElection(
