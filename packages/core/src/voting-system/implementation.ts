@@ -61,7 +61,7 @@ class BlockchainVotingSystem implements VotingSystem {
 			const { request } = await publicClient.simulateContract({
 				address: this.contractAddresses.voterRegistry,
 				abi: voterRegistryAbi,
-				functionName: "verifyVoter",
+				functionName: "registerVoter",
 				args: [voterAddress],
 				account,
 			});
@@ -86,7 +86,7 @@ class BlockchainVotingSystem implements VotingSystem {
 			const data = await this.wallet.getPublicClient().readContract({
 				address: this.contractAddresses.voterRegistry,
 				abi: voterRegistryAbi,
-				functionName: "isVoterVerified",
+				functionName: "isVoterRegistered",
 				args: [voterAddress],
 			});
 			return Result.ok(data);

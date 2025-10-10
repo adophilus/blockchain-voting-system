@@ -5,6 +5,5 @@ import "./core/VotingSystem.sol";
 import "./core/Election.sol";
 import "./core/Party.sol";
 import "./core/Candidate.sol";
-import "./core/Voter.sol";
 import "./core/VoterRegistry.sol";
 import "./core/CandidateRegistry.sol";

@@ -24,3 +24,4 @@ error InvalidAddress();
 error VoterAlreadyVerified();
 error InvalidElectionId();
 error InvalidPartyId();
+error VoterAlreadyRegistered();

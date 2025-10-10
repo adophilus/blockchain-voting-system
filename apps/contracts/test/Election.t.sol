@@ -9,7 +9,7 @@ contract ElectionTest is Test {
     Election public election;
     
     function setUp() public {
-        election = new Election(address(this), "Test Election", "Description", "QmTestElectionCID");
+        election = new Election(address(this), "Test Election", "Description", "QmTestElectionCID", address(0));
     }
     
     function test_ElectionCreation() public view {

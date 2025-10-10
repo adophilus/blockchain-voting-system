@@ -5,9 +5,9 @@ import "./Errors.sol";
 
 contract VoterRegistry {
     address public admin;
-    mapping(address => bool) public verifiedVoters;
+    mapping(address => bool) public registeredVoters;
 
-    event VoterVerified(address indexed voter);
+    event VoterRegistered(address indexed voter);
 
     modifier onlyAdmin() {
         if (msg.sender != admin) revert NotAdmin();
@@ -18,14 +18,14 @@ contract VoterRegistry {
         admin = msg.sender;
     }
 
-    function verifyVoter(address _voter) external onlyAdmin {
+    function registerVoter(address _voter) external onlyAdmin {
         if (_voter == address(0)) revert InvalidAddress();
-        if (verifiedVoters[_voter]) revert VoterAlreadyVerified();
-        verifiedVoters[_voter] = true;
-        emit VoterVerified(_voter);
+        if (registeredVoters[_voter]) revert VoterAlreadyRegistered();
+        registeredVoters[_voter] = true;
+        emit VoterRegistered(_voter);
     }
 
-    function isVoterVerified(address _voter) external view returns (bool) {
-        return verifiedVoters[_voter];
+    function isVoterRegistered(address _voter) external view returns (bool) {
+        return registeredVoters[_voter];
     }
 }

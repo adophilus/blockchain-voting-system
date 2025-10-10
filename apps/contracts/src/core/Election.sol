@@ -1,6 +1,7 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
+import "./VoterRegistry.sol";
 import "../core/Party.sol";
 import "./Errors.sol";
 
@@ -13,6 +14,7 @@ contract Election {
     string public name;
     string public description;
     string public cid; // IPFS CID for election-related media
+    address public voterRegistryAddress;
     
     // Mapping of parties participating in this election
     mapping(address => bool) public participatingParties;
@@ -47,11 +49,18 @@ contract Election {
         _;
     }
     
-    constructor(address _admin, string memory _name, string memory _description, string memory _cid) {
+    modifier onlyRegisteredVoter() {
+        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
+        if (!voterRegistry.isVoterRegistered(msg.sender)) revert NotRegisteredVoter();
+        _;
+    }
+    
+    constructor(address _admin, string memory _name, string memory _description, string memory _cid, address _voterRegistryAddress) {
         admin = _admin;
         name = _name;
         description = _description;
         cid = _cid;
+        voterRegistryAddress = _voterRegistryAddress;
     }
     
     function startElection(uint _startTime, uint _endTime) external onlyAdmin {
@@ -84,7 +93,7 @@ contract Election {
     function vote(
         address _party,
         uint _candidateId
-    ) external hasNotVoted onlyDuringElection {
+    ) external onlyRegisteredVoter hasNotVoted onlyDuringElection {
         if (!participatingParties[_party]) revert PartyNotParticipating();
         
         // Verify that the candidate exists in the party
