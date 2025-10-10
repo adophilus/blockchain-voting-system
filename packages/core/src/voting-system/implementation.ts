@@ -327,7 +327,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionDetails, GetElectionError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
@@ -401,7 +401,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, StartElectionError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
@@ -437,7 +437,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, EndElectionError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
@@ -472,7 +472,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionStatus, GetElectionStatusError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
@@ -513,7 +513,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, CastVoteError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
@@ -550,7 +550,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<boolean, HasVotedError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
@@ -579,7 +579,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionResults, GetElectionResultsError>> {
 		try {
 			const electionAddress = await this.wallet.getPublicClient().readContract({
-				address: this.contractAddress.votingSystem,
+				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
