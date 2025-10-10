@@ -95,8 +95,8 @@ contract Election {
     
     function registerVoterForElection(address _voter) external onlyAdmin {
         VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
-        if (!voterRegistry.isVoterRegistered(_voter)) revert VoterNotVerified();
-        if (registeredVoters[_voter]) revert VoterAlreadyRegistered();
+        if (!voterRegistry.isVoterRegistered(_voter)) revert VoterNotRegistered();
+        if (registeredVoters[_voter]) revert VoterAlreadyRegisteredForElection();
         registeredVoters[_voter] = true;
         emit VoterRegistered(_voter);
     }
