@@ -113,7 +113,11 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
 
-		const startResult = await votingSystem.startElection(electionId, startTime, endTime);
+		const startResult = await votingSystem.startElection(
+			electionId,
+			startTime,
+			endTime,
+		);
 		assert(startResult.isOk, "ERR_OPERATION_FAILED");
 
 		const statusResult = await votingSystem.getElectionStatus(electionId);
@@ -165,7 +169,9 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 		assert(partyResult.isOk, "ERR_OPERATION_FAILED");
 		const partyId = partyResult.value;
-		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(null)?.address;
+		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(
+			null,
+		)?.address;
 		assert(partyAddress, "Party address not found");
 
 		const candidateResult = await votingSystem.registerCandidate(
@@ -185,7 +191,11 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		// Register voter
 		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
-		const castVoteResult = await votingSystem.castVote(electionId, partyAddress, candidateId);
+		const castVoteResult = await votingSystem.castVote(
+			electionId,
+			partyAddress,
+			candidateId,
+		);
 		assert(castVoteResult.isOk, "ERR_OPERATION_FAILED");
 
 		const hasVotedResult = await votingSystem.hasVoted(
@@ -212,7 +222,9 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 		assert(partyResult.isOk, "ERR_OPERATION_FAILED");
 		const partyId = partyResult.value;
-		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(null)?.address;
+		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(
+			null,
+		)?.address;
 		assert(partyAddress, "Party address not found");
 
 		const candidate1Result = await votingSystem.registerCandidate(
@@ -239,7 +251,11 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.registerVoter(voter1Wallet.getAddress());
 
 		// Cast votes
-		await votingSystem.castVote(electionId, partyAddress, candidateIds[0] as number);
+		await votingSystem.castVote(
+			electionId,
+			partyAddress,
+			candidateIds[0] as number,
+		);
 
 		// Wait for election to end
 		await new Promise((resolve) =>

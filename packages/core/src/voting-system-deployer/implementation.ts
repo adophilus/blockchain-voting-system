@@ -39,6 +39,9 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 
 			const account = walletClient.account;
 			const chain = walletClient.chain;
+			// const nonce = await publicClient.getTransactionCount({
+			// 	address: this.wallet.getAddress(),
+			// });
 
 			if (!account) {
 				return Result.err({ type: "InvalidDeployerAccountError" });
@@ -49,6 +52,7 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 				account,
 				bytecode,
 				args: args ?? [],
+				// nonce,
 				chain,
 			} as any);
 

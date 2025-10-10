@@ -3,6 +3,7 @@ import { foundry } from "viem/chains";
 import { env } from "./env";
 import { Wallet } from "../src/wallet";
 import { privateKeyToAccount } from "viem/accounts";
+import { createNonceManager, jsonRpc } from "viem/nonce";
 
 const chain = foundry;
 
@@ -14,7 +15,8 @@ let voter2Wallet: Wallet;
 
 {
 	const privateKey = env.PRIVATE_KEY as Hex;
-	const account = privateKeyToAccount(privateKey) as any;
+	const nonceManager = createNonceManager({ source: jsonRpc() });
+	const account = privateKeyToAccount(privateKey, { nonceManager }) as any;
 	const publicClient = createPublicClient({
 		chain,
 		transport: http(),
@@ -29,7 +31,8 @@ let voter2Wallet: Wallet;
 
 {
 	const privateKey = env.CANDIDATE_1_PRIVATE_KEY as Hex;
-	const account = privateKeyToAccount(privateKey) as any;
+	const nonceManager = createNonceManager({ source: jsonRpc() });
+	const account = privateKeyToAccount(privateKey, { nonceManager }) as any;
 	const publicClient = createPublicClient({
 		chain,
 		transport: http(),
@@ -44,7 +47,8 @@ let voter2Wallet: Wallet;
 
 {
 	const privateKey = env.CANDIDATE_2_PRIVATE_KEY as Hex;
-	const account = privateKeyToAccount(privateKey) as any;
+	const nonceManager = createNonceManager({ source: jsonRpc() });
+	const account = privateKeyToAccount(privateKey, { nonceManager }) as any;
 	const publicClient = createPublicClient({
 		chain,
 		transport: http(),
@@ -59,7 +63,8 @@ let voter2Wallet: Wallet;
 
 {
 	const privateKey = env.VOTER_1_PRIVATE_KEY as Hex;
-	const account = privateKeyToAccount(privateKey) as any;
+	const nonceManager = createNonceManager({ source: jsonRpc() });
+	const account = privateKeyToAccount(privateKey, { nonceManager }) as any;
 	const publicClient = createPublicClient({
 		chain,
 		transport: http(),
@@ -74,7 +79,8 @@ let voter2Wallet: Wallet;
 
 {
 	const privateKey = env.VOTER_2_PRIVATE_KEY as Hex;
-	const account = privateKeyToAccount(privateKey) as any;
+	const nonceManager = createNonceManager({ source: jsonRpc() });
+	const account = privateKeyToAccount(privateKey, { nonceManager }) as any;
 	const publicClient = createPublicClient({
 		chain,
 		transport: http(),

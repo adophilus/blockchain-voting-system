@@ -6,7 +6,7 @@
 	},
 	"scripts": {
 		"lint": "tsc",
-		"test": "vitest"
+		"test": "vitest run"
 	},
 	"dependencies": {
 		"@blockchain-voting-system/contracts": "workspace:^",

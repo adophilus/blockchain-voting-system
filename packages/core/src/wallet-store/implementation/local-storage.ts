@@ -1,5 +1,9 @@
 import { type Chain, createPublicClient, createWalletClient, http } from "viem";
-import { privateKeyToAccount, generatePrivateKey } from "viem/accounts";
+import {
+	privateKeyToAccount,
+	generatePrivateKey,
+	nonceManager,
+} from "viem/accounts";
 import { foundry } from "viem/chains";
 import { Result } from "true-myth";
 import { Wallet } from "../../wallet";
@@ -18,7 +22,7 @@ class LocalStorageWalletStore implements WalletStore {
 	public async createWallet(): Promise<Result<Wallet, CreateWalletError>> {
 		try {
 			const privateKey = generatePrivateKey();
-			const account = privateKeyToAccount(privateKey) as any;
+			const account = privateKeyToAccount(privateKey, { nonceManager }) as any;
 
 			const publicClient = createPublicClient({
 				chain: foundry,
