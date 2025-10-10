@@ -112,7 +112,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const electionId = createResult.value;
 
 		// Get current blockchain time and add 100 seconds
-		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlock = await deployerWallet.getPublicClient().getBlock();
 		const currentBlockTime = Number(currentBlock.timestamp);
 		const startTime = currentBlockTime + 100; // 100 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
@@ -139,7 +139,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const electionId = createResult.value;
 
 		// Get current blockchain time and add 10 seconds
-		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlock = await deployerWallet.getPublicClient().getBlock();
 		const currentBlockTime = Number(currentBlock.timestamp);
 		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
@@ -148,12 +148,12 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Fast-forward blockchain time to after the election ends using RPC calls
-		await votingSystem.wallet.publicClient.transport.request({
-			method: 'evm_setNextBlockTimestamp',
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_setNextBlockTimestamp",
 			params: [endTime + 10], // Ensure we're well past the end time
 		});
-		await votingSystem.wallet.publicClient.transport.request({
-			method: 'evm_mine',
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_mine",
 			params: [],
 		});
 
@@ -184,7 +184,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(
 			null,
 		)?.address;
-		assert(partyAddress, "Party address not found");
+		assert(partyAddress, "ERR_OPERATION_FAILED");
 
 		const candidateResult = await votingSystem.registerCandidate(
 			"Test Candidate",
@@ -195,7 +195,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const candidateId = candidateResult.value;
 
 		// Get current blockchain time and add 10 seconds
-		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlock = await deployerWallet.getPublicClient().getBlock();
 		const currentBlockTime = Number(currentBlock.timestamp);
 		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
@@ -240,7 +240,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const partyAddress = (await votingSystem.getParty(partyId)).unwrapOr(
 			null,
 		)?.address;
-		assert(partyAddress, "Party address not found");
+		assert(partyAddress, "ERR_OPERATION_FAILED");
 
 		const candidate1Result = await votingSystem.registerCandidate(
 			"Candidate D",
@@ -257,7 +257,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const candidateIds = [candidate1Result.value, candidate2Result.value];
 
 		// Get current blockchain time and add 10 seconds
-		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlock = await deployerWallet.getPublicClient().getBlock();
 		const currentBlockTime = Number(currentBlock.timestamp);
 		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
@@ -276,12 +276,12 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 
 		// Fast-forward blockchain time to after the election ends using RPC calls
-		await votingSystem.wallet.publicClient.transport.request({
-			method: 'evm_setNextBlockTimestamp',
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_setNextBlockTimestamp",
 			params: [endTime + 10], // Ensure we're well past the end time
 		});
-		await votingSystem.wallet.publicClient.transport.request({
-			method: 'evm_mine',
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_mine",
 			params: [],
 		});
 
