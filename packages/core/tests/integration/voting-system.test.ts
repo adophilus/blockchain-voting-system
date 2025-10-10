@@ -111,7 +111,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
-		const startTime = getUnixTime(new Date()) + 100; // 100 seconds from now
+		// Get current blockchain time and add 100 seconds
+		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlockTime = Number(currentBlock.timestamp);
+		const startTime = currentBlockTime + 100; // 100 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
 
 		const startResult = await votingSystem.startElection(
@@ -135,17 +138,24 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
-		const startTime = getUnixTime(new Date()) + 10; // 10 seconds from now
+		// Get current blockchain time and add 10 seconds
+		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlockTime = Number(currentBlock.timestamp);
+		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
 
 		// Start the election
 		await votingSystem.startElection(electionId, startTime, endTime);
 
-		// Wait for election to end (endTime + a buffer)
-		const waitTime = (endTime - getUnixTime(new Date()) + 10) * 1000;
-		if (waitTime > 0) {
-			await sleep(waitTime);
-		}
+		// Fast-forward blockchain time to after the election ends using RPC calls
+		await votingSystem.wallet.publicClient.transport.request({
+			method: 'evm_setNextBlockTimestamp',
+			params: [endTime + 10], // Ensure we're well past the end time
+		});
+		await votingSystem.wallet.publicClient.transport.request({
+			method: 'evm_mine',
+			params: [],
+		});
 
 		const endResult = await votingSystem.endElection(electionId);
 		assert(endResult.isOk, "ERR_OPERATION_FAILED");
@@ -184,7 +194,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(candidateResult.isOk, "ERR_OPERATION_FAILED");
 		const candidateId = candidateResult.value;
 
-		const startTime = getUnixTime(new Date()) + 10; // 10 seconds from now
+		// Get current blockchain time and add 10 seconds
+		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlockTime = Number(currentBlock.timestamp);
+		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
 
 		// Start the election
@@ -243,7 +256,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value, candidate2Result.value];
 
-		const startTime = getUnixTime(new Date()) + 10; // 10 seconds from now
+		// Get current blockchain time and add 10 seconds
+		const currentBlock = await votingSystem.wallet.publicClient.getBlock();
+		const currentBlockTime = Number(currentBlock.timestamp);
+		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
 
 		// Start the election
@@ -259,11 +275,15 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			candidateIds[0] as number,
 		);
 
-		// Wait for election to end
-		const waitTime = (endTime - getUnixTime(new Date()) + 5) * 1000;
-		if (waitTime > 0) {
-			await sleep(waitTime);
-		}
+		// Fast-forward blockchain time to after the election ends using RPC calls
+		await votingSystem.wallet.publicClient.transport.request({
+			method: 'evm_setNextBlockTimestamp',
+			params: [endTime + 10], // Ensure we're well past the end time
+		});
+		await votingSystem.wallet.publicClient.transport.request({
+			method: 'evm_mine',
+			params: [],
+		});
 
 		// End the election
 		await votingSystem.endElection(electionId);
