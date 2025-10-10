@@ -1,7 +1,6 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Voter.sol";
 import "./VoterRegistry.sol";
 import "../core/Party.sol";
 import "./Errors.sol";
@@ -22,12 +21,11 @@ contract Election {
     address[] public participatingPartyAddresses;
     mapping(address => mapping(uint => uint)) public partyCandidateVoteCounts; // party => candidateId => voteCount
     
-    // Voter management
-    mapping(address => Voter) public voters;
+    // Track voters who have voted
+    mapping(address => bool) private hasVoted;
     
     event ElectionStarted(uint startTime, uint endTime);
     event PartyAdded(address indexed party);
-    event VoterRegistered(address indexed voter);
     event VoteCast(address indexed voter, address indexed party, uint candidateId);
     event ElectionEnded();
     
@@ -41,13 +39,14 @@ contract Election {
         _;
     }
     
-    modifier onlyRegisteredVoter() {
-        if (!voters[msg.sender].registered) revert NotRegisteredVoter();
+    modifier onlyVerifiedVoter() {
+        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
+        if (!voterRegistry.isVoterVerified(msg.sender)) revert NotRegisteredVoter();
         _;
     }
     
     modifier hasNotVoted() {
-        if (voters[msg.sender].voted) revert AlreadyVoted();
+        if (hasVoted[msg.sender]) revert AlreadyVoted();
         _;
     }
     
@@ -91,19 +90,10 @@ contract Election {
         emit PartyAdded(_party);
     }
     
-    function registerVoter(address _voter) external onlyAdmin {
-        if (voters[_voter].registered) revert VoterAlreadyRegistered();
-        if (_voter == address(0)) revert InvalidVoterAddress();
-        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
-        if (!voterRegistry.isVoterVerified(_voter)) revert VoterNotVerified();
-        voters[_voter] = Voter(true, false);
-        emit VoterRegistered(_voter);
-    }
-    
     function vote(
         address _party,
         uint _candidateId
-    ) external onlyRegisteredVoter hasNotVoted onlyDuringElection {
+    ) external onlyVerifiedVoter hasNotVoted onlyDuringElection {
         if (!participatingParties[_party]) revert PartyNotParticipating();
         
         // Verify that the candidate exists in the party
@@ -111,7 +101,7 @@ contract Election {
         (uint id, , , ) = party.getCandidate(_candidateId);
         if (id != _candidateId) revert InvalidCandidate();
         
-        voters[msg.sender].voted = true;
+        hasVoted[msg.sender] = true;
         partyCandidateVoteCounts[_party][_candidateId]++;
         
         emit VoteCast(msg.sender, _party, _candidateId);

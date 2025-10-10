@@ -14,7 +14,6 @@ error EndTimeBeforeStartTime();
 error ElectionNotStarted();
 error ErrorElectionEnded();
 error InvalidPartyAddress();
-error VoterAlreadyRegistered();
 error InvalidVoterAddress();
 error VoterNotVerified();
 error PartyNotParticipating();

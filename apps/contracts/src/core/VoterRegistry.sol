@@ -8,7 +8,6 @@ contract VoterRegistry {
     mapping(address => bool) public verifiedVoters;
 
     event VoterVerified(address indexed voter);
-    event VoterUnverified(address indexed voter);
 
     modifier onlyAdmin() {
         if (msg.sender != admin) revert NotAdmin();
@@ -24,13 +23,6 @@ contract VoterRegistry {
         if (verifiedVoters[_voter]) revert VoterAlreadyVerified();
         verifiedVoters[_voter] = true;
         emit VoterVerified(_voter);
-    }
-
-    function unverifyVoter(address _voter) external onlyAdmin {
-        if (_voter == address(0)) revert InvalidAddress();
-        if (!verifiedVoters[_voter]) revert VoterNotVerified();
-        verifiedVoters[_voter] = false;
-        emit VoterUnverified(_voter);
     }
 
     function isVoterVerified(address _voter) external view returns (bool) {
