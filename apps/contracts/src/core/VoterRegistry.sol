@@ -20,7 +20,7 @@ contract VoterRegistry {
 
     function registerVoter(address _voter) external onlyAdmin {
         if (_voter == address(0)) revert InvalidAddress();
-        if (registeredVoters[_voter]) revert VoterAlreadyRegistered();
+        if (registeredVoters[_voter]) revert VoterAlreadyInRegistry();
         registeredVoters[_voter] = true;
         emit VoterRegistered(_voter);
     }

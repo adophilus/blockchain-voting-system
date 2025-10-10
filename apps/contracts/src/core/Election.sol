@@ -54,7 +54,7 @@ contract Election {
     }
     
     modifier onlyRegisteredVoter() {
-        if (!registeredVoters[msg.sender]) revert NotRegisteredVoter();
+        if (!registeredVoters[msg.sender]) revert VoterNotRegisteredForElection();
         _;
     }
     
@@ -95,7 +95,7 @@ contract Election {
     
     function registerVoterForElection(address _voter) external onlyAdmin {
         VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
-        if (!voterRegistry.isVoterRegistered(_voter)) revert VoterNotRegistered();
+        if (!voterRegistry.isVoterRegistered(_voter)) revert VoterNotInRegistry();
         if (registeredVoters[_voter]) revert VoterAlreadyRegisteredForElection();
         registeredVoters[_voter] = true;
         emit VoterRegistered(_voter);

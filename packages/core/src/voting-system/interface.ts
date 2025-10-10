@@ -56,8 +56,8 @@ export type ContractCallFailedError = {
 	type: "ContractCallFailedError";
 	message: string;
 };
-export type VoterNotRegisteredError = {
-	type: "VoterNotRegisteredError";
+export type VoterNotInRegistryError = {
+	type: "VoterNotInRegistryError";
 	message: string;
 };
 export type ElectionNotFoundError = {
@@ -169,7 +169,7 @@ export type GetElectionStatusError =
 export type CastVoteError =
 	| ElectionNotFoundError
 	| CandidateNotFoundError
-	| VoterNotRegisteredError
+	| VoterNotInRegistryError
 	| ElectionNotActiveError
 	| AlreadyVotedError
 	| TransactionFailedError
