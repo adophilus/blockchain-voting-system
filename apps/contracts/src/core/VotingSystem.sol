@@ -35,7 +35,7 @@ contract VotingSystem {
     
     function createElection(string memory _name, string memory _description, string memory _cid) external onlyAdmin returns (uint) {
         electionCount++;
-        elections[electionCount] = new Election(admin, _name, _description, _cid, voterRegistryAddress);
+        elections[electionCount] = new Election(admin, _name, _description, _cid);
         
         emit ElectionCreated(electionCount, address(elections[electionCount]));
         return electionCount;
