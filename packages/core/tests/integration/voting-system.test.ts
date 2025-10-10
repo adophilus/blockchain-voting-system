@@ -3,8 +3,9 @@ import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer
 import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
 import type { DeployedContractAddresses } from "../../src/voting-system-deployer/interface";
 import type { ElectionStatus } from "../../src/voting-system/interface";
-import { deployerWallet, voter1Wallet } from "../setup";
+import { deployerWallet, voter1Wallet, sleep } from "../setup";
 import { assert } from "../../src/lib/assert";
+import { getUnixTime } from "date-fns";
 
 describe("BlockchainVotingSystem Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
@@ -110,7 +111,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
-		const startTime = Math.floor(Date.now() / 1000) + 100; // 100 seconds from now
+		const startTime = getUnixTime(new Date()) + 100; // 100 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
 
 		const startResult = await votingSystem.startElection(
@@ -134,16 +135,17 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(createResult.isOk, "ERR_OPERATION_FAILED");
 		const electionId = createResult.value;
 
-		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
+		const startTime = getUnixTime(new Date()) + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
 
 		// Start the election
 		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Wait for election to end (endTime + a buffer)
-		await new Promise((resolve) =>
-			setTimeout(resolve, (endTime - Date.now() / 1000 + 5) * 1000),
-		);
+		const waitTime = (endTime - getUnixTime(new Date()) + 10) * 1000;
+		if (waitTime > 0) {
+			await sleep(waitTime);
+		}
 
 		const endResult = await votingSystem.endElection(electionId);
 		assert(endResult.isOk, "ERR_OPERATION_FAILED");
@@ -182,7 +184,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(candidateResult.isOk, "ERR_OPERATION_FAILED");
 		const candidateId = candidateResult.value;
 
-		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
+		const startTime = getUnixTime(new Date()) + 10; // 10 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
 
 		// Start the election
@@ -241,7 +243,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
 		const candidateIds = [candidate1Result.value, candidate2Result.value];
 
-		const startTime = Math.floor(Date.now() / 1000) + 10; // 10 seconds from now
+		const startTime = getUnixTime(new Date()) + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
 
 		// Start the election
@@ -258,9 +260,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 
 		// Wait for election to end
-		await new Promise((resolve) =>
-			setTimeout(resolve, (endTime - Date.now() / 1000 + 5) * 1000),
-		);
+		const waitTime = (endTime - getUnixTime(new Date()) + 5) * 1000;
+		if (waitTime > 0) {
+			await sleep(waitTime);
+		}
 
 		// End the election
 		await votingSystem.endElection(electionId);
