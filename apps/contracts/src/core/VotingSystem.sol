@@ -63,6 +63,16 @@ contract VotingSystem {
         CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
         return candidateRegistry.getCandidate(_candidateId);
     }
+
+    function isVoterVerified(address _voter) external view returns (bool) {
+        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
+        return voterRegistry.isVoterRegistered(_voter);
+    }
+
+    function registerVoter(address _voter) external onlyAdmin {
+        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
+        voterRegistry.registerVoter(_voter);
+    }
     
     function getElection(uint _electionId) external view returns (address) {
         if (_electionId == 0 || _electionId > electionCount) revert InvalidElectionId();
