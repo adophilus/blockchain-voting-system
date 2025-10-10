@@ -99,6 +99,44 @@ class BlockchainVotingSystem implements VotingSystem {
 		}
 	}
 
+	public async registerVoterForElection(
+		electionId: number,
+		voterAddress: Address,
+	): Promise<Result<void, RegisterVoterError>> {
+		try {
+			const walletClient = this.wallet.getWalletClient();
+			const publicClient = this.wallet.getPublicClient();
+			const account = this.getAccountAddress();
+
+			// Get the election address from the voting system
+			const electionAddress = await publicClient.readContract({
+				address: this.contractAddresses.votingSystem,
+				abi: votingSystemAbi,
+				functionName: "getElection",
+				args: [BigInt(electionId)],
+			});
+
+			const { request } = await publicClient.simulateContract({
+				address: electionAddress,
+				abi: electionAbi,
+				functionName: "registerVoterForElection",
+				args: [voterAddress],
+				account,
+			});
+
+			const hash = await walletClient.writeContract(request);
+			await publicClient.waitForTransactionReceipt({ hash });
+
+			return Result.ok(undefined);
+		} catch (e: any) {
+			console.error(`Write contract call failed for registerVoterForElection:`, e);
+			return Result.err({
+				type: "TransactionFailedError",
+				message: "Contract call/execution failed",
+			});
+		}
+	}
+
 	// Candidate Management
 	public async registerCandidate(
 		name: string,
@@ -515,16 +553,14 @@ class BlockchainVotingSystem implements VotingSystem {
 				args: [BigInt(electionId)],
 			});
 
-			const voter = await this.wallet.getPublicClient().readContract({
+			const hasVotedResult = await this.wallet.getPublicClient().readContract({
 				address: electionAddress,
 				abi: electionAbi,
-				functionName: "voters",
+				functionName: "hasVoted",
 				args: [voterAddress],
 			});
 
-			const [, voted] = voter;
-
-			return Result.ok(voted);
+			return Result.ok(hasVotedResult);
 		} catch (e: any) {
 			console.error(`Read contract call failed for hasVoted:`, e);
 			return Result.err({

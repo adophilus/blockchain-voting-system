@@ -196,6 +196,10 @@ export interface VotingSystem {
 	isVoterVerified(
 		voterAddress: Address,
 	): Promise<Result<boolean, IsVoterVerifiedError>>;
+	registerVoterForElection(
+		electionId: number,
+		voterAddress: Address,
+	): Promise<Result<void, RegisterVoterError>>;
 
 	// Candidate Management
 	registerCandidate(

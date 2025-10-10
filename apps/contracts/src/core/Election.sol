@@ -21,11 +21,15 @@ contract Election {
     address[] public participatingPartyAddresses;
     mapping(address => mapping(uint => uint)) public partyCandidateVoteCounts; // party => candidateId => voteCount
     
-    // Track voters who have voted
-    mapping(address => bool) private hasVoted;
+    // Track voters registered for this specific election (must be in VoterRegistry first)
+    mapping(address => bool) public registeredVoters;
+    
+    // Track voters who have voted in this election
+    mapping(address => bool) public hasVoted;
     
     event ElectionStarted(uint startTime, uint endTime);
     event PartyAdded(address indexed party);
+    event VoterRegistered(address indexed voter);
     event VoteCast(address indexed voter, address indexed party, uint candidateId);
     event ElectionEnded();
     
@@ -50,8 +54,7 @@ contract Election {
     }
     
     modifier onlyRegisteredVoter() {
-        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
-        if (!voterRegistry.isVoterRegistered(msg.sender)) revert NotRegisteredVoter();
+        if (!registeredVoters[msg.sender]) revert NotRegisteredVoter();
         _;
     }
     
@@ -88,6 +91,14 @@ contract Election {
         participatingParties[_party] = true;
         participatingPartyAddresses.push(_party);
         emit PartyAdded(_party);
+    }
+    
+    function registerVoterForElection(address _voter) external onlyAdmin {
+        VoterRegistry voterRegistry = VoterRegistry(voterRegistryAddress);
+        if (!voterRegistry.isVoterRegistered(_voter)) revert VoterNotVerified();
+        if (registeredVoters[_voter]) revert VoterAlreadyRegistered();
+        registeredVoters[_voter] = true;
+        emit VoterRegistered(_voter);
     }
     
     function vote(
