@@ -7,7 +7,7 @@ hero:
   text: "Documentation for the Blockchain Voting System"
   tagline: A secure and transparent voting solution powered by blockchain technology.
   image:
-    src: /images/logo.svg
+    src: ./images/logo.svg
     alt: Blockchain Voting System Logo
   actions:
     - theme: brand
