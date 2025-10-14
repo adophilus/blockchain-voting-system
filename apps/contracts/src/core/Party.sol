@@ -23,11 +23,11 @@ contract Party {
         _;
     }
     
-    constructor(string memory _name, string memory _slogan, string memory _cid, address _candidateRegistryAddress) {
+    constructor(string memory _name, string memory _slogan, string memory _cid, address _candidateRegistryAddress, address _admin) {
         name = _name;
         slogan = _slogan;
         cid = _cid;
-        admin = msg.sender;
+        admin = _admin;
         candidateRegistryAddress = _candidateRegistryAddress;
     }
     

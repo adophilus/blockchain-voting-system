@@ -43,7 +43,7 @@ contract VotingSystem {
     
     function createParty(string memory _name, string memory _slogan, string memory _cid) external onlyAdmin returns (uint) {
         partyCount++;
-        parties[partyCount] = new Party(_name, _slogan, _cid, candidateRegistryAddress);
+        parties[partyCount] = new Party(_name, _slogan, _cid, candidateRegistryAddress, admin);
         
         emit PartyCreated(partyCount, address(parties[partyCount]));
         return partyCount;

@@ -3,13 +3,12 @@ import { BlockchainVotingSystemDeployer } from "../../src/voting-system-deployer
 import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
 import { deployerWallet, voter1Wallet } from "../setup";
 import { assert } from "../../src/lib/assert";
-
-import { votingSystemAbi } from "@blockchain-voting-system/contracts/types";
+import type { Address } from "viem";
 
 describe("BlockchainVotingSystem Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
 	let votingSystem: BlockchainVotingSystem;
-	let votingSystemContractAddress: string;
+	let votingSystemContractAddress: Address;
 
 	beforeAll(async () => {
 		// Deploy all contracts

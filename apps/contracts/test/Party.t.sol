@@ -12,7 +12,7 @@ contract PartyTest is Test {
     
     function setUp() public {
         candidateRegistry = new CandidateRegistry();
-        party = new Party("Test Party", "Test Slogan", "QmTestPartyCID", address(candidateRegistry));
+        party = new Party("Test Party", "Test Slogan", "QmTestPartyCID", address(candidateRegistry), address(this));
     }
     
     function test_PartyCreation() public view {
