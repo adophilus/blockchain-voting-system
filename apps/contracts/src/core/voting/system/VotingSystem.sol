@@ -1,13 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Election.sol";
-import "./Party.sol";
-import "./VoterRegistry.sol";
-import "./CandidateRegistry.sol";
-import "./Errors.sol";
+import "../election/Election.sol";
+import "../party/Party.sol";
+import "../voter/registry/VoterRegistry.sol";
+import "../candidate/registry/CandidateRegistry.sol";
+import "../../../common/Errors.sol";
+import "./IVotingSystem.sol";
 
-contract VotingSystem {
+contract VotingSystem is IVotingSystem {
     address public admin;
     uint public electionCount;
     uint public partyCount;

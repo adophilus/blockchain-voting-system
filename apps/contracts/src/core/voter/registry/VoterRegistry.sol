@@ -1,9 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Errors.sol";
+import "../../../common/Errors.sol";
+import "./IVoterRegistry.sol";
 
-contract VoterRegistry {
+contract VoterRegistry is IVoterRegistry {
     address public admin;
     mapping(address => bool) public registeredVoters;
 

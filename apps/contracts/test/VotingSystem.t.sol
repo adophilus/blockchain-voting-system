@@ -2,10 +2,10 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {VotingSystem} from "../src/core/VotingSystem.sol";
-import {VoterRegistry} from "../src/core/VoterRegistry.sol";
-import {CandidateRegistry} from "../src/core/CandidateRegistry.sol";
-import "../src/core/Errors.sol";
+import {VotingSystem} from "../src/core/voting/system/VotingSystem.sol";
+import {VoterRegistry} from "../src/core/voter/registry/VoterRegistry.sol";
+import {CandidateRegistry} from "../src/core/candidate/registry/CandidateRegistry.sol";
+import "../../common/Errors.sol";
 
 contract VotingSystemTest is Test {
     VotingSystem public votingSystem;

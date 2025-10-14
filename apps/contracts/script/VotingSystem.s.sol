@@ -2,9 +2,10 @@
 pragma solidity ^0.8.24;
 
 import {Script, console} from "forge-std/Script.sol";
-import {VotingSystem} from "../src/core/VotingSystem.sol";
-import {VoterRegistry} from "../src/core/VoterRegistry.sol";
-import {CandidateRegistry} from "../src/core/CandidateRegistry.sol";
+import {VotingSystem} from "../src/core/voting/system/VotingSystem.sol";
+import {VoterRegistry} from "../src/core/voter/registry/VoterRegistry.sol";
+import {CandidateRegistry} from "../src/core/candidate/registry/CandidateRegistry.sol";
+import "../../common/Errors.sol";
 
 contract VotingSystemScript is Script {
     VotingSystem public votingSystem;

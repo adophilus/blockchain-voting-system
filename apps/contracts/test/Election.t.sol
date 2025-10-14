@@ -2,14 +2,18 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Election} from "../src/core/Election.sol";
-import "../src/core/Errors.sol";
+import {Election} from "../src/core/election/Election.sol";
+import {Party} from "../src/core/party/Party.sol";
+import {VoterRegistry} from "../src/core/voter/registry/VoterRegistry.sol";
+import "../../common/Errors.sol";
 
 contract ElectionTest is Test {
     Election public election;
+    VoterRegistry public voterRegistry;
     
     function setUp() public {
-        election = new Election(address(this), "Test Election", "Description", "QmTestElectionCID", address(0));
+        voterRegistry = new VoterRegistry();
+        election = new Election(address(this), "Test Election", "Description", "QmTestElectionCID", address(voterRegistry));
     }
     
     function test_ElectionCreation() public view {

@@ -1,11 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Candidate.sol";
-import "./CandidateRegistry.sol";
-import "./Errors.sol";
+import "../candidate/Candidate.sol";
+import "../candidate/registry/CandidateRegistry.sol";
+import "../../../common/Errors.sol";
+import "./IParty.sol";
 
-contract Party {
+contract Party is IParty {
     string public name;
     string public slogan;
     string public cid; // IPFS CID for party logo or related media

@@ -2,9 +2,9 @@
 pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
-import {Party} from "../src/core/Party.sol";
-import {CandidateRegistry} from "../src/core/CandidateRegistry.sol";
-import "../src/core/Errors.sol";
+import {Party} from "../src/core/party/Party.sol";
+import {CandidateRegistry} from "../src/core/candidate/registry/CandidateRegistry.sol";
+import "../../common/Errors.sol";
 
 contract PartyTest is Test {
     Party public party;

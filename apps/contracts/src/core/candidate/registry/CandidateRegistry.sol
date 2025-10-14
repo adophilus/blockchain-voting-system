@@ -1,10 +1,11 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./Candidate.sol";
-import "./Errors.sol";
+import "../Candidate.sol";
+import "../../../common/Errors.sol";
+import "./ICandidateRegistry.sol";
 
-contract CandidateRegistry {
+contract CandidateRegistry is ICandidateRegistry {
     address public admin;
     uint public nextCandidateId;
     mapping(uint => Candidate) public candidates;

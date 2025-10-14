@@ -1,12 +1,12 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./VoterRegistry.sol";
-import "../core/Party.sol";
-import "./Errors.sol";
-import { console } from "forge-std/console.sol";
+import "../../voter/registry/VoterRegistry.sol";
+import "../../party/Party.sol";
+import "../../common/Errors.sol";
+import "./IElection.sol";
 
-contract Election {
+contract Election is IElection {
     address public admin;
     uint public startTime;
     uint public endTime;
@@ -39,9 +39,6 @@ contract Election {
     event ElectionEnded();
 
     modifier onlyAdmin() {
-        console.log("admin in Eleection.onlyAdmin:------->");
-        console.log(admin);
-        console.log("admin in Election.onlyAdmin:<--------");
         if (msg.sender != admin) revert NotAdmin();
         _;
     }
@@ -80,9 +77,6 @@ contract Election {
         description = _description;
         cid = _cid;
         voterRegistryAddress = _voterRegistryAddress;
-        console.log("admin in election:------->");
-        console.log(admin);
-        console.log("admin in election:<--------");
     }
 
     function startElection(uint _startTime, uint _endTime) external onlyAdmin {
