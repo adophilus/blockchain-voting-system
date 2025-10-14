@@ -39,14 +39,10 @@ class BlockchainVotingSystem implements VotingSystem {
 	constructor(
 		private readonly wallet: Wallet,
 		private readonly votingSystemAddress: Address,
-	) {}
+	) { }
 
 	private getAccountAddress(): Address {
-		const account = this.wallet.getWalletClient().account;
-		if (!account) {
-			throw new Error("WalletClient account is not defined.");
-		}
-		return account.address;
+		return this.wallet.getWalletClient().account!.address;
 	}
 
 	// Voter Management
