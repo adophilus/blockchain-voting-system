@@ -163,6 +163,22 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		expect(statusResult.value).toBe("Ended");
 	}, 60000);
 
+	it("should register a voter for an election successfully", async () => {
+		const createElectionResult = await votingSystem.createElection(
+			"Election for Voter Reg",
+			"Description",
+			"QmElectionCID",
+		);
+		assert(createElectionResult.isOk, "ERR_OPERATION_FAILED");
+		const electionId = createElectionResult.value;
+
+		const registerVoterResult = await votingSystem.registerVoterForElection(
+			electionId,
+			voter1Wallet.getAddress(),
+		);
+		assert(registerVoterResult.isOk, "ERR_OPERATION_FAILED");
+	});
+
 	it("should cast a vote successfully", async () => {
 		const createResult = await votingSystem.createElection(
 			"Test Election Vote",
@@ -201,11 +217,12 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		// Start the election
 		await votingSystem.startElection(electionId, startTime, endTime);
 
-		// Register voter
-		console.log(await votingSystem.registerVoterForElection(
+		// Register voter globally and for election
+		await votingSystem.registerVoter(voter1Wallet.getAddress());
+		await votingSystem.registerVoterForElection(
 			electionId,
 			voter1Wallet.getAddress(),
-		));
+		);
 
 		const castVoteResult = await votingSystem.castVote(
 			electionId,

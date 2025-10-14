@@ -3,6 +3,8 @@ pragma solidity ^0.8.24;
 
 import {Script, console} from "forge-std/Script.sol";
 import {VotingSystem} from "../src/core/VotingSystem.sol";
+import {VoterRegistry} from "../src/core/VoterRegistry.sol";
+import {CandidateRegistry} from "../src/core/CandidateRegistry.sol";
 
 contract VotingSystemScript is Script {
     VotingSystem public votingSystem;
@@ -12,7 +14,10 @@ contract VotingSystemScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        votingSystem = new VotingSystem();
+        VoterRegistry voterRegistry = new VoterRegistry();
+        CandidateRegistry candidateRegistry = new CandidateRegistry();
+
+        votingSystem = new VotingSystem(address(voterRegistry), address(candidateRegistry));
 
         vm.stopBroadcast();
     }

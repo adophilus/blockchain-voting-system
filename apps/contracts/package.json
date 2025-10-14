@@ -9,6 +9,7 @@
 	},
 	"scripts": {
 		"build": "forge build && wagmi generate",
+		"deploy": "./script/deploy.sh",
 		"test": "forge test",
 		"dev": "anvil"
 	},

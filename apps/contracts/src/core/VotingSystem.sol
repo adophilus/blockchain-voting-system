@@ -25,12 +25,10 @@ contract VotingSystem {
         _;
     }
     
-    constructor() {
+    constructor(address _voterRegistryAddress, address _candidateRegistryAddress) {
         admin = msg.sender;
-        VoterRegistry voterRegistry = new VoterRegistry();
-        voterRegistryAddress = address(voterRegistry);
-        CandidateRegistry candidateRegistry = new CandidateRegistry();
-        candidateRegistryAddress = address(candidateRegistry);
+        voterRegistryAddress = _voterRegistryAddress;
+        candidateRegistryAddress = _candidateRegistryAddress;
     }
     
     function createElection(string memory _name, string memory _description, string memory _cid) external onlyAdmin returns (uint) {

@@ -3,17 +3,25 @@ pragma solidity ^0.8.24;
 
 import {Test, console} from "forge-std/Test.sol";
 import {VotingSystem} from "../src/core/VotingSystem.sol";
+import {VoterRegistry} from "../src/core/VoterRegistry.sol";
+import {CandidateRegistry} from "../src/core/CandidateRegistry.sol";
 import "../src/core/Errors.sol";
 
 contract VotingSystemTest is Test {
     VotingSystem public votingSystem;
+    VoterRegistry public voterRegistry;
+    CandidateRegistry public candidateRegistry;
 
     function setUp() public {
-        votingSystem = new VotingSystem();
+        voterRegistry = new VoterRegistry();
+        candidateRegistry = new CandidateRegistry();
+        votingSystem = new VotingSystem(address(voterRegistry), address(candidateRegistry));
     }
 
     function test_VotingSystemCreation() public view {
         assertEq(votingSystem.admin(), address(this));
+        assertEq(votingSystem.voterRegistryAddress(), address(voterRegistry));
+        assertEq(votingSystem.candidateRegistryAddress(), address(candidateRegistry));
     }
 
     function test_CreateElection() public {

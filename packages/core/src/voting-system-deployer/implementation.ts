@@ -6,10 +6,18 @@ import type {
 	DeploySystemError,
 } from "./interface";
 import VotingSystemMetadata from "@blockchain-voting-system/contracts/VotingSystem.sol/VotingSystem.json";
+import VoterRegistryMetadata from "@blockchain-voting-system/contracts/VoterRegistry.sol/VoterRegistry.json";
+import CandidateRegistryMetadata from "@blockchain-voting-system/contracts/CandidateRegistry.sol/CandidateRegistry.json";
 import type { Wallet } from "../wallet";
 
 const VotingSystemABI = VotingSystemMetadata.abi as Abi;
 const VotingSystemBytecode = VotingSystemMetadata.bytecode.object as Hex;
+
+const VoterRegistryABI = VoterRegistryMetadata.abi as Abi;
+const VoterRegistryBytecode = VoterRegistryMetadata.bytecode.object as Hex;
+
+const CandidateRegistryABI = CandidateRegistryMetadata.abi as Abi;
+const CandidateRegistryBytecode = CandidateRegistryMetadata.bytecode.object as Hex;
 
 class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 	constructor(private readonly wallet: Wallet) {}
@@ -53,14 +61,45 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		}
 	}
 
-	private async deployVotingSystem(): Promise<
+	private async deployVoterRegistry(): Promise<
 		Result<Address, DeployContractError>
 	> {
-		return this.deployContract(VotingSystemABI, VotingSystemBytecode);
+		return this.deployContract(VoterRegistryABI, VoterRegistryBytecode);
+	}
+
+	private async deployCandidateRegistry(): Promise<
+		Result<Address, DeployContractError>
+	> {
+		return this.deployContract(CandidateRegistryABI, CandidateRegistryBytecode);
+	}
+
+	private async deployVotingSystem(
+		voterRegistryAddress: Address,
+		candidateRegistryAddress: Address,
+	): Promise<Result<Address, DeployContractError>> {
+		return this.deployContract(VotingSystemABI, VotingSystemBytecode, [
+			voterRegistryAddress,
+			candidateRegistryAddress,
+		]);
 	}
 
 	public async deploySystem(): Promise<Result<Address, DeploySystemError>> {
-		const votingSystemResult = await this.deployVotingSystem();
+		const voterRegistryResult = await this.deployVoterRegistry();
+		if (voterRegistryResult.isErr) {
+			return Result.err(voterRegistryResult.error);
+		}
+		const voterRegistryAddress = voterRegistryResult.value;
+
+		const candidateRegistryResult = await this.deployCandidateRegistry();
+		if (candidateRegistryResult.isErr) {
+			return Result.err(candidateRegistryResult.error);
+		}
+		const candidateRegistryAddress = candidateRegistryResult.value;
+
+		const votingSystemResult = await this.deployVotingSystem(
+			voterRegistryAddress,
+			candidateRegistryAddress,
+		);
 		if (votingSystemResult.isErr) {
 			return Result.err(votingSystemResult.error);
 		}
