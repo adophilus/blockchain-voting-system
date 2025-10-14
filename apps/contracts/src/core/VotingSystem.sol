@@ -83,4 +83,10 @@ contract VotingSystem {
         if (_partyId == 0 || _partyId > partyCount) revert InvalidPartyId();
         return address(parties[_partyId]);
     }
+
+    function registerVoterForElection(uint _electionId, address _voter) external onlyAdmin {
+        if (_electionId == 0 || _electionId > electionCount) revert InvalidElectionId();
+        Election election = elections[_electionId];
+        election.registerVoterForElection(_voter);
+    }
 }

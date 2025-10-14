@@ -4,6 +4,8 @@ import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
 import { deployerWallet, voter1Wallet } from "../setup";
 import { assert } from "../../src/lib/assert";
 
+import { votingSystemAbi } from "@blockchain-voting-system/contracts/types";
+
 describe("BlockchainVotingSystem Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
 	let votingSystem: BlockchainVotingSystem;
@@ -201,10 +203,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Register voter
-		await votingSystem.registerVoterForElection(
+		console.log(await votingSystem.registerVoterForElection(
 			electionId,
 			voter1Wallet.getAddress(),
-		);
+		));
 
 		const castVoteResult = await votingSystem.castVote(
 			electionId,

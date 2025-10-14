@@ -109,18 +109,11 @@ class BlockchainVotingSystem implements VotingSystem {
 			const account = this.getAccountAddress();
 
 			// Get the election address from the voting system
-			const electionAddress = await publicClient.readContract({
+			const { request } = await publicClient.simulateContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
-				functionName: "getElection",
-				args: [BigInt(electionId)],
-			});
-
-			const { request } = await publicClient.simulateContract({
-				address: electionAddress,
-				abi: electionAbi,
 				functionName: "registerVoterForElection",
-				args: [voterAddress],
+				args: [BigInt(electionId), voterAddress],
 				account,
 			});
 
