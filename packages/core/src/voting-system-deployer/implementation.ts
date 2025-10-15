@@ -94,7 +94,6 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		return this.deployContract(ElectionRegistryABI, ElectionRegistryBytecode, [
 			voterRegistryAddress,
 			this.wallet.getAddress(),
-			this.wallet.getAddress(), // primary admin and secondary admin (will be updated after VotingSystem deployment)
 		]);
 	}
 
@@ -104,7 +103,6 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		return this.deployContract(PartyRegistryABI, PartyRegistryBytecode, [
 			candidateRegistryAddress,
 			this.wallet.getAddress(),
-			this.wallet.getAddress(), // primary admin and secondary admin (will be updated after VotingSystem deployment)
 		]);
 	}
 
