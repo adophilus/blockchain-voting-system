@@ -4,12 +4,13 @@ pragma solidity ^0.8.24;
 import {CandidateRegistry} from "../candidate/registry/CandidateRegistry.sol";
 import "../../common/Errors.sol";
 import {IParty} from "./IParty.sol";
+import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract Party is IParty {
+contract Party is IParty, AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     string public name;
     string public slogan;
     string public cid; // IPFS CID for party logo or related media
-    address public admin;
     address public candidateRegistryAddress;
     uint public candidateCount;
 
@@ -17,7 +18,7 @@ contract Party is IParty {
     mapping(uint => bool) private candidateIdExists;
 
     modifier onlyAdmin() {
-        if (msg.sender != admin) revert NotAdmin();
+        _checkRole(ADMIN_ROLE);
         _;
     }
 
@@ -28,10 +29,10 @@ contract Party is IParty {
         address _candidateRegistryAddress,
         address _admin
     ) {
+        _grantRole(ADMIN_ROLE, _admin);
         name = _name;
         slogan = _slogan;
         cid = _cid;
-        admin = _admin;
         candidateRegistryAddress = _candidateRegistryAddress;
     }
 
@@ -112,5 +113,4 @@ contract Party is IParty {
             cids[i] = candidateCidFromReg;
         }
     }
-}
 

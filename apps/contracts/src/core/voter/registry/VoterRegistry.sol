@@ -3,18 +3,19 @@ pragma solidity ^0.8.24;
 
 import "../../../common/Errors.sol";
 import {IVoterRegistry} from "./IVoterRegistry.sol";
+import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract VoterRegistry is IVoterRegistry {
-    address public admin;
+contract VoterRegistry is IVoterRegistry, AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     mapping(address => bool) public registeredVoters;
 
     modifier onlyAdmin() {
-        if (msg.sender != admin) revert NotAdmin();
+        _checkRole(ADMIN_ROLE);
         _;
     }
 
-    constructor() {
-        admin = msg.sender;
+    constructor(address _admin) {
+        _grantRole(ADMIN_ROLE, _admin);
     }
 
     function registerVoter(address _voter) external onlyAdmin {

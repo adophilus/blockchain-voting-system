@@ -4,19 +4,20 @@ pragma solidity ^0.8.24;
 import {Candidate} from "../Candidate.sol";
 import "../../../common/Errors.sol";
 import {ICandidateRegistry} from "./ICandidateRegistry.sol";
+import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract CandidateRegistry is ICandidateRegistry {
-    address public admin;
+contract CandidateRegistry is ICandidateRegistry, AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint public nextCandidateId;
     mapping(uint => Candidate) public candidates;
 
     modifier onlyAdmin() {
-        if (msg.sender != admin) revert NotAdmin();
+        _checkRole(ADMIN_ROLE);
         _;
     }
 
-    constructor() {
-        admin = msg.sender;
+    constructor(address _admin) {
+        _grantRole(ADMIN_ROLE, _admin);
         nextCandidateId = 1;
     }
 
@@ -69,4 +70,3 @@ contract CandidateRegistry is ICandidateRegistry {
         Candidate memory c = candidates[_candidateId];
         return (c.id, c.name, c.position, c.cid);
     }
-}
