@@ -13,8 +13,16 @@ contract VotingSystem is IVotingSystem {
     uint public electionCount;
     uint public partyCount;
 
-    mapping(uint => Election) public elections;
-    mapping(uint => Party) public parties;
+    mapping(uint => Election) internal _elections;
+    mapping(uint => Party) internal _parties;
+
+    function elections(uint _electionId) external view returns (address) {
+        return address(_elections[_electionId]);
+    }
+
+    function parties(uint _partyId) external view returns (address) {
+        return address(_parties[_partyId]);
+    }
     address public voterRegistryAddress;
     address public candidateRegistryAddress;
 
@@ -38,7 +46,7 @@ contract VotingSystem is IVotingSystem {
         string memory _cid
     ) external onlyAdmin returns (uint) {
         electionCount++;
-        elections[electionCount] = new Election(
+        _elections[electionCount] = new Election(
             admin,
             _name,
             _description,
@@ -46,7 +54,7 @@ contract VotingSystem is IVotingSystem {
             voterRegistryAddress
         );
 
-        emit ElectionCreated(electionCount, address(elections[electionCount]));
+        emit ElectionCreated(electionCount, address(_elections[electionCount]));
         return electionCount;
     }
 
@@ -56,7 +64,7 @@ contract VotingSystem is IVotingSystem {
         string memory _cid
     ) external onlyAdmin returns (uint) {
         partyCount++;
-        parties[partyCount] = new Party(
+        _parties[partyCount] = new Party(
             _name,
             _slogan,
             _cid,
@@ -64,7 +72,7 @@ contract VotingSystem is IVotingSystem {
             admin
         );
 
-        emit PartyCreated(partyCount, address(parties[partyCount]));
+        emit PartyCreated(partyCount, address(_parties[partyCount]));
         return partyCount;
     }
 
@@ -117,12 +125,12 @@ contract VotingSystem is IVotingSystem {
     function getElection(uint _electionId) external view returns (address) {
         if (_electionId == 0 || _electionId > electionCount)
             revert InvalidElectionId();
-        return address(elections[_electionId]);
+        return address(_elections[_electionId]);
     }
 
     function getParty(uint _partyId) external view returns (address) {
         if (_partyId == 0 || _partyId > partyCount) revert InvalidPartyId();
-        return address(parties[_partyId]);
+        return address(_parties[_partyId]);
     }
 
     function registerVoterForElection(
@@ -131,7 +139,7 @@ contract VotingSystem is IVotingSystem {
     ) external onlyAdmin {
         if (_electionId == 0 || _electionId > electionCount)
             revert InvalidElectionId();
-        Election election = elections[_electionId];
+        Election election = _elections[_electionId];
         election.registerVoterForElection(_voter);
     }
 }
