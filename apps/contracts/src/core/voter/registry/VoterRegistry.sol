@@ -10,8 +10,12 @@ contract VoterRegistry is IVoterRegistry, AccessControl {
     mapping(address => bool) public registeredVoters;
 
     modifier onlyAdmin() {
-        _checkRole(ADMIN_ROLE);
+        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
         _;
+    }
+
+    function __msgSender() internal view virtual returns (address) {
+        return tx.origin;
     }
 
     constructor(address _admin) {

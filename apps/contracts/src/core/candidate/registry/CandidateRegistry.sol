@@ -12,8 +12,12 @@ contract CandidateRegistry is ICandidateRegistry, AccessControl {
     mapping(uint => Candidate) public candidates;
 
     modifier onlyAdmin() {
-        _checkRole(ADMIN_ROLE);
+        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
         _;
+    }
+
+    function __msgSender() internal view virtual returns (address) {
+        return tx.origin;
     }
 
     constructor(address _admin) {

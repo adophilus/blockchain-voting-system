@@ -30,8 +30,12 @@ contract Election is IElection, AccessControl {
     mapping(address => bool) public hasVoted;
 
     modifier onlyAdmin() {
-        _checkRole(ADMIN_ROLE);
+        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
         _;
+    }
+
+    function __msgSender() internal view virtual returns (address) {
+        return tx.origin;
     }
 
     modifier onlyDuringElection() {
