@@ -7,6 +7,7 @@ import {VoterRegistry} from "../../voter/registry/VoterRegistry.sol";
 import {CandidateRegistry} from "../../candidate/registry/CandidateRegistry.sol";
 import "../../../common/Errors.sol";
 import {IVotingSystem} from "./IVotingSystem.sol";
+import {console} from "forge-std/console.sol";
 
 contract VotingSystem is IVotingSystem {
     address public admin;
@@ -27,6 +28,10 @@ contract VotingSystem is IVotingSystem {
     address public candidateRegistryAddress;
 
     modifier onlyAdmin() {
+        console.log("VotingSystem.onlyAdmin: BEGIN");
+        console.log(admin);
+        console.log(msg.sender);
+        console.log("VotingSystem.onlyAdmin: END");
         if (msg.sender != admin) revert NotAdmin();
         _;
     }
