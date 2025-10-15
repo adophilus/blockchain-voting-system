@@ -33,6 +33,8 @@ import {
 	partyAbi,
 	votingSystemAbi,
 	electionAbi,
+	electionRegistryAbi,
+	partyRegistryAbi,
 } from "@blockchain-voting-system/contracts/types";
 
 class BlockchainVotingSystem implements VotingSystem {
@@ -45,7 +47,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		return this.wallet.getWalletClient().account!.address;
 	}
 
-	// Voter Management
+	// Voter Management - still goes through VotingSystem to get VoterRegistry address
 	public async registerVoter(
 		voterAddress: Address,
 	): Promise<Result<void, RegisterVoterError>> {
@@ -54,9 +56,16 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			const { request } = await publicClient.simulateContract({
+			// Get voter registry address from voting system
+			const voterRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "voterRegistryAddress",
+			});
+
+			const { request } = await publicClient.simulateContract({
+				address: voterRegistryAddress,
+				abi: voterRegistryAbi,
 				functionName: "registerVoter",
 				args: [voterAddress],
 				account,
@@ -79,10 +88,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		voterAddress: Address,
 	): Promise<Result<boolean, IsVoterVerifiedError>> {
 		try {
-			const data = await this.wallet.getPublicClient().readContract({
+			// Get voter registry address from voting system
+			const voterRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
-				functionName: "isVoterVerified",
+				functionName: "voterRegistryAddress",
+			});
+
+			const data = await this.wallet.getPublicClient().readContract({
+				address: voterRegistryAddress,
+				abi: voterRegistryAbi,
+				functionName: "isVoterRegistered",
 				args: [voterAddress],
 			});
 			return Result.ok(data);
@@ -95,6 +111,8 @@ class BlockchainVotingSystem implements VotingSystem {
 		}
 	}
 
+	// Note: registerVoterForElection would need to go to ElectionRegistry or Election contract directly
+	// This depends on the new architecture
 	public async registerVoterForElection(
 		electionId: number,
 		voterAddress: Address,
@@ -104,12 +122,26 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			// Get the election address from the voting system
-			const { request } = await publicClient.simulateContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await publicClient.readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
+				functionName: "getElection",
+				args: [BigInt(electionId)],
+			});
+
+			const { request } = await publicClient.simulateContract({
+				address: electionAddress,
+				abi: electionAbi,
 				functionName: "registerVoterForElection",
-				args: [BigInt(electionId), voterAddress],
+				args: [voterAddress],
 				account,
 			});
 
@@ -129,7 +161,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		}
 	}
 
-	// Candidate Management
+	// Candidate Management - goes to CandidateRegistry directly
 	public async registerCandidate(
 		name: string,
 		position: string,
@@ -140,18 +172,39 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			const { request, result } = await publicClient.simulateContract({
+			// Get candidate registry address from voting system
+			const candidateRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "candidateRegistryAddress",
+			});
+
+			const { request } = await publicClient.simulateContract({
+				address: candidateRegistryAddress,
+				abi: candidateRegistryAbi,
 				functionName: "registerCandidate",
 				args: [name, position, cid],
 				account,
 			});
 
 			const hash = await walletClient.writeContract(request);
-			await publicClient.waitForTransactionReceipt({ hash });
+			const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-			return Result.ok(Number(result));
+			// Parse the event to get the candidate ID
+			const eventTopic = "CandidateRegistered(uint256,string)";
+			const eventSignature = "0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
+			const eventLog = receipt.logs.find(log => log.topics[0] === eventSignature);
+
+			if (!eventLog || !eventLog.topics[1]) {
+				return Result.err({
+					type: "TransactionFailedError",
+					message: "Could not find CandidateRegistered event",
+				});
+			}
+
+			// Convert hex to number
+			const candidateId = Number(BigInt(eventLog.topics[1]));
+			return Result.ok(candidateId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for registerCandidate:`, e);
 			return Result.err({
@@ -172,9 +225,16 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			const { request } = await publicClient.simulateContract({
+			// Get candidate registry address from voting system
+			const candidateRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "candidateRegistryAddress",
+			});
+
+			const { request } = await publicClient.simulateContract({
+				address: candidateRegistryAddress,
+				abi: candidateRegistryAbi,
 				functionName: "updateCandidate",
 				args: [BigInt(candidateId), name, position, cid],
 				account,
@@ -197,9 +257,16 @@ class BlockchainVotingSystem implements VotingSystem {
 		candidateId: number,
 	): Promise<Result<CandidateDetails, GetCandidateError>> {
 		try {
-			const data = await this.wallet.getPublicClient().readContract({
+			// Get candidate registry address from voting system
+			const candidateRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "candidateRegistryAddress",
+			});
+
+			const data = await this.wallet.getPublicClient().readContract({
+				address: candidateRegistryAddress,
+				abi: candidateRegistryAbi,
 				functionName: "getCandidate",
 				args: [BigInt(candidateId)],
 			});
@@ -214,7 +281,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		}
 	}
 
-	// Party Management
+	// Party Management - goes to PartyRegistry directly
 	public async registerParty(
 		name: string,
 		slogan: string,
@@ -225,18 +292,39 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			const { request, result } = await publicClient.simulateContract({
+			// Get party registry address from voting system
+			const partyRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "partyRegistryAddress",
+			});
+
+			const { request } = await publicClient.simulateContract({
+				address: partyRegistryAddress,
+				abi: partyRegistryAbi,
 				functionName: "createParty",
 				args: [name, slogan, logoCid],
 				account,
 			});
 
 			const hash = await walletClient.writeContract(request);
-			await publicClient.waitForTransactionReceipt({ hash });
+			const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-			return Result.ok(Number(result));
+			// Parse the event to get the party ID
+			const eventTopic = "PartyCreated(uint256,address)";
+			const eventSignature = "0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
+			const eventLog = receipt.logs.find(log => log.topics[0] === eventSignature);
+
+			if (!eventLog || !eventLog.topics[1]) {
+				return Result.err({
+					type: "TransactionFailedError",
+					message: "Could not find PartyCreated event",
+				});
+			}
+
+			// Convert hex to number
+			const partyId = Number(BigInt(eventLog.topics[1]));
+			return Result.ok(partyId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for registerParty:`, e);
 			return Result.err({
@@ -250,13 +338,21 @@ class BlockchainVotingSystem implements VotingSystem {
 		partyId: number,
 	): Promise<Result<PartyDetails, GetPartyError>> {
 		try {
-			const partyAddress = await this.wallet.getPublicClient().readContract({
+			// Get party registry address from voting system
+			const partyRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "partyRegistryAddress",
+			});
+
+			const partyAddress = await this.wallet.getPublicClient().readContract({
+				address: partyRegistryAddress,
+				abi: partyRegistryAbi,
 				functionName: "getParty",
 				args: [BigInt(partyId)],
 			});
 
+			// This might need to get party details from the party contract directly
 			const name = await this.wallet.getPublicClient().readContract({
 				address: partyAddress,
 				abi: partyAbi,
@@ -279,7 +375,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		}
 	}
 
-	// Election Management
+	// Election Management - goes to ElectionRegistry directly
 	public async createElection(
 		name: string,
 		description: string,
@@ -290,18 +386,40 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			const { request, result } = await publicClient.simulateContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// We need to listen to the ElectionCreated event to get the ID
+			const { request } = await publicClient.simulateContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "createElection",
 				args: [name, description, cid],
 				account,
 			});
 
 			const hash = await walletClient.writeContract(request);
-			await publicClient.waitForTransactionReceipt({ hash });
+			const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-			return Result.ok(Number(result));
+			// Parse the event to get the election ID
+			const eventTopic = "ElectionCreated(uint256,address)";
+			const eventSignature = "0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
+			const eventLog = receipt.logs.find(log => log.topics[0] === eventSignature);
+
+			if (!eventLog || !eventLog.topics[1]) {
+				return Result.err({
+					type: "TransactionFailedError",
+					message: "Could not find ElectionCreated event",
+				});
+			}
+
+			// Convert hex to number
+			const electionId = Number(BigInt(eventLog.topics[1]));
+			return Result.ok(electionId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for createElection:`, e);
 			return Result.err({
@@ -315,13 +433,21 @@ class BlockchainVotingSystem implements VotingSystem {
 		electionId: number,
 	): Promise<Result<ElectionDetails, GetElectionError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});
 
+			// Get election details from the election contract directly
 			const name = await this.wallet.getPublicClient().readContract({
 				address: electionAddress,
 				abi: electionAbi,
@@ -389,9 +515,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		endTime: number,
 	): Promise<Result<void, StartElectionError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});
@@ -425,9 +559,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		electionId: number,
 	): Promise<Result<void, EndElectionError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});
@@ -460,9 +602,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		electionId: number,
 	): Promise<Result<ElectionStatus, GetElectionStatusError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});
@@ -501,9 +651,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		candidateId: number,
 	): Promise<Result<void, CastVoteError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});
@@ -538,9 +696,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		voterAddress: Address,
 	): Promise<Result<boolean, HasVotedError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});
@@ -567,9 +733,17 @@ class BlockchainVotingSystem implements VotingSystem {
 		electionId: number,
 	): Promise<Result<ElectionResults, GetElectionResultsError>> {
 		try {
-			const electionAddress = await this.wallet.getPublicClient().readContract({
+			// Get election registry address from voting system
+			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+			// Get election address from election registry
+			const electionAddress = await this.wallet.getPublicClient().readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
 				functionName: "getElection",
 				args: [BigInt(electionId)],
 			});

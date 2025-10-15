@@ -2,10 +2,12 @@
 	"$schema": "https://json.schemastore.org/package.json",
 	"name": "@blockchain-voting-system/core",
 	"exports": {
-		".": "./src/index.ts"
+		".": "./src/index.ts",
+		"./*": "./src/*.ts"
 	},
 	"scripts": {
 		"lint": "tsc",
+		"build": "tsc",
 		"test": "vitest run"
 	},
 	"dependencies": {
