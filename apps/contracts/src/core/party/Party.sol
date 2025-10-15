@@ -113,4 +113,4 @@ contract Party is IParty, AccessControl {
             cids[i] = candidateCidFromReg;
         }
     }
-
+}

@@ -70,3 +70,4 @@ contract CandidateRegistry is ICandidateRegistry, AccessControl {
         Candidate memory c = candidates[_candidateId];
         return (c.id, c.name, c.position, c.cid);
     }
+}
