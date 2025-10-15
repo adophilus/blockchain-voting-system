@@ -3,23 +3,18 @@ pragma solidity ^0.8.24;
 
 import "../../../common/Errors.sol";
 import {IVoterRegistry} from "./IVoterRegistry.sol";
-import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract VoterRegistry is IVoterRegistry, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+contract VoterRegistry is IVoterRegistry {
+    address public admin;
     mapping(address => bool) public registeredVoters;
 
     modifier onlyAdmin() {
-        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
+        if (admin != msg.sender) revert NotAdmin();
         _;
     }
 
-    function __msgSender() internal view virtual returns (address) {
-        return tx.origin;
-    }
-
     constructor(address _admin) {
-        _grantRole(ADMIN_ROLE, _admin);
+        admin = _admin;
     }
 
     function registerVoter(address _voter) external onlyAdmin {

@@ -5,6 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {Election} from "../src/core/election/Election.sol";
 import {Party} from "../src/core/party/Party.sol";
 import {VoterRegistry} from "../src/core/voter/registry/VoterRegistry.sol";
+import {Config} from "./Config.sol";
 import "../src/common/Errors.sol";
 
 contract ElectionTest is Test {
@@ -12,24 +13,25 @@ contract ElectionTest is Test {
     VoterRegistry public voterRegistry;
 
     function setUp() public {
-        voterRegistry = new VoterRegistry(address(this));
+        voterRegistry = new VoterRegistry(Config.ADMIN);
         election = new Election(
-            address(this),
             "Test Election",
             "Description",
             "QmTestElectionCID",
-            address(voterRegistry)
+            address(voterRegistry),
+            Config.ADMIN
         );
     }
 
     function test_ElectionCreation() public view {
-        assertEq(election.admin(), address(this));
         assertEq(election.cid(), "QmTestElectionCID");
         assertEq(election.name(), "Test Election");
         assertEq(election.description(), "Description");
     }
 
     function test_StartElection() public {
+        vm.startPrank(Config.ADMIN);
+
         uint startTime = block.timestamp + 100;
         uint endTime = block.timestamp + 200;
 
@@ -41,6 +43,8 @@ contract ElectionTest is Test {
     }
 
     function test_RevertWhen_StartElectionInvalidTimes() public {
+        vm.startPrank(Config.ADMIN);
+
         uint startTime = block.timestamp + 100;
         uint endTime = block.timestamp + 50; // End time before start time
 
@@ -49,6 +53,8 @@ contract ElectionTest is Test {
     }
 
     function test_AddParty() public {
+        vm.startPrank(Config.ADMIN);
+
         address testParty = address(0x1234);
         election.startElection(block.timestamp + 100, block.timestamp + 200);
         election.addParty(testParty);

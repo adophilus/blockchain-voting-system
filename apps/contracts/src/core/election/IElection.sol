@@ -12,7 +12,6 @@ interface IElection {
     );
     event ElectionEnded();
 
-    function admin() external view returns (address);
     function startTime() external view returns (uint);
     function endTime() external view returns (uint);
     function electionStarted() external view returns (bool);

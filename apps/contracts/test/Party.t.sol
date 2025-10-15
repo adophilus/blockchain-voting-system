@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Test, console} from "forge-std/Test.sol";
 import {Party} from "../src/core/party/Party.sol";
 import {CandidateRegistry} from "../src/core/candidate/registry/CandidateRegistry.sol";
+import {Config} from "./Config.sol";
 import "../src/common/Errors.sol";
 
 contract PartyTest is Test {
@@ -11,13 +12,15 @@ contract PartyTest is Test {
     CandidateRegistry public candidateRegistry;
 
     function setUp() public {
-        candidateRegistry = new CandidateRegistry(address(this));
+        vm.startPrank(Config.ADMIN);
+
+        candidateRegistry = new CandidateRegistry(msg.sender);
         party = new Party(
             "Test Party",
             "Test Slogan",
             "QmTestPartyCID",
             address(candidateRegistry),
-            address(this)
+            Config.ADMIN
         );
     }
 
@@ -25,7 +28,6 @@ contract PartyTest is Test {
         assertEq(party.name(), "Test Party");
         assertEq(party.slogan(), "Test Slogan");
         assertEq(party.cid(), "QmTestPartyCID");
-        assertEq(party.admin(), address(this));
     }
 
     function test_RegisterCandidate() public {

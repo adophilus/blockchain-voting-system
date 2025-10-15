@@ -10,23 +10,17 @@ import {IPartyRegistry} from "../../party/registry/IPartyRegistry.sol";
 import "../../../common/Errors.sol";
 import {IVotingSystem} from "./IVotingSystem.sol";
 import {console} from "forge-std/console.sol";
-import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract VotingSystem is IVotingSystem, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-
+contract VotingSystem is IVotingSystem {
+    address public admin;
     address public voterRegistryAddress;
     address public candidateRegistryAddress;
     address public electionRegistryAddress;
     address public partyRegistryAddress;
 
     modifier onlyAdmin() {
-        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
+        if (msg.sender != admin) revert NotAdmin();
         _;
-    }
-
-    function __msgSender() internal view virtual returns (address) {
-        return tx.origin;
     }
 
     constructor(
@@ -36,11 +30,11 @@ contract VotingSystem is IVotingSystem, AccessControl {
         address _partyRegistryAddress,
         address _admin
     ) {
-        _grantRole(ADMIN_ROLE, _admin);
         voterRegistryAddress = _voterRegistryAddress;
         candidateRegistryAddress = _candidateRegistryAddress;
         electionRegistryAddress = _electionRegistryAddress;
         partyRegistryAddress = _partyRegistryAddress;
+        admin = _admin;
     }
 
     function createElection(
@@ -48,11 +42,9 @@ contract VotingSystem is IVotingSystem, AccessControl {
         string memory _description,
         string memory _cid
     ) external onlyAdmin returns (uint) {
-        (uint electionId, address electionAddress) = IElectionRegistry(electionRegistryAddress).createElection(
-            _name,
-            _description,
-            _cid
-        );
+        (uint electionId, address electionAddress) = IElectionRegistry(
+            electionRegistryAddress
+        ).createElection(_name, _description, _cid);
 
         emit ElectionCreated(electionId, electionAddress);
         return electionId;
@@ -63,11 +55,9 @@ contract VotingSystem is IVotingSystem, AccessControl {
         string memory _slogan,
         string memory _cid
     ) external onlyAdmin returns (uint) {
-        (uint partyId, address partyAddress) = IPartyRegistry(partyRegistryAddress).createParty(
-            _name,
-            _slogan,
-            _cid
-        );
+        (uint partyId, address partyAddress) = IPartyRegistry(
+            partyRegistryAddress
+        ).createParty(_name, _slogan, _cid);
 
         emit PartyCreated(partyId, partyAddress);
         return partyId;
@@ -120,7 +110,8 @@ contract VotingSystem is IVotingSystem, AccessControl {
     }
 
     function getElection(uint _electionId) external view returns (address) {
-        return IElectionRegistry(electionRegistryAddress).getElection(_electionId);
+        return
+            IElectionRegistry(electionRegistryAddress).getElection(_electionId);
     }
 
     function getParty(uint _partyId) external view returns (address) {
@@ -131,28 +122,22 @@ contract VotingSystem is IVotingSystem, AccessControl {
         uint _electionId,
         address _voter
     ) external onlyAdmin {
-        address electionAddress = IElectionRegistry(electionRegistryAddress).getElection(_electionId);
+        address electionAddress = IElectionRegistry(electionRegistryAddress)
+            .getElection(_electionId);
         if (electionAddress == address(0)) revert InvalidElectionId();
         Election election = Election(electionAddress);
         election.registerVoterForElection(_voter);
     }
 
     function elections(uint _electionId) external view returns (address) {
-        return IElectionRegistry(electionRegistryAddress).getElection(_electionId);
-    }
-
-    function setElectionRegistry(address _newRegistry) external onlyAdmin {
-        electionRegistryAddress = _newRegistry;
-    }
-    
-    function setPartyRegistry(address _newRegistry) external onlyAdmin {
-        partyRegistryAddress = _newRegistry;
+        return
+            IElectionRegistry(electionRegistryAddress).getElection(_electionId);
     }
 
     function parties(uint _partyId) external view returns (address) {
         return IPartyRegistry(partyRegistryAddress).getParty(_partyId);
     }
-    
+
     function electionCount() external view returns (uint) {
         return IElectionRegistry(electionRegistryAddress).getElectionCount();
     }

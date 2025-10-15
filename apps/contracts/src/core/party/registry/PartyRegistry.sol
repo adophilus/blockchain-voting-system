@@ -5,11 +5,9 @@ import {Party} from "../Party.sol";
 import {CandidateRegistry} from "../../candidate/registry/CandidateRegistry.sol";
 import {InvalidPartyId, NotAdmin} from "../../../common/Errors.sol";
 import "./IPartyRegistry.sol";
-import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract PartyRegistry is IPartyRegistry, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
-    
+contract PartyRegistry is IPartyRegistry {
+    address public admin;
     uint public partyCount;
     mapping(uint => address) public parties;
     mapping(address => bool) public isParty;
@@ -17,20 +15,16 @@ contract PartyRegistry is IPartyRegistry, AccessControl {
     address public candidateRegistryAddress;
 
     modifier onlyAdmin() {
-        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
 
-    function __msgSender() internal view virtual returns (address) {
-        return tx.origin;
-    }
-
-    constructor(address _candidateRegistryAddress, address _primaryAdmin, address _secondaryAdmin) {
-        _grantRole(ADMIN_ROLE, _primaryAdmin);
-        if (_secondaryAdmin != address(0)) {
-            _grantRole(ADMIN_ROLE, _secondaryAdmin);
-        }
+    constructor(
+        address _candidateRegistryAddress,
+        address _admin
+    ) {
         candidateRegistryAddress = _candidateRegistryAddress;
+        admin = _admin;
     }
 
     function createParty(
@@ -46,10 +40,10 @@ contract PartyRegistry is IPartyRegistry, AccessControl {
             candidateRegistryAddress,
             msg.sender // admin
         );
-        
+
         parties[partyCount] = address(newParty);
         isParty[address(newParty)] = true;
-        
+
         emit PartyCreated(partyCount, address(newParty));
         return (partyCount, address(newParty));
     }
@@ -63,3 +57,4 @@ contract PartyRegistry is IPartyRegistry, AccessControl {
         return partyCount;
     }
 }
+

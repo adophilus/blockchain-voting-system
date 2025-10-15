@@ -19,24 +19,23 @@ contract DeployVotingSystemScript is Script {
 
         VoterRegistry voterRegistry = new VoterRegistry(msg.sender);
         CandidateRegistry candidateRegistry = new CandidateRegistry(msg.sender);
-        
-        // Deploy voting system first with placeholder registry addresses
-        votingSystem = new VotingSystem(
+        ElectionRegistry electionRegistry = new ElectionRegistry(
             address(voterRegistry),
+            msg.sender
+        );
+        PartyRegistry partyRegistry = new PartyRegistry(
             address(candidateRegistry),
-            address(0), // Will set these after creating registries
-            address(0), // Will set these after creating registries
             msg.sender
         );
 
-        ElectionRegistry electionRegistry = new ElectionRegistry(address(voterRegistry), msg.sender, address(votingSystem));
-        PartyRegistry partyRegistry = new PartyRegistry(address(candidateRegistry), msg.sender, address(votingSystem));
-
-        // Update registry addresses in voting system
-        votingSystem.setElectionRegistry(address(electionRegistry));
-        votingSystem.setPartyRegistry(address(partyRegistry));
+        votingSystem = new VotingSystem(
+            address(voterRegistry),
+            address(candidateRegistry),
+            address(electionRegistry),
+            address(partyRegistry),
+            msg.sender
+        );
 
         vm.stopBroadcast();
     }
 }
-

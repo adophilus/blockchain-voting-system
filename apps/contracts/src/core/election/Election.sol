@@ -5,9 +5,8 @@ import {VoterRegistry} from "../voter/registry/VoterRegistry.sol";
 import {Party} from "../party/Party.sol";
 import "../../common/Errors.sol";
 import {IElection} from "./IElection.sol";
-import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract Election is IElection, AccessControl {
+contract Election is IElection {
     bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint public startTime;
     uint public endTime;
@@ -17,6 +16,7 @@ contract Election is IElection, AccessControl {
     string public description;
     string public cid; // IPFS CID for election-related media
     address public voterRegistryAddress;
+    address public admin;
 
     // Mapping of parties participating in this election
     mapping(address => bool) public participatingParties;
@@ -30,12 +30,8 @@ contract Election is IElection, AccessControl {
     mapping(address => bool) public hasVoted;
 
     modifier onlyAdmin() {
-        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
+        if (msg.sender != admin) revert NotAdmin();
         _;
-    }
-
-    function __msgSender() internal view virtual returns (address) {
-        return tx.origin;
     }
 
     modifier onlyDuringElection() {
@@ -60,21 +56,18 @@ contract Election is IElection, AccessControl {
         _;
     }
 
-    address public admin;
-
     constructor(
-        address _admin,
         string memory _name,
         string memory _description,
         string memory _cid,
-        address _voterRegistryAddress
+        address _voterRegistryAddress,
+        address _admin
     ) {
-        _grantRole(ADMIN_ROLE, _admin);
-        admin = _admin;
         name = _name;
         description = _description;
         cid = _cid;
         voterRegistryAddress = _voterRegistryAddress;
+        admin = _admin;
     }
 
     function startElection(uint _startTime, uint _endTime) external onlyAdmin {
