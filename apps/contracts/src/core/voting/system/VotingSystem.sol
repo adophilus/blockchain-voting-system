@@ -35,15 +35,12 @@ contract VotingSystem is IVotingSystem, AccessControl {
 
     constructor(
         address _voterRegistryAddress,
-        address _candidateRegistryAddress
+        address _candidateRegistryAddress,
+        address _admin
     ) {
-        _grantRole(ADMIN_ROLE, msg.sender);
+        _grantRole(ADMIN_ROLE, _admin);
         voterRegistryAddress = _voterRegistryAddress;
         candidateRegistryAddress = _candidateRegistryAddress;
-    }
-
-    function isAdmin(address _address) external view returns (bool) {
-        return hasRole(ADMIN_ROLE, _address);
     }
 
     function createElection(

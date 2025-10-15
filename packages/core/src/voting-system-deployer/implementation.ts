@@ -65,13 +65,19 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 	private async deployVoterRegistry(): Promise<
 		Result<Address, DeployContractError>
 	> {
-		return this.deployContract(VoterRegistryABI, VoterRegistryBytecode);
+		return this.deployContract(VoterRegistryABI, VoterRegistryBytecode, [
+			this.wallet.getAddress(),
+		]);
 	}
 
 	private async deployCandidateRegistry(): Promise<
 		Result<Address, DeployContractError>
 	> {
-		return this.deployContract(CandidateRegistryABI, CandidateRegistryBytecode);
+		return this.deployContract(
+			CandidateRegistryABI,
+			CandidateRegistryBytecode,
+			[this.wallet.getAddress()],
+		);
 	}
 
 	private async deployVotingSystem(
@@ -81,20 +87,18 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 		return this.deployContract(VotingSystemABI, VotingSystemBytecode, [
 			voterRegistryAddress,
 			candidateRegistryAddress,
+			this.wallet.getAddress(),
 		]);
 	}
 
 	public async deploySystem(): Promise<Result<Address, DeploySystemError>> {
-		console.log('about to deploy system')
 		const voterRegistryResult = await this.deployVoterRegistry();
-		console.log({ voterRegistryResult });
 		if (voterRegistryResult.isErr) {
 			return Result.err(voterRegistryResult.error);
 		}
 		const voterRegistryAddress = voterRegistryResult.value;
 
 		const candidateRegistryResult = await this.deployCandidateRegistry();
-		console.log({ candidateRegistryResult });
 		if (candidateRegistryResult.isErr) {
 			return Result.err(candidateRegistryResult.error);
 		}

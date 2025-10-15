@@ -20,7 +20,8 @@ contract DeployVotingSystemScript is Script {
 
         votingSystem = new VotingSystem(
             address(voterRegistry),
-            address(candidateRegistry)
+            address(candidateRegistry),
+            msg.sender
         );
 
         vm.stopBroadcast();

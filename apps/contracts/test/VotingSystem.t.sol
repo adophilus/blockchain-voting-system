@@ -17,7 +17,8 @@ contract VotingSystemTest is Test {
         candidateRegistry = new CandidateRegistry(address(this));
         votingSystem = new VotingSystem(
             address(voterRegistry),
-            address(candidateRegistry)
+            address(candidateRegistry),
+            address(this)
         );
     }
 
