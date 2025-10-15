@@ -2,13 +2,11 @@
 pragma solidity ^0.8.24;
 
 import "../../../common/Errors.sol";
-import "./IVoterRegistry.sol";
+import {IVoterRegistry} from "./IVoterRegistry.sol";
 
 contract VoterRegistry is IVoterRegistry {
     address public admin;
     mapping(address => bool) public registeredVoters;
-
-    event VoterRegistered(address indexed voter);
 
     modifier onlyAdmin() {
         if (msg.sender != admin) revert NotAdmin();

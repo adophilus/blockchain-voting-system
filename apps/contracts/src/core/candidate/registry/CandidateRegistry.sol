@@ -1,17 +1,14 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "../Candidate.sol";
+import {Candidate} from "../Candidate.sol";
 import "../../../common/Errors.sol";
-import "./ICandidateRegistry.sol";
+import {ICandidateRegistry} from "./ICandidateRegistry.sol";
 
 contract CandidateRegistry is ICandidateRegistry {
     address public admin;
     uint public nextCandidateId;
     mapping(uint => Candidate) public candidates;
-
-    event CandidateRegistered(uint indexed candidateId, string name);
-    event CandidateUpdated(uint indexed candidateId, string name);
 
     modifier onlyAdmin() {
         if (msg.sender != admin) revert NotAdmin();
@@ -23,7 +20,11 @@ contract CandidateRegistry is ICandidateRegistry {
         nextCandidateId = 1;
     }
 
-    function registerCandidate(string memory _name, string memory _position, string memory _cid) external onlyAdmin returns (uint) {
+    function registerCandidate(
+        string memory _name,
+        string memory _position,
+        string memory _cid
+    ) external onlyAdmin returns (uint) {
         if (bytes(_name).length == 0) revert EmptyName();
         // In a real system, you might want to check for duplicate names or other unique identifiers
         // For simplicity, we'll allow multiple candidates with the same name for now, but with unique IDs
@@ -35,8 +36,14 @@ contract CandidateRegistry is ICandidateRegistry {
         return currentId;
     }
 
-    function updateCandidate(uint _candidateId, string memory _name, string memory _position, string memory _cid) external onlyAdmin {
-        if (_candidateId == 0 || _candidateId >= nextCandidateId) revert InvalidCandidateId();
+    function updateCandidate(
+        uint _candidateId,
+        string memory _name,
+        string memory _position,
+        string memory _cid
+    ) external onlyAdmin {
+        if (_candidateId == 0 || _candidateId >= nextCandidateId)
+            revert InvalidCandidateId();
         if (bytes(_name).length == 0) revert EmptyName();
 
         candidates[_candidateId].name = _name;
@@ -45,8 +52,20 @@ contract CandidateRegistry is ICandidateRegistry {
         emit CandidateUpdated(_candidateId, _name);
     }
 
-    function getCandidate(uint _candidateId) external view returns (uint id, string memory name, string memory position, string memory cid) {
-        if (_candidateId == 0 || _candidateId >= nextCandidateId) revert InvalidCandidateId();
+    function getCandidate(
+        uint _candidateId
+    )
+        external
+        view
+        returns (
+            uint id,
+            string memory name,
+            string memory position,
+            string memory cid
+        )
+    {
+        if (_candidateId == 0 || _candidateId >= nextCandidateId)
+            revert InvalidCandidateId();
         Candidate memory c = candidates[_candidateId];
         return (c.id, c.name, c.position, c.cid);
     }

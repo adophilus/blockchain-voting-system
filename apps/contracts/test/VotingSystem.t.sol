@@ -5,7 +5,7 @@ import {Test, console} from "forge-std/Test.sol";
 import {VotingSystem} from "../src/core/voting/system/VotingSystem.sol";
 import {VoterRegistry} from "../src/core/voter/registry/VoterRegistry.sol";
 import {CandidateRegistry} from "../src/core/candidate/registry/CandidateRegistry.sol";
-import "../../common/Errors.sol";
+import "../src/common/Errors.sol";
 
 contract VotingSystemTest is Test {
     VotingSystem public votingSystem;
@@ -15,13 +15,19 @@ contract VotingSystemTest is Test {
     function setUp() public {
         voterRegistry = new VoterRegistry();
         candidateRegistry = new CandidateRegistry();
-        votingSystem = new VotingSystem(address(voterRegistry), address(candidateRegistry));
+        votingSystem = new VotingSystem(
+            address(voterRegistry),
+            address(candidateRegistry)
+        );
     }
 
     function test_VotingSystemCreation() public view {
         assertEq(votingSystem.admin(), address(this));
         assertEq(votingSystem.voterRegistryAddress(), address(voterRegistry));
-        assertEq(votingSystem.candidateRegistryAddress(), address(candidateRegistry));
+        assertEq(
+            votingSystem.candidateRegistryAddress(),
+            address(candidateRegistry)
+        );
     }
 
     function test_CreateElection() public {
@@ -60,3 +66,4 @@ contract VotingSystemTest is Test {
         votingSystem.getParty(999);
     }
 }
+

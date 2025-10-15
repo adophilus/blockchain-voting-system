@@ -1,10 +1,10 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "../../voter/registry/VoterRegistry.sol";
-import "../../party/Party.sol";
+import {VoterRegistry} from "../voter/registry/VoterRegistry.sol";
+import {Party} from "../party/Party.sol";
 import "../../common/Errors.sol";
-import "./IElection.sol";
+import {IElection} from "./IElection.sol";
 
 contract Election is IElection {
     address public admin;
@@ -27,16 +27,6 @@ contract Election is IElection {
 
     // Track voters who have voted in this election
     mapping(address => bool) public hasVoted;
-
-    event ElectionStarted(uint startTime, uint endTime);
-    event PartyAdded(address indexed party);
-    event VoterRegistered(address indexed voter);
-    event VoteCast(
-        address indexed voter,
-        address indexed party,
-        uint candidateId
-    );
-    event ElectionEnded();
 
     modifier onlyAdmin() {
         if (msg.sender != admin) revert NotAdmin();

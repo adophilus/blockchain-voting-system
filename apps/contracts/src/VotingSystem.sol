@@ -1,9 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "./core/VotingSystem.sol";
-import "./core/Election.sol";
-import "./core/Party.sol";
-import "./core/Candidate.sol";
-import "./core/VoterRegistry.sol";
-import "./core/CandidateRegistry.sol";
+import "./core/voting/system/VotingSystem.sol";
+import "./core/election/Election.sol";
+import "./core/party/Party.sol";
+import "./core/candidate/Candidate.sol";
+import "./core/candidate/registry/CandidateRegistry.sol";
+import "./core/voter/registry/VoterRegistry.sol";

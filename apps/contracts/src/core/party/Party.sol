@@ -1,10 +1,9 @@
 // SPDX-License-Identifier: MIT
 pragma solidity ^0.8.24;
 
-import "../candidate/Candidate.sol";
-import "../candidate/registry/CandidateRegistry.sol";
-import "../../../common/Errors.sol";
-import "./IParty.sol";
+import {CandidateRegistry} from "../candidate/registry/CandidateRegistry.sol";
+import "../../common/Errors.sol";
+import {IParty} from "./IParty.sol";
 
 contract Party is IParty {
     string public name;
@@ -13,47 +12,72 @@ contract Party is IParty {
     address public admin;
     address public candidateRegistryAddress;
     uint public candidateCount;
-    
+
     uint[] public candidateIds;
     mapping(uint => bool) private candidateIdExists;
-    
-    event CandidateRegistered(uint indexed candidateId, string name);
-    
+
     modifier onlyAdmin() {
         if (msg.sender != admin) revert NotAdmin();
         _;
     }
-    
-    constructor(string memory _name, string memory _slogan, string memory _cid, address _candidateRegistryAddress, address _admin) {
+
+    constructor(
+        string memory _name,
+        string memory _slogan,
+        string memory _cid,
+        address _candidateRegistryAddress,
+        address _admin
+    ) {
         name = _name;
         slogan = _slogan;
         cid = _cid;
         admin = _admin;
         candidateRegistryAddress = _candidateRegistryAddress;
     }
-    
-    function registerCandidate(uint _candidateId) external onlyAdmin returns (uint) {
-        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
-        (uint candidateIdFromReg, string memory candidateNameFromReg, , ) = candidateRegistry.getCandidate(_candidateId);
+
+    function registerCandidate(
+        uint _candidateId
+    ) external onlyAdmin returns (uint) {
+        CandidateRegistry candidateRegistry = CandidateRegistry(
+            candidateRegistryAddress
+        );
+        (
+            uint candidateIdFromReg,
+            string memory candidateNameFromReg,
+            ,
+
+        ) = candidateRegistry.getCandidate(_candidateId);
         if (candidateIdFromReg != _candidateId) revert InvalidCandidateId();
-        if (candidateIdExists[_candidateId]) revert CandidateAlreadyRegistered();
-        
+        if (candidateIdExists[_candidateId])
+            revert CandidateAlreadyRegistered();
+
         candidateIds.push(_candidateId);
         candidateIdExists[_candidateId] = true;
         candidateCount++;
-        
+
         emit CandidateRegistered(_candidateId, candidateNameFromReg);
         return _candidateId;
     }
-    
+
     function getCandidate(
         uint _candidateId
-    ) external view returns (uint candidateId_, string memory candidateName_, string memory candidatePosition_, string memory candidateCid_) {
+    )
+        external
+        view
+        returns (
+            uint candidateId_,
+            string memory candidateName_,
+            string memory candidatePosition_,
+            string memory candidateCid_
+        )
+    {
         if (!candidateIdExists[_candidateId]) revert CandidateNotRegistered();
-        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        CandidateRegistry candidateRegistry = CandidateRegistry(
+            candidateRegistryAddress
+        );
         return candidateRegistry.getCandidate(_candidateId);
     }
-    
+
     function getAllCandidates()
         external
         view
@@ -70,11 +94,18 @@ contract Party is IParty {
         positions = new string[](numCandidates);
         cids = new string[](numCandidates);
 
-        CandidateRegistry candidateRegistry = CandidateRegistry(candidateRegistryAddress);
+        CandidateRegistry candidateRegistry = CandidateRegistry(
+            candidateRegistryAddress
+        );
 
         for (uint i = 0; i < numCandidates; i++) {
             uint candidateId = candidateIds[i];
-            (uint candidateIdFromReg, string memory candidateNameFromReg, string memory candidatePositionFromReg, string memory candidateCidFromReg) = candidateRegistry.getCandidate(candidateId);
+            (
+                uint candidateIdFromReg,
+                string memory candidateNameFromReg,
+                string memory candidatePositionFromReg,
+                string memory candidateCidFromReg
+            ) = candidateRegistry.getCandidate(candidateId);
             ids[i] = candidateIdFromReg;
             names[i] = candidateNameFromReg;
             positions[i] = candidatePositionFromReg;
@@ -82,3 +113,4 @@ contract Party is IParty {
         }
     }
 }
+
