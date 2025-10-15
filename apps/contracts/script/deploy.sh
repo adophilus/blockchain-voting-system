@@ -2,7 +2,7 @@
 
 
 forge script \
-  ./script/VotingSystem.s.sol \
+  ./script/DeployVotingSystem.s.sol \
   --broadcast \
   --private-key $PRIVATE_KEY \
   --optimize \

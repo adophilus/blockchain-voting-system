@@ -5,9 +5,10 @@ import {VoterRegistry} from "../voter/registry/VoterRegistry.sol";
 import {Party} from "../party/Party.sol";
 import "../../common/Errors.sol";
 import {IElection} from "./IElection.sol";
+import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract Election is IElection {
-    address public admin;
+contract Election is IElection, AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint public startTime;
     uint public endTime;
     bool public electionStarted;
@@ -29,7 +30,7 @@ contract Election is IElection {
     mapping(address => bool) public hasVoted;
 
     modifier onlyAdmin() {
-        if (msg.sender != admin) revert NotAdmin();
+        _checkRole(ADMIN_ROLE);
         _;
     }
 
@@ -55,6 +56,8 @@ contract Election is IElection {
         _;
     }
 
+    address public admin;
+
     constructor(
         address _admin,
         string memory _name,
@@ -62,6 +65,7 @@ contract Election is IElection {
         string memory _cid,
         address _voterRegistryAddress
     ) {
+        _grantRole(ADMIN_ROLE, _admin);
         admin = _admin;
         name = _name;
         description = _description;

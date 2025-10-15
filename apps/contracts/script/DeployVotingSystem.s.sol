@@ -7,7 +7,7 @@ import {VoterRegistry} from "../src/core/voter/registry/VoterRegistry.sol";
 import {CandidateRegistry} from "../src/core/candidate/registry/CandidateRegistry.sol";
 import "../src/common/Errors.sol";
 
-contract VotingSystemScript is Script {
+contract DeployVotingSystemScript is Script {
     VotingSystem public votingSystem;
 
     function setUp() public {}
@@ -15,8 +15,8 @@ contract VotingSystemScript is Script {
     function run() public {
         vm.startBroadcast();
 
-        VoterRegistry voterRegistry = new VoterRegistry();
-        CandidateRegistry candidateRegistry = new CandidateRegistry();
+        VoterRegistry voterRegistry = new VoterRegistry(msg.sender);
+        CandidateRegistry candidateRegistry = new CandidateRegistry(msg.sender);
 
         votingSystem = new VotingSystem(
             address(voterRegistry),

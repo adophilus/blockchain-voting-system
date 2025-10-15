@@ -12,7 +12,7 @@ contract ElectionTest is Test {
     VoterRegistry public voterRegistry;
 
     function setUp() public {
-        voterRegistry = new VoterRegistry();
+        voterRegistry = new VoterRegistry(address(this));
         election = new Election(
             address(this),
             "Test Election",

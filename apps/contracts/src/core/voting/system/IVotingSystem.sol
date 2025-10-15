@@ -5,7 +5,6 @@ interface IVotingSystem {
     event ElectionCreated(uint indexed electionId, address electionAddress);
     event PartyCreated(uint indexed partyId, address partyAddress);
 
-    function admin() external view returns (address);
     function electionCount() external view returns (uint);
     function partyCount() external view returns (uint);
     function elections(uint) external view returns (address);

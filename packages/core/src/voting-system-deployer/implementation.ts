@@ -17,7 +17,8 @@ const VoterRegistryABI = VoterRegistryMetadata.abi as Abi;
 const VoterRegistryBytecode = VoterRegistryMetadata.bytecode.object as Hex;
 
 const CandidateRegistryABI = CandidateRegistryMetadata.abi as Abi;
-const CandidateRegistryBytecode = CandidateRegistryMetadata.bytecode.object as Hex;
+const CandidateRegistryBytecode = CandidateRegistryMetadata.bytecode
+	.object as Hex;
 
 class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 	constructor(private readonly wallet: Wallet) {}
@@ -84,13 +85,16 @@ class BlockchainVotingSystemDeployer implements VotingSystemDeployer {
 	}
 
 	public async deploySystem(): Promise<Result<Address, DeploySystemError>> {
+		console.log('about to deploy system')
 		const voterRegistryResult = await this.deployVoterRegistry();
+		console.log({ voterRegistryResult });
 		if (voterRegistryResult.isErr) {
 			return Result.err(voterRegistryResult.error);
 		}
 		const voterRegistryAddress = voterRegistryResult.value;
 
 		const candidateRegistryResult = await this.deployCandidateRegistry();
+		console.log({ candidateRegistryResult });
 		if (candidateRegistryResult.isErr) {
 			return Result.err(candidateRegistryResult.error);
 		}

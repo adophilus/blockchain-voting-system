@@ -13,8 +13,8 @@ contract VotingSystemTest is Test {
     CandidateRegistry public candidateRegistry;
 
     function setUp() public {
-        voterRegistry = new VoterRegistry();
-        candidateRegistry = new CandidateRegistry();
+        voterRegistry = new VoterRegistry(address(this));
+        candidateRegistry = new CandidateRegistry(address(this));
         votingSystem = new VotingSystem(
             address(voterRegistry),
             address(candidateRegistry)
@@ -22,7 +22,6 @@ contract VotingSystemTest is Test {
     }
 
     function test_VotingSystemCreation() public view {
-        assertEq(votingSystem.admin(), address(this));
         assertEq(votingSystem.voterRegistryAddress(), address(voterRegistry));
         assertEq(
             votingSystem.candidateRegistryAddress(),

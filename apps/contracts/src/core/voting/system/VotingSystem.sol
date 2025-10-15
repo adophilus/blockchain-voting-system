@@ -8,9 +8,10 @@ import {CandidateRegistry} from "../../candidate/registry/CandidateRegistry.sol"
 import "../../../common/Errors.sol";
 import {IVotingSystem} from "./IVotingSystem.sol";
 import {console} from "forge-std/console.sol";
+import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract VotingSystem is IVotingSystem {
-    address public admin;
+contract VotingSystem is IVotingSystem, AccessControl {
+    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
     uint public electionCount;
     uint public partyCount;
 
@@ -28,11 +29,7 @@ contract VotingSystem is IVotingSystem {
     address public candidateRegistryAddress;
 
     modifier onlyAdmin() {
-        console.log("VotingSystem.onlyAdmin: BEGIN");
-        console.log(admin);
-        console.log(msg.sender);
-        console.log("VotingSystem.onlyAdmin: END");
-        if (msg.sender != admin) revert NotAdmin();
+        _checkRole(ADMIN_ROLE);
         _;
     }
 
@@ -40,9 +37,13 @@ contract VotingSystem is IVotingSystem {
         address _voterRegistryAddress,
         address _candidateRegistryAddress
     ) {
-        admin = msg.sender;
+        _grantRole(ADMIN_ROLE, msg.sender);
         voterRegistryAddress = _voterRegistryAddress;
         candidateRegistryAddress = _candidateRegistryAddress;
+    }
+
+    function isAdmin(address _address) external view returns (bool) {
+        return hasRole(ADMIN_ROLE, _address);
     }
 
     function createElection(
@@ -52,7 +53,7 @@ contract VotingSystem is IVotingSystem {
     ) external onlyAdmin returns (uint) {
         electionCount++;
         _elections[electionCount] = new Election(
-            admin,
+            msg.sender, // Use msg.sender which is guaranteed to be an admin due to onlyAdmin modifier
             _name,
             _description,
             _cid,
@@ -74,7 +75,7 @@ contract VotingSystem is IVotingSystem {
             _slogan,
             _cid,
             candidateRegistryAddress,
-            admin
+            msg.sender // Use msg.sender which is guaranteed to be an admin due to onlyAdmin modifier
         );
 
         emit PartyCreated(partyCount, address(_parties[partyCount]));

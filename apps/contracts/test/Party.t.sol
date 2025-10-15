@@ -11,7 +11,7 @@ contract PartyTest is Test {
     CandidateRegistry public candidateRegistry;
 
     function setUp() public {
-        candidateRegistry = new CandidateRegistry();
+        candidateRegistry = new CandidateRegistry(address(this));
         party = new Party(
             "Test Party",
             "Test Slogan",
