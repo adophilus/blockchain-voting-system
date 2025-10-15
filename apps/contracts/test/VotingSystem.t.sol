@@ -54,38 +54,40 @@ contract VotingSystemTest is Test {
     function test_CreateElection() public {
         vm.startPrank(Config.ADMIN);
 
-        uint electionId = votingSystem.createElection(
+        (uint electionId, ) = electionRegistry.createElection(
             "Test Election",
             "Description",
             "QmTestElectionCID"
         );
         assertEq(electionId, 1);
-        assertEq(votingSystem.electionCount(), 1);
+        assertEq(electionRegistry.getElectionCount(), 1);
 
-        address electionAddress = votingSystem.getElection(1);
+        address electionAddress = electionRegistry.getElection(1);
         assertNotEq(electionAddress, address(0));
     }
 
     function test_CreateParty() public {
-        uint partyId = votingSystem.createParty(
+        vm.startPrank(Config.ADMIN);
+        
+        (uint partyId, ) = partyRegistry.createParty(
             "Test Party",
             "Test Slogan",
             "QmTestPartyCID"
         );
         assertEq(partyId, 1);
-        assertEq(votingSystem.partyCount(), 1);
+        assertEq(partyRegistry.getPartyCount(), 1);
 
-        address partyAddress = votingSystem.getParty(1);
+        address partyAddress = partyRegistry.getParty(1);
         assertNotEq(partyAddress, address(0));
     }
 
     function test_RevertWhen_GetInvalidElection() public {
         vm.expectRevert(InvalidElectionId.selector);
-        votingSystem.getElection(999);
+        electionRegistry.getElection(999);
     }
 
     function test_RevertWhen_GetInvalidParty() public {
         vm.expectRevert(InvalidPartyId.selector);
-        votingSystem.getParty(999);
+        partyRegistry.getParty(999);
     }
 }
