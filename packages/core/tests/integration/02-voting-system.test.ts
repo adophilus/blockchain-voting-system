@@ -4,6 +4,11 @@ import { BlockchainVotingSystem } from "../../src/voting-system/implementation";
 import { deployerWallet, voter1Wallet } from "../setup";
 import { assert } from "../../src/lib/assert";
 import type { Address } from "viem";
+import {
+	votingSystemAbi,
+	electionRegistryAbi,
+	electionAbi,
+} from "@blockchain-voting-system/contracts/types";
 
 describe("BlockchainVotingSystem Integration Tests", () => {
 	let deployer: BlockchainVotingSystemDeployer;
@@ -214,15 +219,60 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 3600; // 1 hour later
 
-		// Start the election
-		await votingSystem.startElection(electionId, startTime, endTime);
-
 		// Register voter globally (should already be registered from earlier test)
 		// and for this specific election
 		await votingSystem.registerVoterForElection(
 			electionId,
 			voter1Wallet.getAddress(),
 		);
+
+		// Start the election
+		await votingSystem.startElection(electionId, startTime, endTime);
+
+		// Add the party to the election AFTER starting the election
+		const electionRegistryAddress = await deployerWallet
+			.getPublicClient()
+			.readContract({
+				address: votingSystemContractAddress,
+				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+		const electionAddress = await deployerWallet
+			.getPublicClient()
+			.readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
+				functionName: "getElection",
+				args: [BigInt(electionId)],
+			});
+
+		// Add party to election using direct contract call (after election is started)
+		const { request: addPartyRequest } =
+			await deployerWallet.getPublicClient().simulateContract({
+				address: electionAddress,
+				abi: electionAbi,
+				functionName: "addParty",
+				args: [partyAddress],
+				account: deployerWallet.getWalletClient().account,
+			});
+
+		const addPartyHash = await deployerWallet
+			.getWalletClient()
+			.writeContract(addPartyRequest);
+		await deployerWallet
+			.getPublicClient()
+			.waitForTransactionReceipt({ hash: addPartyHash });
+
+		// Fast-forward blockchain time to be within the election period
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_setNextBlockTimestamp",
+			params: [startTime + 10], // 10 seconds after start time
+		});
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_mine",
+			params: [],
+		});
 
 		// Create a new voting system instance with the voter's wallet to cast the vote
 		const voterVotingSystem = new BlockchainVotingSystem(
@@ -286,14 +336,59 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const startTime = currentBlockTime + 10; // 10 seconds from now
 		const endTime = startTime + 20; // 20 seconds later
 
-		// Start the election
-		await votingSystem.startElection(electionId, startTime, endTime);
-
 		// Register voter for this specific election
 		await votingSystem.registerVoterForElection(
 			electionId,
 			voter1Wallet.getAddress(),
 		);
+
+		// Start the election
+		await votingSystem.startElection(electionId, startTime, endTime);
+
+		// Add the party to the election AFTER starting the election
+		const electionRegistryAddress = await deployerWallet
+			.getPublicClient()
+			.readContract({
+				address: votingSystemContractAddress,
+				abi: votingSystemAbi,
+				functionName: "electionRegistryAddress",
+			});
+
+		const electionAddress = await deployerWallet
+			.getPublicClient()
+			.readContract({
+				address: electionRegistryAddress,
+				abi: electionRegistryAbi,
+				functionName: "getElection",
+				args: [BigInt(electionId)],
+			});
+
+		// Add party to election using direct contract call (after election is started)
+		const { request: addPartyRequest } =
+			await deployerWallet.getPublicClient().simulateContract({
+				address: electionAddress,
+				abi: electionAbi,
+				functionName: "addParty",
+				args: [partyAddress],
+				account: deployerWallet.getWalletClient().account,
+			});
+
+		const addPartyHash = await deployerWallet
+			.getWalletClient()
+			.writeContract(addPartyRequest);
+		await deployerWallet
+			.getPublicClient()
+			.waitForTransactionReceipt({ hash: addPartyHash });
+
+		// Fast-forward blockchain time to be within the election period
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_setNextBlockTimestamp",
+			params: [startTime + 5], // 5 seconds after start time
+		});
+		await deployerWallet.getPublicClient().transport.request({
+			method: "evm_mine",
+			params: [],
+		});
 
 		// Create a new voting system instance with the voter's wallet to cast the vote
 		const voterVotingSystem = new BlockchainVotingSystem(
