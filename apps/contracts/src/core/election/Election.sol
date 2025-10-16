@@ -3,6 +3,7 @@ pragma solidity ^0.8.24;
 
 import {VoterRegistry} from "../voter/registry/VoterRegistry.sol";
 import {Party} from "../party/Party.sol";
+import {console} from "forge-std/console.sol";
 import "../../common/Errors.sol";
 import {IElection} from "./IElection.sol";
 
@@ -105,6 +106,7 @@ contract Election is IElection {
             revert VoterAlreadyRegisteredForElection();
         registeredVoters[_voter] = true;
         emit VoterRegistered(_voter);
+        console.log("Voter registered for election");
     }
 
     function vote(

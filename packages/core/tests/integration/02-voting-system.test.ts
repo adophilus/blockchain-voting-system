@@ -218,10 +218,12 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		await votingSystem.startElection(electionId, startTime, endTime);
 
 		// Register voter globally and for election
-		await votingSystem.registerVoter(voter1Wallet.getAddress());
-		await votingSystem.registerVoterForElection(
-			electionId,
-			voter1Wallet.getAddress(),
+		// await votingSystem.registerVoter(voter1Wallet.getAddress());
+		console.log(
+			await votingSystem.registerVoterForElection(
+				electionId,
+				voter1Wallet.getAddress(),
+			),
 		);
 
 		const castVoteResult = await votingSystem.castVote(
