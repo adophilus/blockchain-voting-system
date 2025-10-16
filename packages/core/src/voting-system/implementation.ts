@@ -1,4 +1,11 @@
-import type { Address, PublicClient, WalletClient, Hex, Abi } from "viem";
+import {
+	type Address,
+	type PublicClient,
+	type WalletClient,
+	type Hex,
+	type Abi,
+	parseEventLogs,
+} from "viem";
 import { Result } from "true-myth";
 import type { Wallet } from "../wallet";
 import type {
@@ -41,7 +48,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	constructor(
 		private readonly wallet: Wallet,
 		private readonly votingSystemAddress: Address,
-	) { }
+	) {}
 
 	private getAccountAddress(): Address {
 		return this.wallet.getWalletClient().account!.address;
@@ -89,11 +96,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<boolean, IsVoterVerifiedError>> {
 		try {
 			// Get voter registry address from voting system
-			const voterRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "voterRegistryAddress",
-			});
+			const voterRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "voterRegistryAddress",
+				});
 
 			const data = await this.wallet.getPublicClient().readContract({
 				address: voterRegistryAddress,
@@ -190,20 +199,38 @@ class BlockchainVotingSystem implements VotingSystem {
 			const hash = await walletClient.writeContract(request);
 			const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-			// Parse the event to get the candidate ID
-			const eventTopic = "CandidateRegistered(uint256,string)";
-			const eventSignature = "0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
-			const eventLog = receipt.logs.find(log => log.topics[0] === eventSignature);
+			// --- START: Cleaner Event Decoding using Viem's parseEventLogs ---
 
-			if (!eventLog || !eventLog.topics[1]) {
+			// 1. Decode all logs in the receipt using the Candidate Registry ABI
+			const logs = parseEventLogs({
+				abi: candidateRegistryAbi,
+				logs: receipt.logs,
+				eventName: "CandidateRegistered", // Filter only for this specific event
+			});
+
+			// 2. Find the relevant event (assuming there's only one CandidateRegistered event)
+			const candidateRegisteredEvent = logs.find(
+				(log) => log.eventName === "CandidateRegistered",
+			);
+
+			// 3. Extract the candidateId argument
+			if (
+				!candidateRegisteredEvent ||
+				!candidateRegisteredEvent.args.candidateId
+			) {
 				return Result.err({
 					type: "TransactionFailedError",
-					message: "Could not find CandidateRegistered event",
+					message:
+						"Could not find 'CandidateRegistered' event or candidate ID argument in receipt.",
 				});
 			}
 
-			// Convert hex to number
-			const candidateId = Number(BigInt(eventLog.topics[1]));
+			// Viem returns BigInt for uint256; convert to Number if the function return type mandates it.
+			// Note: If you can update your return type to BigInt (BigInt<bigint>) it would be safer.
+			const candidateId = Number(candidateRegisteredEvent.args.candidateId);
+
+			// --- END: Cleaner Event Decoding ---
+
 			return Result.ok(candidateId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for registerCandidate:`, e);
@@ -258,11 +285,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<CandidateDetails, GetCandidateError>> {
 		try {
 			// Get candidate registry address from voting system
-			const candidateRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "candidateRegistryAddress",
-			});
+			const candidateRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "candidateRegistryAddress",
+				});
 
 			const data = await this.wallet.getPublicClient().readContract({
 				address: candidateRegistryAddress,
@@ -312,8 +341,11 @@ class BlockchainVotingSystem implements VotingSystem {
 
 			// Parse the event to get the party ID
 			const eventTopic = "PartyCreated(uint256,address)";
-			const eventSignature = "0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
-			const eventLog = receipt.logs.find(log => log.topics[0] === eventSignature);
+			const eventSignature =
+				"0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
+			const eventLog = receipt.logs.find(
+				(log) => log.topics[0] === eventSignature,
+			);
 
 			if (!eventLog || !eventLog.topics[1]) {
 				return Result.err({
@@ -339,11 +371,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<PartyDetails, GetPartyError>> {
 		try {
 			// Get party registry address from voting system
-			const partyRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "partyRegistryAddress",
-			});
+			const partyRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "partyRegistryAddress",
+				});
 
 			const partyAddress = await this.wallet.getPublicClient().readContract({
 				address: partyRegistryAddress,
@@ -407,8 +441,11 @@ class BlockchainVotingSystem implements VotingSystem {
 
 			// Parse the event to get the election ID
 			const eventTopic = "ElectionCreated(uint256,address)";
-			const eventSignature = "0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
-			const eventLog = receipt.logs.find(log => log.topics[0] === eventSignature);
+			const eventSignature =
+				"0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
+			const eventLog = receipt.logs.find(
+				(log) => log.topics[0] === eventSignature,
+			);
 
 			if (!eventLog || !eventLog.topics[1]) {
 				return Result.err({
@@ -434,11 +471,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionDetails, GetElectionError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			const electionAddress = await this.wallet.getPublicClient().readContract({
 				address: electionRegistryAddress,
@@ -516,11 +555,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, StartElectionError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			// Get election address from election registry
 			const electionAddress = await this.wallet.getPublicClient().readContract({
@@ -560,11 +601,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, EndElectionError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			// Get election address from election registry
 			const electionAddress = await this.wallet.getPublicClient().readContract({
@@ -603,11 +646,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionStatus, GetElectionStatusError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			// Get election address from election registry
 			const electionAddress = await this.wallet.getPublicClient().readContract({
@@ -652,11 +697,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<void, CastVoteError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			// Get election address from election registry
 			const electionAddress = await this.wallet.getPublicClient().readContract({
@@ -697,11 +744,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<boolean, HasVotedError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			// Get election address from election registry
 			const electionAddress = await this.wallet.getPublicClient().readContract({
@@ -734,11 +783,13 @@ class BlockchainVotingSystem implements VotingSystem {
 	): Promise<Result<ElectionResults, GetElectionResultsError>> {
 		try {
 			// Get election registry address from voting system
-			const electionRegistryAddress = await this.wallet.getPublicClient().readContract({
-				address: this.votingSystemAddress,
-				abi: votingSystemAbi,
-				functionName: "electionRegistryAddress",
-			});
+			const electionRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "electionRegistryAddress",
+				});
 
 			// Get election address from election registry
 			const electionAddress = await this.wallet.getPublicClient().readContract({
