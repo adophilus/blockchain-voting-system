@@ -217,23 +217,27 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		// Start the election
 		await votingSystem.startElection(electionId, startTime, endTime);
 
-		// Register voter globally and for election
-		// await votingSystem.registerVoter(voter1Wallet.getAddress());
-		console.log(
-			await votingSystem.registerVoterForElection(
-				electionId,
-				voter1Wallet.getAddress(),
-			),
+		// Register voter globally (should already be registered from earlier test)
+		// and for this specific election
+		await votingSystem.registerVoterForElection(
+			electionId,
+			voter1Wallet.getAddress(),
 		);
 
-		const castVoteResult = await votingSystem.castVote(
+		// Create a new voting system instance with the voter's wallet to cast the vote
+		const voterVotingSystem = new BlockchainVotingSystem(
+			voter1Wallet,
+			votingSystemContractAddress,
+		);
+
+		const castVoteResult = await voterVotingSystem.castVote(
 			electionId,
 			partyAddress,
 			candidateId,
 		);
 		assert(castVoteResult.isOk, "ERR_OPERATION_FAILED");
 
-		const hasVotedResult = await votingSystem.hasVoted(
+		const hasVotedResult = await voterVotingSystem.hasVoted(
 			electionId,
 			voter1Wallet.getAddress(),
 		);
@@ -285,11 +289,20 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		// Start the election
 		await votingSystem.startElection(electionId, startTime, endTime);
 
-		// Register voter
-		await votingSystem.registerVoter(voter1Wallet.getAddress());
+		// Register voter for this specific election
+		await votingSystem.registerVoterForElection(
+			electionId,
+			voter1Wallet.getAddress(),
+		);
 
-		// Cast votes
-		await votingSystem.castVote(
+		// Create a new voting system instance with the voter's wallet to cast the vote
+		const voterVotingSystem = new BlockchainVotingSystem(
+			voter1Wallet,
+			votingSystemContractAddress,
+		);
+
+		// Cast votes using voter's wallet
+		await voterVotingSystem.castVote(
 			electionId,
 			partyAddress,
 			candidateIds[0] as number,
