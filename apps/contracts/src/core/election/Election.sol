@@ -104,6 +104,7 @@ contract Election is IElection {
             revert VoterNotInRegistry();
         if (registeredVoters[_voter])
             revert VoterAlreadyRegisteredForElection();
+        if (electionStarted) revert ElectionAlreadyStarted();
         registeredVoters[_voter] = true;
         emit VoterRegistered(_voter);
         console.log("Voter registered for election");
