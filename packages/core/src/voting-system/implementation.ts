@@ -339,23 +339,35 @@ class BlockchainVotingSystem implements VotingSystem {
 			const hash = await walletClient.writeContract(request);
 			const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-			// Parse the event to get the party ID
-			const eventTopic = "PartyCreated(uint256,address)";
-			const eventSignature =
-				"0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
-			const eventLog = receipt.logs.find(
-				(log) => log.topics[0] === eventSignature,
+			// --- START: Cleaner Event Decoding using Viem's parseEventLogs ---
+
+			// 1. Decode all logs in the receipt using the Party Registry ABI
+			const logs = parseEventLogs({
+				abi: partyRegistryAbi,
+				logs: receipt.logs,
+				eventName: "PartyCreated", // Filter only for this specific event
+			});
+
+			// 2. Find the relevant event (assuming there's only one PartyCreated event)
+			const partyCreatedEvent = logs.find(
+				(log) => log.eventName === "PartyCreated",
 			);
 
-			if (!eventLog || !eventLog.topics[1]) {
+			// 3. Extract the partyId argument
+			if (!partyCreatedEvent || !partyCreatedEvent.args.partyId) {
 				return Result.err({
 					type: "TransactionFailedError",
-					message: "Could not find PartyCreated event",
+					message:
+						"Could not find 'PartyCreated' event or party ID argument in receipt.",
 				});
 			}
 
-			// Convert hex to number
-			const partyId = Number(BigInt(eventLog.topics[1]));
+			// Viem returns BigInt for uint256; convert to Number if the function return type mandates it.
+			// Note: If you can update your return type to BigInt (BigInt<bigint>) it would be safer.
+			const partyId = Number(partyCreatedEvent.args.partyId);
+
+			// --- END: Cleaner Event Decoding ---
+
 			return Result.ok(partyId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for registerParty:`, e);
@@ -439,23 +451,35 @@ class BlockchainVotingSystem implements VotingSystem {
 			const hash = await walletClient.writeContract(request);
 			const receipt = await publicClient.waitForTransactionReceipt({ hash });
 
-			// Parse the event to get the election ID
-			const eventTopic = "ElectionCreated(uint256,address)";
-			const eventSignature =
-				"0x" + Buffer.from(eventTopic).toString("hex").substring(0, 64);
-			const eventLog = receipt.logs.find(
-				(log) => log.topics[0] === eventSignature,
+			// --- START: Cleaner Event Decoding using Viem's parseEventLogs ---
+
+			// 1. Decode all logs in the receipt using the Election Registry ABI
+			const logs = parseEventLogs({
+				abi: electionRegistryAbi,
+				logs: receipt.logs,
+				eventName: "ElectionCreated", // Filter only for this specific event
+			});
+
+			// 2. Find the relevant event (assuming there's only one ElectionCreated event)
+			const electionCreatedEvent = logs.find(
+				(log) => log.eventName === "ElectionCreated",
 			);
 
-			if (!eventLog || !eventLog.topics[1]) {
+			// 3. Extract the electionId argument
+			if (!electionCreatedEvent || !electionCreatedEvent.args.electionId) {
 				return Result.err({
 					type: "TransactionFailedError",
-					message: "Could not find ElectionCreated event",
+					message:
+						"Could not find 'ElectionCreated' event or election ID argument in receipt.",
 				});
 			}
 
-			// Convert hex to number
-			const electionId = Number(BigInt(eventLog.topics[1]));
+			// Viem returns BigInt for uint256; convert to Number if the function return type mandates it.
+			// Note: If you can update your return type to BigInt (BigInt<bigint>) it would be safer.
+			const electionId = Number(electionCreatedEvent.args.electionId);
+
+			// --- END: Cleaner Event Decoding ---
+
 			return Result.ok(electionId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for createElection:`, e);
