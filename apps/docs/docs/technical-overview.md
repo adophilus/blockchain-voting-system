@@ -1,6 +1,10 @@
 # Technical Overview
 
-This document provides a comprehensive overview of the technical implementation of the Blockchain Voting System, including the materials used, methods employed, and rationale behind key design decisions. This information is intended to support project reporting requirements.
+This document provides a comprehensive overview of the technical implementation of the Blockchain Voting System, specifically addressing the materials used, methods employed, and rationale behind key design decisions for project reporting requirements.
+
+## Project Report Materials and Methods
+
+For the purposes of project documentation and reporting, this section explicitly outlines the materials and methods used in the implementation of the Blockchain Voting System.
 
 ## System Overview
 
@@ -150,3 +154,20 @@ Consideration for decentralized governance patterns to:
 ## Conclusion
 
 The Blockchain Voting System represents a thoughtful application of modern blockchain development practices. By leveraging established patterns, industry-standard libraries, and careful architectural planning, the system provides a robust foundation for secure, transparent elections while remaining extensible for future enhancements.
+
+### Summary for Project Reporting
+
+**Materials Used:**
+- Solidity v0.8.24+ for smart contract development
+- OpenZeppelin Contracts v5.x for secure contract patterns
+- Foundry development toolkit for compilation and testing
+- Next.js for the web application frontend
+- IPFS for decentralized storage
+- VitePress for documentation generation
+
+**Methods Employed:**
+- Registry pattern architecture for modular contract design
+- Role-based access control using OpenZeppelin's AccessControl
+- Event-driven architecture for transparency and off-chain indexing
+- Gas optimization techniques for cost-effective operations
+- Comprehensive testing strategy including unit and integration tests
