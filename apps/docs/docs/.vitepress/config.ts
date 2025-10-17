@@ -47,6 +47,10 @@ export default defineConfig({
 				],
 			},
 			{
+				text: "Technical Information",
+				items: [{ text: "Technical Overview", link: "/technical-overview" }],
+			},
+			{
 				text: "Further Improvements",
 				items: [{ text: "Token-Based Identity", link: "/further-improvement" }],
 			},

@@ -4,24 +4,19 @@ pragma solidity ^0.8.24;
 import {Candidate} from "../Candidate.sol";
 import "../../../common/Errors.sol";
 import {ICandidateRegistry} from "./ICandidateRegistry.sol";
-import {AccessControl} from "openzeppelin-contracts/contracts/access/AccessControl.sol";
 
-contract CandidateRegistry is ICandidateRegistry, AccessControl {
-    bytes32 public constant ADMIN_ROLE = keccak256("ADMIN_ROLE");
+contract CandidateRegistry is ICandidateRegistry {
+    address public admin;
     uint public nextCandidateId;
     mapping(uint => Candidate) public candidates;
 
     modifier onlyAdmin() {
-        require(hasRole(ADMIN_ROLE, __msgSender()), NotAdmin());
+        if (msg.sender != admin) revert NotAdmin();
         _;
     }
 
-    function __msgSender() internal view virtual returns (address) {
-        return tx.origin;
-    }
-
     constructor(address _admin) {
-        _grantRole(ADMIN_ROLE, _admin);
+        admin = _admin;
         nextCandidateId = 1;
     }
 
