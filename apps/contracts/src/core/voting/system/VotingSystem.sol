@@ -8,6 +8,7 @@ import {IPartyRegistry} from "../../party/registry/IPartyRegistry.sol";
 import {IParty} from "../../party/IParty.sol";
 import "../../../common/Errors.sol";
 import {IVotingSystem} from "./IVotingSystem.sol";
+import {console} from "forge-std/console.sol";
 
 contract VotingSystem is IVotingSystem {
     address public admin;
@@ -28,11 +29,11 @@ contract VotingSystem is IVotingSystem {
         address _partyRegistryAddress,
         address _admin
     ) {
+        admin = _admin;
         voterRegistryAddress = _voterRegistryAddress;
         candidateRegistryAddress = _candidateRegistryAddress;
         electionRegistryAddress = _electionRegistryAddress;
         partyRegistryAddress = _partyRegistryAddress;
-        admin = _admin;
     }
 
     /**
@@ -56,6 +57,9 @@ contract VotingSystem is IVotingSystem {
         address partyAddress = partyRegistry.getParty(_partyId);
         IParty party = IParty(partyAddress);
         party.registerCandidate(candidateId);
+        
+        // Emit CandidateRegistered event
+        emit CandidateRegistered(candidateId, _name);
         
         return candidateId;
     }
