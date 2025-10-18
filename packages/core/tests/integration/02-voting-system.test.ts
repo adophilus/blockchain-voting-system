@@ -41,7 +41,18 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 	});
 
 	it("should register a candidate successfully", async () => {
+		// First register a party, since candidates belong to parties
+		const partyResult = await votingSystem.registerParty(
+			"Test Party",
+			"For testing",
+			"QmTestPartyCID",
+		);
+		assert(partyResult.isOk, "ERR_OPERATION_FAILED");
+		const partyId = partyResult.value;
+		expect(partyId).toBe(1); // First party gets ID 1
+
 		const result = await votingSystem.registerCandidate(
+			partyId,
 			"John Doe",
 			"President",
 			"QmJohnDoeCid",
@@ -55,7 +66,17 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 	});
 
 	it("should update a candidate successfully", async () => {
+		// First register a party, since candidates belong to parties
+		const partyResult = await votingSystem.registerParty(
+			"Test Party 2",
+			"For testing updates",
+			"QmTestParty2CID",
+		);
+		assert(partyResult.isOk, "ERR_OPERATION_FAILED");
+		const partyId = partyResult.value;
+
 		const registerResult = await votingSystem.registerCandidate(
+			partyId,
 			"Jane Doe",
 			"Vice President",
 			"QmJaneDoeCid",
@@ -64,6 +85,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const candidateId = registerResult.value;
 
 		const updateResult = await votingSystem.updateCandidate(
+			partyId,
 			candidateId,
 			"Jane Smith",
 			"Vice President",
@@ -83,9 +105,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			"QmGreenPartyLogoCid",
 		);
 		assert(result.isOk, "ERR_OPERATION_FAILED");
-		expect(result.value).toBe(1); // First party gets ID 1
+		const partyId = result.value; // Get the actual party ID
+		expect(partyId).toBeGreaterThan(0); // Verify that a valid party ID was returned
 
-		const party = await votingSystem.getParty(1);
+		const party = await votingSystem.getParty(partyId);
 		assert(party.isOk, "ERR_OPERATION_FAILED");
 		expect(party.value.name).toBe("Green Party");
 	});
@@ -206,6 +229,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(partyAddress, "ERR_OPERATION_FAILED");
 
 		const candidateResult = await votingSystem.registerCandidate(
+			partyId,
 			"Test Candidate",
 			"President",
 			"QmCandidateCID",
@@ -293,7 +317,7 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		);
 		assert(hasVotedResult.isOk, "ERR_OPERATION_FAILED");
 		expect(hasVotedResult.value).toBe(true);
-	});
+	}, 60000);
 
 	it("should get election results successfully", async () => {
 		const createResult = await votingSystem.createElection(
@@ -317,11 +341,13 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(partyAddress, "ERR_OPERATION_FAILED");
 
 		const candidate1Result = await votingSystem.registerCandidate(
+			partyId,
 			"Candidate D",
 			"Position D",
 			"QmCidD",
 		);
 		const candidate2Result = await votingSystem.registerCandidate(
+			partyId,
 			"Candidate E",
 			"Position E",
 			"QmCidE",

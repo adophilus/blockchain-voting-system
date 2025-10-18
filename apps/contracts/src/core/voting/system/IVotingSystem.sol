@@ -12,12 +12,5 @@ interface IVotingSystem {
     function electionRegistryAddress() external view returns (address);
     function partyRegistryAddress() external view returns (address);
 
-    function registerCandidateForParty(
-        uint _partyId,
-        string memory _name,
-        string memory _position,
-        string memory _cid
-    ) external returns (uint candidateId);
-
     // Only essential functions that don't duplicate registry functionality
 }

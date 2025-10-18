@@ -8,7 +8,6 @@ import {IPartyRegistry} from "../../party/registry/IPartyRegistry.sol";
 import {IParty} from "../../party/IParty.sol";
 import "../../../common/Errors.sol";
 import {IVotingSystem} from "./IVotingSystem.sol";
-import {console} from "forge-std/console.sol";
 
 contract VotingSystem is IVotingSystem {
     address public admin;
@@ -35,32 +34,5 @@ contract VotingSystem is IVotingSystem {
         electionRegistryAddress = _electionRegistryAddress;
         partyRegistryAddress = _partyRegistryAddress;
     }
-
-    /**
-     * Registers a candidate both globally and with a specific party
-     * This function coordinates the two-step process:
-     * 1. Register candidate globally in CandidateRegistry
-     * 2. Register candidate with specific party
-     */
-    function registerCandidateForParty(
-        uint _partyId,
-        string memory _name,
-        string memory _position,
-        string memory _cid
-    ) external onlyAdmin returns (uint candidateId) {
-        // Step 1: Register candidate globally in CandidateRegistry
-        ICandidateRegistry candidateRegistry = ICandidateRegistry(candidateRegistryAddress);
-        candidateId = candidateRegistry.registerCandidate(_name, _position, _cid);
-        
-        // Step 2: Register candidate with the specific party
-        IPartyRegistry partyRegistry = IPartyRegistry(partyRegistryAddress);
-        address partyAddress = partyRegistry.getParty(_partyId);
-        IParty party = IParty(partyAddress);
-        party.registerCandidate(candidateId);
-        
-        // Emit CandidateRegistered event
-        emit CandidateRegistered(candidateId, _name);
-        
-        return candidateId;
-    }
 }
+

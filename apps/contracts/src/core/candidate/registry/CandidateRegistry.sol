@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {Candidate} from "../Candidate.sol";
 import "../../../common/Errors.sol";
 import {ICandidateRegistry} from "./ICandidateRegistry.sol";
+import {console} from "forge-std/console.sol";
 
 contract CandidateRegistry is ICandidateRegistry {
     address public admin;
@@ -11,6 +12,9 @@ contract CandidateRegistry is ICandidateRegistry {
     mapping(uint => Candidate) public candidates;
 
     modifier onlyAdmin() {
+        console.log("Got here 4?");
+        console.log(msg.sender);
+        console.log(admin);
         if (msg.sender != admin) revert NotAdmin();
         _;
     }
@@ -25,9 +29,8 @@ contract CandidateRegistry is ICandidateRegistry {
         string memory _position,
         string memory _cid
     ) external onlyAdmin returns (uint) {
+        console.log("Got here? 3");
         if (bytes(_name).length == 0) revert EmptyName();
-        // In a real system, you might want to check for duplicate names or other unique identifiers
-        // For simplicity, we'll allow multiple candidates with the same name for now, but with unique IDs
 
         uint currentId = nextCandidateId;
         candidates[currentId] = Candidate(currentId, _name, _position, _cid);

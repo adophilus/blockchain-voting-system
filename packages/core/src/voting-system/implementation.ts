@@ -170,7 +170,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		}
 	}
 
-	// Candidate Management - goes to VotingSystem which delegates to registries
+	// Candidate Management - performs the same operations as registerCandidateForParty
 	public async registerCandidate(
 		partyId: number,
 		name: string,
@@ -182,26 +182,71 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			// Call registerCandidateForParty on the voting system contract
-			const { request } = await publicClient.simulateContract({
+			// Step 1: Register candidate globally in CandidateRegistry
+			const candidateRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
-				functionName: "registerCandidateForParty",
-				args: [BigInt(partyId), name, position, cid],
+				functionName: "candidateRegistryAddress",
+			});
+
+			const { request: registerCandidateRequest } = await publicClient.simulateContract({
+				address: candidateRegistryAddress,
+				abi: candidateRegistryAbi,
+				functionName: "registerCandidate",
+				args: [name, position, cid],
 				account,
 			});
 
-			const hash = await walletClient.writeContract(request);
-			const receipt = await publicClient.waitForTransactionReceipt({ hash });
+			const registerCandidateHash = await walletClient.writeContract(registerCandidateRequest);
+			const registerCandidateReceipt = await publicClient.waitForTransactionReceipt({ hash: registerCandidateHash });
 
-			// The registerCandidateForParty function returns the candidateId directly
-			// No need to parse events since the function returns the value
-			
-			// For now, we'll assume the function returns the candidateId in the receipt
-			// In a real implementation, we would parse the return value or event
-			// For this case, let's just return a placeholder value
-			const candidateId = 1; // This is a placeholder - in reality we'd parse from receipt
+			// Extract candidate ID from CandidateRegistered event in candidate registry
+			const candidateLogs = parseEventLogs({
+				abi: candidateRegistryAbi,
+				logs: registerCandidateReceipt.logs,
+				eventName: "CandidateRegistered",
+			});
 
+			const candidateRegisteredEvent = candidateLogs.find(
+				(log) => log.eventName === "CandidateRegistered",
+			);
+
+			if (!candidateRegisteredEvent || candidateRegisteredEvent.args.candidateId === undefined) {
+				return Result.err({
+					type: "TransactionFailedError",
+					message: "Could not find 'CandidateRegistered' event or candidate ID argument in receipt.",
+				});
+			}
+
+			const candidateId = Number(candidateRegisteredEvent.args.candidateId);
+
+			// Step 2: Register candidate with the specific party
+			const partyRegistryAddress = await publicClient.readContract({
+				address: this.votingSystemAddress,
+				abi: votingSystemAbi,
+				functionName: "partyRegistryAddress",
+			});
+
+			const partyAddress = await publicClient.readContract({
+				address: partyRegistryAddress,
+				abi: partyRegistryAbi,
+				functionName: "getParty",
+				args: [BigInt(partyId)],
+			});
+
+			const { request: registerCandidateToPartyRequest } = await publicClient.simulateContract({
+				address: partyAddress,
+				abi: partyAbi,
+				functionName: "registerCandidate",
+				args: [BigInt(candidateId)],
+				account,
+			});
+
+			const registerToPartyHash = await walletClient.writeContract(registerCandidateToPartyRequest);
+			await publicClient.waitForTransactionReceipt({ hash: registerToPartyHash });
+
+			// Emit CandidateRegistered event locally to maintain consistency
+			// In a real implementation, we might want to return a success result with the candidate ID
 			return Result.ok(candidateId);
 		} catch (e: any) {
 			console.error(`Write contract call failed for registerCandidate:`, e);
@@ -224,12 +269,19 @@ class BlockchainVotingSystem implements VotingSystem {
 			const publicClient = this.wallet.getPublicClient();
 			const account = this.getAccountAddress();
 
-			// Call updateCandidateForParty on the voting system contract
-			const { request } = await publicClient.simulateContract({
+			// Get candidate registry address from voting system
+			const candidateRegistryAddress = await publicClient.readContract({
 				address: this.votingSystemAddress,
 				abi: votingSystemAbi,
-				functionName: "updateCandidateForParty",
-				args: [BigInt(partyId), BigInt(candidateId), name, position, cid],
+				functionName: "candidateRegistryAddress",
+			});
+
+			// Call updateCandidate on the candidate registry contract
+			const { request } = await publicClient.simulateContract({
+				address: candidateRegistryAddress,
+				abi: candidateRegistryAbi,
+				functionName: "updateCandidate",
+				args: [BigInt(candidateId), name, position, cid],
 				account,
 			});
 
