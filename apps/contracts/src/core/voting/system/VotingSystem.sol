@@ -5,7 +5,7 @@ import {IVoterRegistry} from "../../voter/registry/IVoterRegistry.sol";
 import {ICandidateRegistry} from "../../candidate/registry/ICandidateRegistry.sol";
 import {IElectionRegistry} from "../../election/registry/IElectionRegistry.sol";
 import {IPartyRegistry} from "../../party/registry/IPartyRegistry.sol";
-import {Party} from "../../party/Party.sol";
+import {IParty} from "../../party/IParty.sol";
 import "../../../common/Errors.sol";
 import {IVotingSystem} from "./IVotingSystem.sol";
 
@@ -35,9 +35,6 @@ contract VotingSystem is IVotingSystem {
         admin = _admin;
     }
 
-    // Only keep essential orchestration functions that coordinate across registries
-    // The registry-specific functions are called directly from the registries
-    
     /**
      * Registers a candidate both globally and with a specific party
      * This function coordinates the two-step process:
@@ -57,7 +54,7 @@ contract VotingSystem is IVotingSystem {
         // Step 2: Register candidate with the specific party
         IPartyRegistry partyRegistry = IPartyRegistry(partyRegistryAddress);
         address partyAddress = partyRegistry.getParty(_partyId);
-        Party party = Party(partyAddress);
+        IParty party = IParty(partyAddress);
         party.registerCandidate(candidateId);
         
         return candidateId;
