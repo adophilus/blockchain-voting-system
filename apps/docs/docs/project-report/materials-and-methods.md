@@ -176,7 +176,15 @@ Decentralized storage was integrated to:
 3. **Ensure Immutability** - Guarantee stored content cannot be tampered with
 4. **Provide Availability** - Decentralized storage ensures content persistence
 
-## Implementation Workflow
+## Development Methodology
+
+The project was developed using **Agile methodology**, which emphasized:
+
+1. **Iterative Development** - Features were developed in small, manageable increments
+2. **Continuous Integration** - Regular integration of new functionality with existing codebase
+3. **Frequent Testing** - Comprehensive testing at each development stage
+4. **Adaptive Planning** - Flexibility to adjust requirements and implementation based on findings
+5. **Collaborative Approach** - Regular communication and feedback loops
 
 The development followed an iterative approach:
 
@@ -189,6 +197,18 @@ The development followed an iterative approach:
 7. **Documentation Generation** - Produced detailed technical documentation
 8. **Deployment Preparation** - Configured deployment scripts and procedures
 
+## Deployment Target
+
+The Blockchain Voting System is designed for deployment on the **Polygon blockchain**, chosen for its:
+
+1. **Scalability** - High throughput and low latency compared to Ethereum mainnet
+2. **Cost Efficiency** - Significantly lower gas fees than Ethereum mainnet
+3. **EVM Compatibility** - Seamless compatibility with existing Ethereum development tools
+4. **Security** - Robust security model with proof-of-stake consensus
+5. **Developer Experience** - Familiar development environment for Ethereum developers
+
+The system leverages Polygon's infrastructure to provide a cost-effective and scalable solution for blockchain-based voting while maintaining the security and decentralization benefits of blockchain technology.
+
 ## Conclusion
 
-The Blockchain Voting System was successfully implemented using established blockchain development practices and industry-standard tools. The combination of Solidity for smart contracts, OpenZeppelin for security patterns, Foundry for development tooling, and IPFS for decentralized storage created a robust foundation for a secure and transparent voting solution. The registry pattern architecture effectively addressed Ethereum's contract size limitations while maintaining system functionality and extensibility.
+The Blockchain Voting System was successfully implemented using **Agile methodology** and is designed for deployment on the **Polygon blockchain**. The system was developed using established blockchain development practices and industry-standard tools. The combination of Solidity for smart contracts, OpenZeppelin for security patterns, Foundry for development tooling, and IPFS for decentralized storage created a robust foundation for a secure and transparent voting solution. The registry pattern architecture effectively addressed Ethereum's contract size limitations while maintaining system functionality and extensibility. The use of Agile methodology enabled iterative development, continuous integration, and adaptive planning, while the Polygon blockchain target provides scalability and cost efficiency for real-world deployment.

@@ -115,16 +115,22 @@ contract Election is IElection {
         uint _candidateId
     ) external onlyRegisteredVoter hasNotVoted onlyDuringElection {
         if (!participatingParties[_party]) revert PartyNotParticipating();
+        console.log("Party registered");
 
         // Verify that the candidate exists in the party
         Party party = Party(_party);
+        console.log("Got party");
         (uint id, , , ) = party.getCandidate(_candidateId);
+        console.log("Got candidate id");
         if (id != _candidateId) revert InvalidCandidate();
 
         hasVoted[msg.sender] = true;
+        console.log("tracked vote");
         partyCandidateVoteCounts[_party][_candidateId]++;
+        console.log("increased candidate count");
 
         emit VoteCast(msg.sender, _party, _candidateId);
+        console.log("emitted event");
     }
 
     function getVoteCount(

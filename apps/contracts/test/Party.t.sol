@@ -12,9 +12,7 @@ contract PartyTest is Test {
     CandidateRegistry public candidateRegistry;
 
     function setUp() public {
-        vm.startPrank(Config.ADMIN);
-
-        candidateRegistry = new CandidateRegistry(msg.sender);
+        candidateRegistry = new CandidateRegistry(Config.ADMIN);
         party = new Party(
             "Test Party",
             "Test Slogan",
@@ -31,6 +29,8 @@ contract PartyTest is Test {
     }
 
     function test_RegisterCandidate() public {
+        vm.startPrank(Config.ADMIN);
+
         uint registeredCandidateId = candidateRegistry.registerCandidate(
             "John Doe",
             "President",
@@ -53,6 +53,8 @@ contract PartyTest is Test {
     }
 
     function test_RevertWhen_RegisterCandidateDuplicateName() public {
+        vm.startPrank(Config.ADMIN);
+
         uint candidateId1 = candidateRegistry.registerCandidate(
             "John Doe",
             "President",
@@ -64,6 +66,8 @@ contract PartyTest is Test {
     }
 
     function test_GetAllCandidates() public {
+        vm.startPrank(Config.ADMIN);
+
         uint candidateId1 = candidateRegistry.registerCandidate(
             "John Doe",
             "President",

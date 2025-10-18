@@ -4,6 +4,7 @@ pragma solidity ^0.8.24;
 import {CandidateRegistry} from "../candidate/registry/CandidateRegistry.sol";
 import "../../common/Errors.sol";
 import {IParty} from "./IParty.sol";
+import {console} from "forge-std/console.sol";
 
 contract Party is IParty {
     string public name;
@@ -71,7 +72,9 @@ contract Party is IParty {
             string memory candidateCid_
         )
     {
+        console.log("Before candidate not registered in Party.sol");
         if (!candidateIdExists[_candidateId]) revert CandidateNotRegistered();
+        console.log("After candidate not registered in Party.sol");
         CandidateRegistry candidateRegistry = CandidateRegistry(
             candidateRegistryAddress
         );
