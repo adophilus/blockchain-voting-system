@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vs/api",
+  "name": "@blockchain-voting-system/api",
   "packageManager": "pnpm@10.10.0",
   "exports": {
     ".": "./src/index.ts"
@@ -15,7 +15,7 @@
     "lint": "pnpm typegen && biome lint . && tsc"
   },
   "dependencies": {
-    "@vs/docs-openapi": "workspace:^",
+    "@blockchain-voting-system/docs-openapi": "workspace:^",
     "@zodios/core": "^10.9.6",
     "openapi-fetch": "^0.13.4",
     "openapi-react-query": "^0.2.9"

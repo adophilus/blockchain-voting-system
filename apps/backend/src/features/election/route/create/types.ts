@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { type types, schema as apiSchema } from '@vs/api'
+import { type types, schema as apiSchema } from '@blockchain-voting-system/api'
 
 export namespace Request {
   export const body = apiSchema.schemas.Api_Election_Create_Request_Body

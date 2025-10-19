@@ -1,5 +1,5 @@
 import { env } from '@/lib/env'
-import { createClient, createReactQueryClient } from '@vs/api'
+import { createClient, createReactQueryClient } from '@blockchain-voting-system/api'
 
 namespace BackendClient {
   export const client = createClient(env.VITE_BACKEND_URL)

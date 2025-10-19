@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vs/docs-openapi",
+  "name": "@blockchain-voting-system/docs-openapi",
   "private": true,
   "version": "0.0.0",
   "type": "module",

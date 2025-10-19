@@ -1,4 +1,4 @@
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 import { Container } from '@n8n/di'
 import type { MiddlewareHandler } from 'hono'
 import { StatusCodes } from '@/features/http'

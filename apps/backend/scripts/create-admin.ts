@@ -1,7 +1,7 @@
 import { AuthUserRepository } from '@/features/auth/repository'
 import { hashPassword } from '@/features/auth/utils/password'
 import { Container } from '@n8n/di'
-import { bootstrap } from '@vs/backend'
+import { bootstrap } from '@blockchain-voting-system/backend'
 import { ulid } from 'ulidx'
 
 await bootstrap()

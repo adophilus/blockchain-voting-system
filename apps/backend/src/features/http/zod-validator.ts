@@ -1,4 +1,4 @@
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 import { type Hook, zValidator as zValidatorHono } from '@hono/zod-validator'
 import type { Env, Input, MiddlewareHandler, ValidationTargets } from 'hono'
 import type { ZodSchema, z } from 'zod'

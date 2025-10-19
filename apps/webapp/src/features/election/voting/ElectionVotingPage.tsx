@@ -8,7 +8,7 @@ import {
 import { Badge } from '@/components/ui/badge'
 import { Vote, AlertCircle, Calendar, Clock } from 'lucide-react'
 import { format } from 'date-fns'
-import type { Election, Position } from '@vs/backend/types'
+import type { Election, Position } from '@blockchain-voting-system/backend/types'
 import { ElectionVotingBallot } from './ElectionVotingBallot'
 import { ElectionVotingSuccess } from './ElectionVotingSuccess'
 import { useState } from 'react'

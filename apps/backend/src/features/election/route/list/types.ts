@@ -1,5 +1,5 @@
 import type { z } from 'zod'
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 import { Pagination } from '@/features/pagination'
 
 export namespace Request {

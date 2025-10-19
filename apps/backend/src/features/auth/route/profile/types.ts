@@ -1,4 +1,4 @@
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 
 export namespace Request {}
 

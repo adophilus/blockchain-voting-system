@@ -20,7 +20,7 @@ import { toast } from 'sonner'
 import { useForm } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 
 interface ElectionVoterVerificationProps {
   electionId: string

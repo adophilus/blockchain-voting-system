@@ -1,6 +1,6 @@
 {
   "$schema": "https://json.schemastore.org/package.json",
-  "name": "@vs/backend",
+  "name": "@blockchain-voting-system/backend",
   "type": "module",
   "scripts": {
     "start": "pnpm db migrate:latest && tsx ./scripts/create-admin.ts && tsx ./scripts/dev.ts",
@@ -15,23 +15,17 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
-    "@hono/otel": "^0.4.0",
-    "@n8n/di": "^0.2.0",
-    "@opentelemetry/api": "^1.9.0",
-    "@opentelemetry/auto-instrumentations-node": "^0.62.0",
-    "@opentelemetry/exporter-logs-otlp-http": "^0.203.0",
-    "@opentelemetry/exporter-trace-otlp-http": "^0.203.0",
+    "@blockchain-voting-system/api": "workspace:^",
+    "@blockchain-voting-system/backend": "workspace:^",
     "@blockchain-voting-system/core": "workspace:^",
-		"viem": "^2.36.0",
-    "@opentelemetry/resources": "^2.0.1",
-    "@opentelemetry/sdk-logs": "^0.203.0",
-    "@opentelemetry/sdk-node": "^0.203.0",
+    "@n8n/di": "^0.2.0",
     "@types/bcryptjs": "^3.0.0",
-    "@vs/api": "workspace:^",
-    "@vs/backend": "workspace:^",
+    "@hono/node-server": "^1.14.4",
     "bcryptjs": "^3.0.2",
     "better-sqlite3": "^12.2.0",
     "date-fns": "^4.1.0",
+    "hono": "^4.7.11",
+    "@hono/zod-validator": "^0.4.3",
     "jose": "^6.0.11",
     "jsx-email": "^2.7.2",
     "kysely": "^0.28.3",
@@ -47,7 +41,9 @@
     "reflect-metadata": "^0.2.2",
     "ts-results": "^3.3.0",
     "tslog": "^4.9.3",
-    "tsyringe": "^4.10.0"
+    "tsyringe": "^4.10.0",
+    "ulidx": "^2.4.1",
+    "viem": "^2.36.0"
   },
   "devDependencies": {
     "@effect/cli": "^0.61.8",

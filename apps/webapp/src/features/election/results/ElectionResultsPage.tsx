@@ -1,4 +1,4 @@
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 import { Storage } from '@/features/storage'
 import { ElectionHeader } from '@/features/election/voting/ElectionHeader'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'

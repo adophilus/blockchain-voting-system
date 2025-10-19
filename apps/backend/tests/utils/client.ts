@@ -1,4 +1,4 @@
-import { createClient, type Middleware } from '@vs/api'
+import { createClient, type Middleware } from '@blockchain-voting-system/api'
 import { config } from '@/features/config'
 import { app } from './bootstrap'
 

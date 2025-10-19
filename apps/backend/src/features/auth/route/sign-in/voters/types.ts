@@ -1,5 +1,5 @@
 import { z } from 'zod'
-import { type types, schema } from '@vs/api'
+import { type types, schema } from '@blockchain-voting-system/api'
 
 export namespace Request {
   export const body =

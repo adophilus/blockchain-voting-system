@@ -11,17 +11,14 @@ import {
 	type Hex,
 } from "viem";
 import { foundry, polygon } from "viem/chains";
-import { Result } from "true-myth";
-import { config } from "../config";
+import { config } from "@/features/config";
 import { privateKeyToAccount } from "viem/accounts";
+import { BlockchainService } from "./interface";
 
-export type BlockchainServiceError =
-	| { type: "InitializationError"; message: string }
-	| { type: "WalletError"; message: string }
-	| { type: "VotingSystemError"; message: string };
+export type BlockchainServiceError = never;
 
-export class BlockchainService {
-	private votingSystem: BlockchainVotingSystem
+export class BlockchainServiceImplementation implements BlockchainService {
+	private votingSystem: BlockchainVotingSystem;
 
 	constructor(
 		private readonly privateKey: Hex,

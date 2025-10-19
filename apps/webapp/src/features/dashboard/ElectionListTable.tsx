@@ -9,7 +9,7 @@ import {
 import TablePagination from '@/components/ui/table-pagination'
 import { format } from 'date-fns'
 import type { Dispatch, SetStateAction } from 'react'
-import type { types } from '@vs/api'
+import type { types } from '@blockchain-voting-system/api'
 import { Badge } from '@/components/ui/badge'
 import {
   DropdownMenu,

@@ -7,7 +7,7 @@ import {
 } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { CheckCircle } from 'lucide-react'
-import type { Election } from '@vs/backend/types'
+import type { Election } from '@blockchain-voting-system/backend/types'
 
 interface ElectionVotingSuccessProps {
   election: Election.Selectable

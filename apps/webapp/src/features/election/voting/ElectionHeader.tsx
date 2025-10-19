@@ -1,7 +1,7 @@
 import { Badge } from "@/components/ui/badge"
 import { Vote, Calendar, Clock } from "lucide-react"
 import { format } from 'date-fns'
-import type { Election } from '@vs/backend/types'
+import type { Election } from '@blockchain-voting-system/backend/types'
 
 interface ElectionHeaderProps {
   election: Election.Selectable
