@@ -1,39 +1,49 @@
-import { BlockchainVotingSystem } from '@blockchain-voting-system/core'
-import { Wallet } from '@blockchain-voting-system/core'
-import type { Logger } from '@/features/logger'
-import type { Address } from 'viem'
+import { BlockchainVotingSystem } from "@blockchain-voting-system/core";
+import { jsonRpc } from "viem/nonce";
+import { Wallet } from "@blockchain-voting-system/core";
+import type { Logger } from "@/features/logger";
+import {
+	createNonceManager,
+	createPublicClient,
+	createWalletClient,
+	http,
+	type Address,
+	type Hex,
+} from "viem";
+import { foundry, polygon } from "viem/chains";
+import { Result } from "true-myth";
+import { config } from "../config";
+import { privateKeyToAccount } from "viem/accounts";
+
+export type BlockchainServiceError =
+	| { type: "InitializationError"; message: string }
+	| { type: "WalletError"; message: string }
+	| { type: "VotingSystemError"; message: string };
 
 export class BlockchainService {
-  private votingSystem: BlockchainVotingSystem | null = null
+	private votingSystem: BlockchainVotingSystem
 
-  constructor(
-    private logger: Logger,
-    private votingSystemAddress: Address
-  ) {}
+	constructor(
+		private readonly privateKey: Hex,
+		private votingSystemAddress: Address,
+		private logger: Logger,
+	) {
+		const chain = config.environment.DEVELOPMENT ? foundry : polygon;
+		const transport = http();
+		const nonceManager = createNonceManager({ source: jsonRpc() });
+		const account = privateKeyToAccount(privateKey, { nonceManager });
 
-  async initialize(walletPrivateKey: `0x${string}`): Promise<void> {
-    try {
-      // Create wallet from private key
-      const wallet = new Wallet(walletPrivateKey)
-      
-      // Create voting system instance
-      this.votingSystem = new BlockchainVotingSystem(
-        wallet,
-        this.votingSystemAddress
-      )
-      
-      this.logger.info('Blockchain service initialized successfully')
-    } catch (error) {
-      this.logger.error('Failed to initialize blockchain service:', error)
-      throw error
-    }
-  }
+		const publicClient = createPublicClient({ chain, transport });
+		const walletClient = createWalletClient({ chain, transport, account });
+		const wallet = new Wallet(privateKey, publicClient, walletClient);
 
-  getVotingSystem(): BlockchainVotingSystem | null {
-    return this.votingSystem
-  }
+		this.votingSystem = new BlockchainVotingSystem(
+			wallet,
+			this.votingSystemAddress,
+		);
+	}
 
-  isInitialized(): boolean {
-    return this.votingSystem !== null
-  }
+	getVotingSystem(): BlockchainVotingSystem {
+		return this.votingSystem;
+	}
 }

@@ -55,6 +55,7 @@ import { KyselyStorageRepository } from '@/features/storage/repository'
 import { SubmitVoteUseCase } from '@/features/election/voter/use-case'
 import { BlockchainService } from '@/features/blockchain/service'
 import { BlockchainSubmitVoteUseCase } from '@/features/election/voter/route/submit/blockchain-use-case'
+import { Result } from 'true-myth'
 
 export const bootstrap = async () => {
   const logger = new Logger()
@@ -71,11 +72,15 @@ export const bootstrap = async () => {
   // Initialize blockchain service if wallet private key is provided
   if (config.blockchain.walletPrivateKey) {
     try {
-      await blockchainService.initialize(
+      const initResult = await blockchainService.initialize(
         config.blockchain.walletPrivateKey as `0x${string}`
       )
+      
+      if (initResult.isErr) {
+        logger.error('Failed to initialize blockchain service:', initResult.error)
+      }
     } catch (error) {
-      logger.error('Failed to initialize blockchain service:', error)
+      logger.error('Unexpected error initializing blockchain service:', error)
     }
   }
 

@@ -21,6 +21,8 @@
     "@opentelemetry/auto-instrumentations-node": "^0.62.0",
     "@opentelemetry/exporter-logs-otlp-http": "^0.203.0",
     "@opentelemetry/exporter-trace-otlp-http": "^0.203.0",
+    "@blockchain-voting-system/core": "workspace:^",
+		"viem": "^2.36.0",
     "@opentelemetry/resources": "^2.0.1",
     "@opentelemetry/sdk-logs": "^0.203.0",
     "@opentelemetry/sdk-node": "^0.203.0",
