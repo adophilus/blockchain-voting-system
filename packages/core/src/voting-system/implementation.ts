@@ -1,16 +1,8 @@
-import {
-	type Address,
-	type PublicClient,
-	type WalletClient,
-	type Hex,
-	type Abi,
-	parseEventLogs,
-} from "viem";
+import { type Address, parseEventLogs } from "viem";
 import { Result } from "true-myth";
 import type { Wallet } from "../wallet";
 import type {
 	VotingSystem,
-	ContractAddresses,
 	CandidateDetails,
 	PartyDetails,
 	ElectionStatus,
@@ -48,7 +40,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	constructor(
 		private readonly wallet: Wallet,
 		private readonly votingSystemAddress: Address,
-	) {}
+	) { }
 
 	private getAccountAddress(): Address {
 		return this.wallet.getWalletClient().account!.address;
@@ -189,16 +181,22 @@ class BlockchainVotingSystem implements VotingSystem {
 				functionName: "candidateRegistryAddress",
 			});
 
-			const { request: registerCandidateRequest } = await publicClient.simulateContract({
-				address: candidateRegistryAddress,
-				abi: candidateRegistryAbi,
-				functionName: "registerCandidate",
-				args: [name, position, cid],
-				account,
-			});
+			const { request: registerCandidateRequest } =
+				await publicClient.simulateContract({
+					address: candidateRegistryAddress,
+					abi: candidateRegistryAbi,
+					functionName: "registerCandidate",
+					args: [name, position, cid],
+					account,
+				});
 
-			const registerCandidateHash = await walletClient.writeContract(registerCandidateRequest);
-			const registerCandidateReceipt = await publicClient.waitForTransactionReceipt({ hash: registerCandidateHash });
+			const registerCandidateHash = await walletClient.writeContract(
+				registerCandidateRequest,
+			);
+			const registerCandidateReceipt =
+				await publicClient.waitForTransactionReceipt({
+					hash: registerCandidateHash,
+				});
 
 			// Extract candidate ID from CandidateRegistered event in candidate registry
 			const candidateLogs = parseEventLogs({
@@ -211,10 +209,14 @@ class BlockchainVotingSystem implements VotingSystem {
 				(log) => log.eventName === "CandidateRegistered",
 			);
 
-			if (!candidateRegisteredEvent || candidateRegisteredEvent.args.candidateId === undefined) {
+			if (
+				!candidateRegisteredEvent ||
+				candidateRegisteredEvent.args.candidateId === undefined
+			) {
 				return Result.err({
 					type: "TransactionFailedError",
-					message: "Could not find 'CandidateRegistered' event or candidate ID argument in receipt.",
+					message:
+						"Could not find 'CandidateRegistered' event or candidate ID argument in receipt.",
 				});
 			}
 
@@ -234,16 +236,21 @@ class BlockchainVotingSystem implements VotingSystem {
 				args: [BigInt(partyId)],
 			});
 
-			const { request: registerCandidateToPartyRequest } = await publicClient.simulateContract({
-				address: partyAddress,
-				abi: partyAbi,
-				functionName: "registerCandidate",
-				args: [BigInt(candidateId)],
-				account,
-			});
+			const { request: registerCandidateToPartyRequest } =
+				await publicClient.simulateContract({
+					address: partyAddress,
+					abi: partyAbi,
+					functionName: "registerCandidate",
+					args: [BigInt(candidateId)],
+					account,
+				});
 
-			const registerToPartyHash = await walletClient.writeContract(registerCandidateToPartyRequest);
-			await publicClient.waitForTransactionReceipt({ hash: registerToPartyHash });
+			const registerToPartyHash = await walletClient.writeContract(
+				registerCandidateToPartyRequest,
+			);
+			await publicClient.waitForTransactionReceipt({
+				hash: registerToPartyHash,
+			});
 
 			// Emit CandidateRegistered event locally to maintain consistency
 			// In a real implementation, we might want to return a success result with the candidate ID
@@ -258,7 +265,6 @@ class BlockchainVotingSystem implements VotingSystem {
 	}
 
 	public async updateCandidate(
-		partyId: number,
 		candidateId: number,
 		name: string,
 		position: string,

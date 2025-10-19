@@ -209,7 +209,6 @@ export interface VotingSystem {
 		cid: string,
 	): Promise<Result<number, RegisterCandidateError>>;
 	updateCandidate(
-		partyId: number,
 		candidateId: number,
 		name: string,
 		position: string,
