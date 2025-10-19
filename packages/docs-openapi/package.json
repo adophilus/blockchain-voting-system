@@ -1,0 +1,20 @@
+{
+  "$schema": "https://json.schemastore.org/package.json",
+  "name": "@vs/docs-openapi",
+  "private": true,
+  "version": "0.0.0",
+  "type": "module",
+  "exports": {
+    "./openapi.yaml": "./build/openapi.yaml"
+  },
+  "scripts": {
+    "build": "tsp compile .",
+    "dev": "pnpm build --watch",
+    "lint": "pnpm build"
+  },
+  "devDependencies": {
+    "@typespec/compiler": "^1.4.0",
+    "@typespec/openapi3": "^1.4.0",
+    "@typespec/http": "^1.4.0"
+  }
+}
