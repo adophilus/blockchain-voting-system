@@ -10,6 +10,9 @@ export const env = createEnv({
     DATABASE_URL: z.string(),
     BACKEND_URL: z.string(),
     AUTH_TOKEN_SECRET: z.string().min(32),
+    BLOCKCHAIN_VOTING_SYSTEM_ADDRESS: z.string().optional(),
+    BLOCKCHAIN_WALLET_PRIVATE_KEY: z.string().optional(),
+    BLOCKCHAIN_RPC_URL: z.string().optional(),
   },
   runtimeEnv: process.env
 })

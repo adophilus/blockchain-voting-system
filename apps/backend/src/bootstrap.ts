@@ -53,12 +53,31 @@ import { UploadUseCase } from '@/features/storage/route/upload/use-case'
 import { GetFileUseCase } from '@/features/storage/route/get/use-case'
 import { KyselyStorageRepository } from '@/features/storage/repository'
 import { SubmitVoteUseCase } from '@/features/election/voter/use-case'
+import { BlockchainService } from '@/features/blockchain/service'
+import { BlockchainSubmitVoteUseCase } from '@/features/election/voter/route/submit/blockchain-use-case'
 
 export const bootstrap = async () => {
   const logger = new Logger()
 
   // Database
   const kyselyClient = await createKyselySqliteClient()
+
+  // Blockchain Service
+  const blockchainService = new BlockchainService(
+    logger,
+    config.blockchain.votingSystemAddress as `0x${string}`
+  )
+  
+  // Initialize blockchain service if wallet private key is provided
+  if (config.blockchain.walletPrivateKey) {
+    try {
+      await blockchainService.initialize(
+        config.blockchain.walletPrivateKey as `0x${string}`
+      )
+    } catch (error) {
+      logger.error('Failed to initialize blockchain service:', error)
+    }
+  }
 
   // Storage DI
   const storageRepository = new KyselyStorageRepository(kyselyClient, logger)
@@ -85,9 +104,11 @@ export const bootstrap = async () => {
   )
   const voterRepository = new KyselyVoterRepository(kyselyClient, logger)
   const voteRepository = new KyselyVoteRepository(kyselyClient, logger)
+  const blockchainSubmitVoteUseCase = new BlockchainSubmitVoteUseCase(blockchainService, logger)
   const submitVoteUseCase = new SubmitVoteUseCase(
     voterRepository,
-    voteRepository
+    voteRepository,
+    blockchainSubmitVoteUseCase
   )
 
   // Cron Service
@@ -133,6 +154,9 @@ export const bootstrap = async () => {
   // App
   Container.set(App, app)
 
+  // Blockchain Service
+  Container.set(BlockchainService, blockchainService)
+
   // Database
   Container.set(KyselyClient, kyselyClient)
 
@@ -158,6 +182,9 @@ export const bootstrap = async () => {
   Container.set(VoterRepository, voterRepository)
   Container.set(VoteRepository, voteRepository)
   Container.set(SubmitVoteUseCase, submitVoteUseCase)
+
+  // Blockchain DI
+  Container.set(BlockchainService, blockchainService)
 
   // Cron Service
   Container.set(CronService, cronService)

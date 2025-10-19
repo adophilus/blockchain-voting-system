@@ -4,11 +4,13 @@ import type { VoterRepository } from '@/features/election/voter/repository'
 import type { VoteRepository } from '@/features/election/voting/repository'
 import { ulid } from 'ulidx'
 import type { Vote } from '@/types'
+import type { BlockchainSubmitVoteUseCase } from './blockchain-use-case'
 
 export class SubmitVoteUseCase {
   constructor(
     private voterRepository: VoterRepository,
-    private voteRepository: VoteRepository
+    private voteRepository: VoteRepository,
+    private blockchainSubmitVoteUseCase: BlockchainSubmitVoteUseCase
   ) {}
 
   async execute(
@@ -65,6 +67,12 @@ export class SubmitVoteUseCase {
         code: 'ERR_UNEXPECTED'
       })
     }
+
+    // Submit vote to blockchain (non-blocking)
+    this.blockchainSubmitVoteUseCase.execute(payload).catch((error) => {
+      // Log error but don't block the response
+      console.error('Error submitting vote to blockchain:', error)
+    })
 
     return Result.ok({
       code: 'VOTE_SUBMITTED',
