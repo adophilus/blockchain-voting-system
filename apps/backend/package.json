@@ -15,6 +15,11 @@
     "./*": "./src/*.ts"
   },
   "dependencies": {
+    "@hono/node-server": "^1.14.4",
+    "@hono/zod-validator": "^0.4.3",
+    "hono": "^4.7.11",
+    "ulidx": "^2.4.1",
+    "http-status-codes": "^2.3.0",
     "@blockchain-voting-system/api": "workspace:^",
     "@blockchain-voting-system/backend": "workspace:^",
     "@hono/otel": "^0.4.0",
