@@ -16,6 +16,7 @@ import type {
 	RegisterPartyError,
 	UpdatePartyError,
 	GetPartyError,
+	GetPartyAddressByCandidateIdError,
 	CreateElectionError,
 	GetElectionError,
 	StartElectionError,
@@ -438,6 +439,82 @@ class BlockchainVotingSystem implements VotingSystem {
 			return Result.ok({ id: partyId, name, logoCid, address: partyAddress });
 		} catch (e: any) {
 			console.error(`Read contract call failed for getParty:`, e);
+			return Result.err({
+				type: "ContractCallFailedError",
+				message: "Contract call/execution failed",
+			});
+		}
+	}
+
+	public async getPartyAddressByCandidateId(
+		candidateId: number,
+	): Promise<Result<Address, GetPartyAddressByCandidateIdError>> {
+		try {
+			// Get candidate registry address from voting system
+			const candidateRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "candidateRegistryAddress",
+				});
+
+			// Get candidate details to find the party ID
+			// Note: This assumes the candidate struct includes a partyId field
+			// In the current contract implementation, we may need to enhance this
+			const candidateData = await this.wallet.getPublicClient().readContract({
+				address: candidateRegistryAddress,
+				abi: candidateRegistryAbi,
+				functionName: "getCandidate",
+				args: [BigInt(candidateId)],
+			});
+
+			// Extract party ID from candidate data
+			// This assumes the candidate struct has been enhanced to include partyId
+			// If not, we'll need to implement a different approach
+			const [, , , , partyId] = candidateData;
+			
+			if (!partyId || partyId === 0n) {
+				return Result.err({
+					type: "PartyNotFoundError",
+					message: "Candidate is not associated with a party",
+				});
+			}
+
+			// Get party registry address from voting system
+			const partyRegistryAddress = await this.wallet
+				.getPublicClient()
+				.readContract({
+					address: this.votingSystemAddress,
+					abi: votingSystemAbi,
+					functionName: "partyRegistryAddress",
+				});
+
+			// Get party address from party registry
+			const partyAddress = await this.wallet.getPublicClient().readContract({
+				address: partyRegistryAddress,
+				abi: partyRegistryAbi,
+				functionName: "getParty",
+				args: [partyId],
+			});
+
+			return Result.ok(partyAddress);
+		} catch (e: any) {
+			console.error(`Read contract call failed for getPartyAddressByCandidateId:`, e);
+			
+			// Determine the specific error type
+			if (e.message && e.message.includes("InvalidCandidateId")) {
+				return Result.err({
+					type: "CandidateNotFoundError",
+					message: "Candidate not found",
+				});
+			} else if (e.message && e.message.includes("PartyNotFound")) {
+				return Result.err({
+					type: "PartyNotFoundError",
+					message: "Party not found for candidate",
+				});
+			}
+			
 			return Result.err({
 				type: "ContractCallFailedError",
 				message: "Contract call/execution failed",

@@ -3,7 +3,6 @@ pragma solidity ^0.8.24;
 
 import {VoterRegistry} from "../voter/registry/VoterRegistry.sol";
 import {Party} from "../party/Party.sol";
-import {console} from "forge-std/console.sol";
 import "../../common/Errors.sol";
 import {IElection} from "./IElection.sol";
 
@@ -107,7 +106,6 @@ contract Election is IElection {
         if (electionStarted) revert ElectionAlreadyStarted();
         registeredVoters[_voter] = true;
         emit VoterRegistered(_voter);
-        console.log("Voter registered for election");
     }
 
     function vote(
@@ -115,22 +113,16 @@ contract Election is IElection {
         uint _candidateId
     ) external onlyRegisteredVoter hasNotVoted onlyDuringElection {
         if (!participatingParties[_party]) revert PartyNotParticipating();
-        console.log("Party registered");
 
         // Verify that the candidate exists in the party
         Party party = Party(_party);
-        console.log("Got party");
-        (uint id, , , ) = party.getCandidate(_candidateId);
-        console.log("Got candidate id");
+        (uint id, , , , ) = party.getCandidate(_candidateId);
         if (id != _candidateId) revert InvalidCandidate();
 
         hasVoted[msg.sender] = true;
-        console.log("tracked vote");
         partyCandidateVoteCounts[_party][_candidateId]++;
-        console.log("increased candidate count");
 
         emit VoteCast(msg.sender, _party, _candidateId);
-        console.log("emitted event");
     }
 
     function getVoteCount(

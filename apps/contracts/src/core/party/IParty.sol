@@ -12,6 +12,6 @@ interface IParty {
     function candidateCount() external view returns (uint);
 
     function registerCandidate(uint _candidateId) external returns (uint);
-    function getCandidate(uint _candidateId) external view returns (uint candidateId_, string memory candidateName_, string memory candidatePosition_, string memory candidateCid_);
+    function getCandidate(uint _candidateId) external view returns (uint candidateId_, string memory candidateName_, string memory candidatePosition_, string memory candidateCid_, uint candidatePartyId_);
     function getAllCandidates() external view returns (uint[] memory ids, string[] memory names, string[] memory positions, string[] memory cids);
 }

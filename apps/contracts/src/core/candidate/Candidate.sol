@@ -5,6 +5,6 @@ struct Candidate {
     uint id;
     string name;
     string position;
-    string cid; // IPFS CID for candidate image or profile
-    uint partyId; // NEW: Party ID that registered this candidate
+    string cid;
+    uint partyId;
 }

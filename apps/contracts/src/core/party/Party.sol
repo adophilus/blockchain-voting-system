@@ -4,7 +4,6 @@ pragma solidity ^0.8.24;
 import {CandidateRegistry} from "../candidate/registry/CandidateRegistry.sol";
 import "../../common/Errors.sol";
 import {IParty} from "./IParty.sol";
-import {console} from "forge-std/console.sol";
 
 contract Party is IParty {
     string public name;
@@ -46,7 +45,7 @@ contract Party is IParty {
             uint candidateIdFromReg,
             string memory candidateNameFromReg,
             ,
-
+            ,
         ) = candidateRegistry.getCandidate(_candidateId);
         if (candidateIdFromReg != _candidateId) revert InvalidCandidateId();
         if (candidateIdExists[_candidateId])
@@ -69,12 +68,11 @@ contract Party is IParty {
             uint candidateId_,
             string memory candidateName_,
             string memory candidatePosition_,
-            string memory candidateCid_
+            string memory candidateCid_,
+            uint candidatePartyId_
         )
     {
-        console.log("Before candidate not registered in Party.sol");
         if (!candidateIdExists[_candidateId]) revert CandidateNotRegistered();
-        console.log("After candidate not registered in Party.sol");
         CandidateRegistry candidateRegistry = CandidateRegistry(
             candidateRegistryAddress
         );
@@ -107,7 +105,8 @@ contract Party is IParty {
                 uint candidateIdFromReg,
                 string memory candidateNameFromReg,
                 string memory candidatePositionFromReg,
-                string memory candidateCidFromReg
+                string memory candidateCidFromReg,
+                uint candidatePartyId
             ) = candidateRegistry.getCandidate(candidateId);
             ids[i] = candidateIdFromReg;
             names[i] = candidateNameFromReg;

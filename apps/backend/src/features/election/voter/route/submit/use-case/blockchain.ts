@@ -3,13 +3,12 @@ import { Result } from "true-myth";
 import type { BlockchainService } from "@/features/blockchain/service";
 import { Logger } from "@/features/logger";
 import { SubmitVoteUseCase } from "./interface";
-import type { BlockchainVotingSystem } from "@blockchain-voting-system/core";
 
 export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 	constructor(
 		private blockchainService: BlockchainService,
 		private logger: Logger,
-	) { }
+	) {}
 
 	async execute(
 		payload: Request.Body,
@@ -18,13 +17,13 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 			const votingSystem = this.blockchainService.getVotingSystem();
 
 			// Validate election exists on blockchain
-			const electionResult = await votingSystem.getElection(
+			const findExistingElectionResult = await votingSystem.getElection(
 				payload.election_id,
 			);
-			if (electionResult.isErr) {
+			if (findExistingElectionResult.isErr) {
 				this.logger.error(
 					"Election not found on blockchain:",
-					electionResult.error,
+					findExistingElectionResult.error,
 				);
 				return Result.err({
 					code: "ERR_ELECTION_NOT_FOUND",
@@ -75,8 +74,7 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 				const candidate = candidateResult.value;
 
 				// Get party details for this candidate
-				const partyAddress = await this.getPartyAddressForCandidate(
-					votingSystem,
+				const partyAddress = await votingSystem.getPartyAddressByCandidateId(
 					vote.candidate_id,
 				);
 
@@ -124,69 +122,6 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 			return Result.err({
 				code: "ERR_UNEXPECTED",
 			});
-		}
-	}
-
-	/**
-	 * Helper method to get the party address for a given candidate
-	 * This queries the blockchain to find which party registered the candidate
-	 */
-	private async getPartyAddressForCandidate(
-		votingSystem: BlockchainVotingSystem,
-		candidateId: number,
-	): Promise<string | null> {
-		try {
-			this.logger.debug(`Getting party address for candidate ${candidateId}`);
-
-			// Get candidate details to get the partyId
-			const candidateResult = await votingSystem.getCandidate(candidateId);
-
-			if (candidateResult.isErr) {
-				this.logger.error(
-					`Failed to get candidate ${candidateId} from registry:`,
-					candidateResult.error,
-				);
-				return null;
-			}
-
-			const candidate = candidateResult.value;
-
-			// Extract partyId from candidate details
-			// In the enhanced contracts, the candidate would include a partyId field
-			const partyId = candidate.partyId; // This assumes the candidate struct has a partyId field
-
-			if (!partyId) {
-				this.logger.warn(`Candidate ${candidateId} has no associated party`);
-				return null;
-			}
-
-			// Get party registry address from voting system
-			const partyRegistryAddress = await votingSystem.getPartyRegistryAddress();
-
-			if (!partyRegistryAddress) {
-				this.logger.error("Failed to get party registry address");
-				return null;
-			}
-
-			// Get party address from party registry using partyId
-			const partyAddress = await votingSystem.getParty(partyId);
-
-			if (!partyAddress) {
-				this.logger.warn(`No party found with ID ${partyId}`);
-				return null;
-			}
-
-			this.logger.debug(
-				`Found party ${partyId} with address ${partyAddress} for candidate ${candidateId}`,
-			);
-			
-			return partyAddress;
-		} catch (error) {
-			this.logger.error(
-				`Failed to get party address for candidate ${candidateId}:`,
-				error,
-			);
-			return null;
 		}
 	}
 }

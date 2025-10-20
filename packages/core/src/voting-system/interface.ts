@@ -134,6 +134,11 @@ export type GetPartyError =
 	| PartyNotFoundError
 	| ContractCallFailedError
 	| UnknownError;
+export type GetPartyAddressByCandidateIdError =
+	| CandidateNotFoundError
+	| PartyNotFoundError
+	| ContractCallFailedError
+	| UnknownError;
 
 // Election Management
 export type CreateElectionError =
@@ -230,6 +235,9 @@ export interface VotingSystem {
 		logoCid: string,
 	): Promise<Result<void, UpdatePartyError>>;
 	getParty(partyId: number): Promise<Result<PartyDetails, GetPartyError>>;
+	getPartyAddressByCandidateId(
+		candidateId: number,
+	): Promise<Result<Address, GetPartyAddressByCandidateIdError>>;
 
 	// Election Management
 	createElection(
@@ -265,4 +273,9 @@ export interface VotingSystem {
 	getElectionResults(
 		electionId: number,
 	): Promise<Result<ElectionResults, GetElectionResultsError>>;
+	
+	// Blockchain Integration
+	getPartyAddressByCandidateId(
+		candidateId: number,
+	): Promise<Result<Address, GetPartyAddressByCandidateIdError>>;
 }
