@@ -34,7 +34,8 @@ contract PartyTest is Test {
         uint registeredCandidateId = candidateRegistry.registerCandidate(
             "John Doe",
             "President",
-            "QmTestCandidateCID"
+            "QmTestCandidateCID",
+            1
         );
         uint candidateId = party.registerCandidate(registeredCandidateId);
         assertEq(candidateId, registeredCandidateId);
@@ -44,12 +45,14 @@ contract PartyTest is Test {
             uint id,
             string memory name,
             string memory position,
-            string memory cid
+            string memory cid,
+            uint partyId
         ) = party.getCandidate(registeredCandidateId);
         assertEq(id, registeredCandidateId);
         assertEq(name, "John Doe");
         assertEq(position, "President");
         assertEq(cid, "QmTestCandidateCID");
+        assertEq(partyId, 1);
     }
 
     function test_RevertWhen_RegisterCandidateDuplicateName() public {
@@ -58,7 +61,8 @@ contract PartyTest is Test {
         uint candidateId1 = candidateRegistry.registerCandidate(
             "John Doe",
             "President",
-            "QmTestCandidateCID1"
+            "QmTestCandidateCID1",
+            1
         );
         party.registerCandidate(candidateId1);
         vm.expectRevert(CandidateAlreadyRegistered.selector);
@@ -71,13 +75,15 @@ contract PartyTest is Test {
         uint candidateId1 = candidateRegistry.registerCandidate(
             "John Doe",
             "President",
-            "QmTestCandidateCID1"
+            "QmTestCandidateCID1",
+            1
         );
         party.registerCandidate(candidateId1);
         uint candidateId2 = candidateRegistry.registerCandidate(
             "Jane Smith",
             "Vice President",
-            "QmTestCandidateCID2"
+            "QmTestCandidateCID2",
+            2
         );
         party.registerCandidate(candidateId2);
 

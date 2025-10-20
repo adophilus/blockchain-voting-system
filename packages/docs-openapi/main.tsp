@@ -652,10 +652,6 @@ namespace Api {
             namespace Success {
               model VoteSubmitted {
                 code: "VOTE_SUBMITTED";
-                data: {
-                  success: true;
-                  message: "Votes submitted successfully";
-                };
               }
               alias Success = VoteSubmitted;
             }
@@ -960,3 +956,4 @@ namespace Api {
     }
   }
 }
+

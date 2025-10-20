@@ -106,7 +106,6 @@ contract Party is IParty {
                 string memory candidateNameFromReg,
                 string memory candidatePositionFromReg,
                 string memory candidateCidFromReg,
-                uint candidatePartyId
             ) = candidateRegistry.getCandidate(candidateId);
             ids[i] = candidateIdFromReg;
             names[i] = candidateNameFromReg;

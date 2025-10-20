@@ -112,10 +112,6 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 
 			return Result.ok({
 				code: "VOTE_SUBMITTED",
-				data: {
-					success: true,
-					message: "Votes submitted successfully to blockchain",
-				},
 			});
 		} catch (error) {
 			this.logger.error("Error submitting vote to blockchain:", error);

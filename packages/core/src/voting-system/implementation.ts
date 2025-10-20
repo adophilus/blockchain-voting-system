@@ -459,9 +459,6 @@ class BlockchainVotingSystem implements VotingSystem {
 					functionName: "candidateRegistryAddress",
 				});
 
-			// Get candidate details to find the party ID
-			// Note: This assumes the candidate struct includes a partyId field
-			// In the current contract implementation, we may need to enhance this
 			const candidateData = await this.wallet.getPublicClient().readContract({
 				address: candidateRegistryAddress,
 				abi: candidateRegistryAbi,
@@ -469,9 +466,6 @@ class BlockchainVotingSystem implements VotingSystem {
 				args: [BigInt(candidateId)],
 			});
 
-			// Extract party ID from candidate data
-			// This assumes the candidate struct has been enhanced to include partyId
-			// If not, we'll need to implement a different approach
 			const [, , , , partyId] = candidateData;
 			
 			if (!partyId || partyId === 0n) {
