@@ -41,17 +41,6 @@
 				"buildDepsTargetName": "build-deps",
 				"watchDepsTargetName": "watch-deps"
 			}
-		},
-		{
-			"plugin": "@nx/next/plugin",
-			"options": {
-				"startTargetName": "next:start",
-				"buildTargetName": "next:build",
-				"devTargetName": "next:dev",
-				"serveStaticTargetName": "serve-static",
-				"buildDepsTargetName": "build-deps",
-				"watchDepsTargetName": "watch-deps"
-			}
 		}
 	]
 }

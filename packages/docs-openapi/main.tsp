@@ -115,6 +115,18 @@ namespace Api {
     code: "ERR_${T}_ALREADY_IN_USE";
   }
 
+  @error
+  model ElectionNotStartedError {
+    @statusCode _code: 409;
+    code: "ERR_ELECTION_NOT_STARTED";
+  }
+
+  @error
+  model ElectionAlreadyEndedError {
+    @statusCode _code: 409;
+    code: "ERR_ELECTION_ALREADY_ENDED";
+  }
+
   @example("Student Council Election 2024")
   scalar ElectionTitle extends string;
 
@@ -664,7 +676,12 @@ namespace Api {
               }
 
               alias Error =
+                | NotFoundError<"ELECTION">
+                | NotFoundError<"CANDIDATE">
                 | NotFoundError<"VOTER">
+                | NotFoundError<"PARTY">
+                | ElectionNotStartedError
+                | ElectionAlreadyEndedError
                 | VoterAlreadyVotedError
                 | BadRequestError
                 | UnexpectedError;

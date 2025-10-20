@@ -18,7 +18,7 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 
 			// Validate election exists on blockchain
 			const findExistingElectionResult = await votingSystem.getElection(
-				payload.election_id,
+				Number.parseInt(payload.election_id),
 			);
 			if (findExistingElectionResult.isErr) {
 				this.logger.error(
@@ -32,7 +32,7 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 
 			// Validate election is active
 			const electionStatusResult = await votingSystem.getElectionStatus(
-				payload.election_id,
+				Number.parseInt(payload.election_id),
 			);
 			if (electionStatusResult.isErr) {
 				this.logger.error(
@@ -40,18 +40,20 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 					electionStatusResult.error,
 				);
 				return Result.err({
-					code: "ERR_ELECTION_STATUS_CHECK_FAILED",
+					code: "ERR_UNEXPECTED",
 				});
 			}
 
 			const electionStatus = electionStatusResult.value;
-			if (electionStatus !== "Active") {
-				this.logger.warn(
-					"Attempt to vote in inactive election:",
-					electionStatus,
-				);
+			if (electionStatus === "Pending") {
+				this.logger.warn("Attempt to vote in pending election:");
 				return Result.err({
-					code: "ERR_ELECTION_NOT_ACTIVE",
+					code: "ERR_ELECTION_NOT_STARTED",
+				});
+			} else if (electionStatus === "Ended") {
+				this.logger.warn("Attempt to vote in ended election:");
+				return Result.err({
+					code: "ERR_ELECTION_ALREADY_ENDED",
 				});
 			}
 
@@ -59,7 +61,7 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 			for (const vote of payload.votes) {
 				// Get candidate details from blockchain to validate existence
 				const candidateResult = await votingSystem.getCandidate(
-					vote.candidate_id,
+					Number.parseInt(vote.candidate_id),
 				);
 				if (candidateResult.isErr) {
 					this.logger.error(
@@ -74,24 +76,43 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 				const candidate = candidateResult.value;
 
 				// Get party details for this candidate
-				const partyAddress = await votingSystem.getPartyAddressByCandidateId(
-					vote.candidate_id,
-				);
+				const getPartyAddressResult =
+					await votingSystem.getPartyAddressByCandidateId(
+						Number.parseInt(vote.candidate_id),
+					);
 
-				if (!partyAddress) {
+				if (getPartyAddressResult.isErr) {
 					this.logger.error(
 						`Party not found for candidate ${vote.candidate_id}`,
+						getPartyAddressResult.error,
 					);
-					return Result.err({
-						code: "ERR_PARTY_NOT_FOUND",
-					});
+
+					switch (getPartyAddressResult.error.type) {
+						case "PartyNotFoundError": {
+							return Result.err({
+								code: "ERR_PARTY_NOT_FOUND",
+							});
+						}
+						case "CandidateNotFoundError": {
+							return Result.err({
+								code: "ERR_CANDIDATE_NOT_FOUND",
+							});
+						}
+						default: {
+							return Result.err({
+								code: "ERR_UNEXPECTED",
+							});
+						}
+					}
 				}
+
+				const partyAddress = getPartyAddressResult.value;
 
 				// Cast the vote on the blockchain
 				const castVoteResult = await votingSystem.castVote(
-					payload.election_id,
+					Number.parseInt(payload.election_id),
 					partyAddress,
-					vote.candidate_id,
+					Number.parseInt(vote.candidate_id),
 				);
 
 				if (castVoteResult.isErr) {
@@ -99,10 +120,34 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 						`Failed to cast vote for candidate ${vote.candidate_id} on blockchain:`,
 						castVoteResult.error,
 					);
-					// Return error since blockchain submission failed
-					return Result.err({
-						code: "ERR_BLOCKCHAIN_VOTE_SUBMISSION_FAILED",
-					});
+
+					switch (castVoteResult.error.type) {
+						case "ElectionNotFoundError": {
+							return Result.err({
+								code: "ERR_ELECTION_NOT_FOUND",
+							});
+						}
+						case "AlreadyVotedError": {
+							return Result.err({
+								code: "ERR_VOTER_ALREADY_VOTED",
+							});
+						}
+						case "CandidateNotFoundError": {
+							return Result.err({
+								code: "ERR_CANDIDATE_NOT_FOUND",
+							});
+						}
+						case "ElectionNotActiveError": {
+							return Result.err({
+								code: "ERR_ELECTION_NOT_STARTED",
+							});
+						}
+						default: {
+							return Result.err({
+								code: "ERR_UNEXPECTED",
+							});
+						}
+					}
 				}
 
 				this.logger.info(
