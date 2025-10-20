@@ -138,24 +138,7 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 		try {
 			this.logger.debug(`Getting party address for candidate ${candidateId}`);
 
-			// In the current contract architecture, we need to:
-			// 1. Get the candidate details to understand which party registered them
-			// 2. Get the party registry to find the party address
-			// 3. Return the party's address
-
-			// However, looking at the interface, there's no direct way to get
-			// which party registered a specific candidate. The candidate details
-			// don't include party information, and there's no reverse lookup.
-
-			// For a proper implementation, we would need to:
-			// 1. Have candidates store their party ID when registered
-			// 2. Have a method to get party address by party ID
-			// 3. Or iterate through all parties to find which one has this candidate
-
-			// Since we don't have that in the current interface, we'll implement
-			// a more realistic approach that would work with enhanced contracts:
-
-			// Get candidate details (if they include party information)
+			// Get candidate details to get the partyId
 			const candidateResult = await votingSystem.getCandidate(candidateId);
 
 			if (candidateResult.isErr) {
@@ -168,47 +151,36 @@ export class BlockchainSubmitVoteUseCase implements SubmitVoteUseCase {
 
 			const candidate = candidateResult.value;
 
-			// In a real implementation with proper contracts, we would:
-			// 1. Get the party ID from candidate details
-			// 2. Use votingSystem.getParty(partyId) to get party details
-			// 3. Extract the party address from party details
+			// Extract partyId from candidate details
+			// In the enhanced contracts, the candidate would include a partyId field
+			const partyId = candidate.partyId; // This assumes the candidate struct has a partyId field
 
-			// For demonstration purposes with the current interface limitations,
-			// we'll use a deterministic mapping that simulates what a real 
-			// blockchain lookup would do with enhanced contracts:
-
-			// Mock parties that would exist on the blockchain with their addresses
-			const mockParties = [
-				{
-					id: 1,
-					address: "0x1234567890123456789012345678901234567890",
-					candidates: [1, 4, 7, 10] // candidates registered by this party
-				},
-				{
-					id: 2,
-					address: "0xabcdef123456789012345678901234567890abcd",
-					candidates: [2, 5, 8, 11]
-				},
-				{
-					id: 3,
-					address: "0x9876543210987654321098765432109876543210",
-					candidates: [3, 6, 9, 12]
-				}
-			];
-
-			// Find which party has this candidate
-			for (const party of mockParties) {
-				if (party.candidates.includes(candidateId)) {
-					this.logger.debug(
-						`Found party ${party.id} with address ${party.address} for candidate ${candidateId}`,
-					);
-					return party.address;
-				}
+			if (!partyId) {
+				this.logger.warn(`Candidate ${candidateId} has no associated party`);
+				return null;
 			}
 
-			// If no party found for this candidate
-			this.logger.warn(`No party found for candidate ${candidateId}`);
-			return null;
+			// Get party registry address from voting system
+			const partyRegistryAddress = await votingSystem.getPartyRegistryAddress();
+
+			if (!partyRegistryAddress) {
+				this.logger.error("Failed to get party registry address");
+				return null;
+			}
+
+			// Get party address from party registry using partyId
+			const partyAddress = await votingSystem.getParty(partyId);
+
+			if (!partyAddress) {
+				this.logger.warn(`No party found with ID ${partyId}`);
+				return null;
+			}
+
+			this.logger.debug(
+				`Found party ${partyId} with address ${partyAddress} for candidate ${candidateId}`,
+			);
+			
+			return partyAddress;
 		} catch (error) {
 			this.logger.error(
 				`Failed to get party address for candidate ${candidateId}:`,
