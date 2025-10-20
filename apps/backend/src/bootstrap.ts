@@ -1,29 +1,29 @@
-import "reflect-metadata";
+import 'reflect-metadata'
 
-import { Container } from "@n8n/di";
-import { App, HonoApp } from "@/features/app";
+import { Container } from '@n8n/di'
+import { App, HonoApp } from '@/features/app'
 import {
   AuthUserRepository,
-  KyselyAuthUserRepository,
-} from "@/features/auth/repository";
+  KyselyAuthUserRepository
+} from '@/features/auth/repository'
 import {
   GetUserProfileUseCase,
   SignInWithEmailUseCase,
   SignInWithVoterCodeUseCase,
-  SignUpWithEmailUseCase,
-} from "@/features/auth/use-case";
-import { config } from "@/features/config";
-import { KyselyClient } from "@/features/database/kysely";
-import { createKyselySqliteClient } from "@/features/database/kysely/sqlite";
-import { Logger } from "@/features/logger";
+  SignUpWithEmailUseCase
+} from '@/features/auth/use-case'
+import { config } from '@/features/config'
+import { KyselyClient } from '@/features/database/kysely'
+import { createKyselySqliteClient } from '@/features/database/kysely/sqlite'
+import { Logger } from '@/features/logger'
 import {
   StorageService,
-  SqliteStorageService,
-} from "@/features/storage/service";
+  SqliteStorageService
+} from '@/features/storage/service'
 import {
   ElectionRepository,
-  KyselyElectionRepository,
-} from "@/features/election/repository";
+  KyselyElectionRepository
+} from '@/features/election/repository'
 import {
   ListElectionsUseCase,
   CreateElectionUseCase,
@@ -35,172 +35,150 @@ import {
   ListVotersUseCase,
   GetElectionResultsUseCase,
   EndElectionUseCase,
-  DeleteElectionUseCase,
-} from "@/features/election/use-case";
-import { PositionRepository } from "@/features/election/position/repository";
-import { KyselyPositionRepository } from "@/features/election/position/repository/kysely";
-import { CandidateRepository } from "@/features/election/candidate/repository";
-import { KyselyCandidateRepository } from "@/features/election/candidate/repository/kysely";
+  DeleteElectionUseCase
+} from '@/features/election/use-case'
+import { PositionRepository } from '@/features/election/position/repository'
+import { KyselyPositionRepository } from '@/features/election/position/repository/kysely'
+import { CandidateRepository } from '@/features/election/candidate/repository'
+import { KyselyCandidateRepository } from '@/features/election/candidate/repository/kysely'
 import {
   KyselyVoterRepository,
-  VoterRepository,
-} from "@/features/election/voter/repository";
-import { KyselyVoteRepository } from "@/features/election/voting/repository/kysely";
-import { VoteRepository } from "@/features/election/voting/repository";
-import { CronService } from "@/features/cron/service";
-import { ElectionStatusCronJob } from "@/features/election/cron";
-import { UploadUseCase } from "@/features/storage/route/upload/use-case";
-import { GetFileUseCase } from "@/features/storage/route/get/use-case";
-import { KyselyStorageRepository } from "@/features/storage/repository";
-import {
-  SubmitVoteUseCase,
-  BlockchainSubmitVoteUseCase,
-} from "@/features/election/voter/use-case";
-import {
-  BlockchainService,
-  BlockchainServiceImplementation,
-} from "@/features/blockchain/service";
+  VoterRepository
+} from '@/features/election/voter/repository'
+import { KyselyVoteRepository } from '@/features/election/voting/repository/kysely'
+import { VoteRepository } from '@/features/election/voting/repository'
+import { CronService } from '@/features/cron/service'
+import { ElectionStatusCronJob } from '@/features/election/cron'
+import { UploadUseCase } from '@/features/storage/route/upload/use-case'
+import { GetFileUseCase } from '@/features/storage/route/get/use-case'
+import { KyselyStorageRepository } from '@/features/storage/repository'
+import { SubmitVoteUseCase } from '@/features/election/voter/use-case'
 
 export const bootstrap = async () => {
-  const logger = new Logger();
+  const logger = new Logger()
 
   // Database
-  const kyselyClient = await createKyselySqliteClient();
-
-  // Blockchain Service
-  const blockchainService = new BlockchainServiceImplementation(
-    config.blockchain.walletPrivateKey,
-    config.blockchain.votingSystemAddress,
-    logger,
-  );
+  const kyselyClient = await createKyselySqliteClient()
 
   // Storage DI
-  const storageRepository = new KyselyStorageRepository(kyselyClient, logger);
-  const storageService = new SqliteStorageService(storageRepository);
+  const storageRepository = new KyselyStorageRepository(kyselyClient, logger)
+  const storageService = new SqliteStorageService(storageRepository)
 
   // Auth DI
-  const authUserRepository = new KyselyAuthUserRepository(kyselyClient, logger);
+  const authUserRepository = new KyselyAuthUserRepository(kyselyClient, logger)
 
   // Auth Use Cases
-  const getUserProfileUseCase = new GetUserProfileUseCase();
-  const signInWithEmailUseCase = new SignInWithEmailUseCase(authUserRepository);
-  const signUpWithEmailUseCase = new SignUpWithEmailUseCase(authUserRepository);
+  const getUserProfileUseCase = new GetUserProfileUseCase()
+  const signInWithEmailUseCase = new SignInWithEmailUseCase(authUserRepository)
+  const signUpWithEmailUseCase = new SignUpWithEmailUseCase(authUserRepository)
   const signInWithVoterCodeUseCase = new SignInWithVoterCodeUseCase(
     kyselyClient,
-    logger,
-  );
+    logger
+  )
 
   // Elections DI
-  const electionRepository = new KyselyElectionRepository(kyselyClient, logger);
-  const positionRepository = new KyselyPositionRepository(kyselyClient, logger);
+  const electionRepository = new KyselyElectionRepository(kyselyClient, logger)
+  const positionRepository = new KyselyPositionRepository(kyselyClient, logger)
   const candidateRepository = new KyselyCandidateRepository(
     kyselyClient,
-    logger,
-  );
-  const voterRepository = new KyselyVoterRepository(kyselyClient, logger);
-  const voteRepository = new KyselyVoteRepository(kyselyClient, logger);
-  const submitVoteUseCase = new BlockchainSubmitVoteUseCase(
-    blockchainService,
-    logger,
-  );
+    logger
+  )
+  const voterRepository = new KyselyVoterRepository(kyselyClient, logger)
+  const voteRepository = new KyselyVoteRepository(kyselyClient, logger)
+  const submitVoteUseCase = new SubmitVoteUseCase(
+    voterRepository,
+    voteRepository
+  )
 
   // Cron Service
   const electionStatusCronJob = new ElectionStatusCronJob(
     electionRepository,
-    logger,
-  );
-  const cronService = new CronService([electionStatusCronJob], logger);
+    logger
+  )
+  const cronService = new CronService([electionStatusCronJob], logger)
 
   // Elections Use Cases
-  const generateVotersUseCase = new GenerateVotersUseCase(voterRepository);
-  const listElectionsUseCase = new ListElectionsUseCase(electionRepository);
-  const createElectionUseCase = new CreateElectionUseCase(electionRepository);
-  const createPositionUseCase = new CreatePositionUseCase(positionRepository);
-  const createCandidateUseCase = new CreateCandidateUseCase(
-    candidateRepository,
-  );
+  const generateVotersUseCase = new GenerateVotersUseCase(voterRepository)
+  const listElectionsUseCase = new ListElectionsUseCase(electionRepository)
+  const createElectionUseCase = new CreateElectionUseCase(electionRepository)
+  const createPositionUseCase = new CreatePositionUseCase(positionRepository)
+  const createCandidateUseCase = new CreateCandidateUseCase(candidateRepository)
   const getElectionByIdUseCase = new GetElectionByIdUseCase(
     electionRepository,
     positionRepository,
     candidateRepository,
-    logger,
-  );
+    logger
+  )
   const getPlatformElectionMetricsUseCase =
-    new GetPlatformElectionMetricsUseCase(electionRepository, logger);
-  const listVotersUseCase = new ListVotersUseCase(voterRepository, logger);
-  const uploadUseCase = new UploadUseCase(storageRepository);
-  const getFileUseCase = new GetFileUseCase(storageRepository, logger);
-  const endElectionUseCase = new EndElectionUseCase(electionRepository);
+    new GetPlatformElectionMetricsUseCase(electionRepository, logger)
+  const listVotersUseCase = new ListVotersUseCase(voterRepository, logger)
+  const uploadUseCase = new UploadUseCase(storageRepository)
+  const getFileUseCase = new GetFileUseCase(storageRepository, logger)
+  const endElectionUseCase = new EndElectionUseCase(electionRepository)
   const getElectionResultsUseCase = new GetElectionResultsUseCase(
     electionRepository,
     voterRepository,
     voteRepository,
     positionRepository,
     candidateRepository,
-    logger,
-  );
+    logger
+  )
   const deleteElectionUseCase = new DeleteElectionUseCase(
     electionRepository,
-    logger,
-  );
+    logger
+  )
 
-  const app = new HonoApp(logger);
+  const app = new HonoApp(logger)
 
   // App
-  Container.set(App, app);
-
-  // Blockchain Service
-  Container.set(BlockchainService, blockchainService);
+  Container.set(App, app)
 
   // Database
-  Container.set(KyselyClient, kyselyClient);
+  Container.set(KyselyClient, kyselyClient)
 
   // Storage DI
-  Container.set(StorageService, storageService);
+  Container.set(StorageService, storageService)
 
   // OpenTelemetry DI
-  Container.set(Logger, logger);
+  Container.set(Logger, logger)
 
   // Auth DI
-  Container.set(AuthUserRepository, authUserRepository);
+  Container.set(AuthUserRepository, authUserRepository)
 
   // Auth Use Cases
-  Container.set(GetUserProfileUseCase, getUserProfileUseCase);
-  Container.set(SignInWithEmailUseCase, signInWithEmailUseCase);
-  Container.set(SignUpWithEmailUseCase, signUpWithEmailUseCase);
-  Container.set(SignInWithVoterCodeUseCase, signInWithVoterCodeUseCase);
+  Container.set(GetUserProfileUseCase, getUserProfileUseCase)
+  Container.set(SignInWithEmailUseCase, signInWithEmailUseCase)
+  Container.set(SignUpWithEmailUseCase, signUpWithEmailUseCase)
+  Container.set(SignInWithVoterCodeUseCase, signInWithVoterCodeUseCase)
 
   // Elections DI
-  Container.set(ElectionRepository, electionRepository);
-  Container.set(PositionRepository, positionRepository);
-  Container.set(CandidateRepository, candidateRepository);
-  Container.set(VoterRepository, voterRepository);
-  Container.set(VoteRepository, voteRepository);
-  Container.set(SubmitVoteUseCase, submitVoteUseCase);
-
-  // Blockchain DI
-  Container.set(BlockchainService, blockchainService);
+  Container.set(ElectionRepository, electionRepository)
+  Container.set(PositionRepository, positionRepository)
+  Container.set(CandidateRepository, candidateRepository)
+  Container.set(VoterRepository, voterRepository)
+  Container.set(VoteRepository, voteRepository)
+  Container.set(SubmitVoteUseCase, submitVoteUseCase)
 
   // Cron Service
-  Container.set(CronService, cronService);
+  Container.set(CronService, cronService)
 
   // Elections Use Cases
-  Container.set(GenerateVotersUseCase, generateVotersUseCase);
-  Container.set(ListElectionsUseCase, listElectionsUseCase);
-  Container.set(CreateElectionUseCase, createElectionUseCase);
-  Container.set(CreatePositionUseCase, createPositionUseCase);
-  Container.set(CreateCandidateUseCase, createCandidateUseCase);
-  Container.set(GetElectionByIdUseCase, getElectionByIdUseCase);
+  Container.set(GenerateVotersUseCase, generateVotersUseCase)
+  Container.set(ListElectionsUseCase, listElectionsUseCase)
+  Container.set(CreateElectionUseCase, createElectionUseCase)
+  Container.set(CreatePositionUseCase, createPositionUseCase)
+  Container.set(CreateCandidateUseCase, createCandidateUseCase)
+  Container.set(GetElectionByIdUseCase, getElectionByIdUseCase)
   Container.set(
     GetPlatformElectionMetricsUseCase,
-    getPlatformElectionMetricsUseCase,
-  );
-  Container.set(ListVotersUseCase, listVotersUseCase);
-  Container.set(EndElectionUseCase, endElectionUseCase);
-  Container.set(GetElectionResultsUseCase, getElectionResultsUseCase);
-  Container.set(DeleteElectionUseCase, deleteElectionUseCase);
-  Container.set(UploadUseCase, uploadUseCase);
-  Container.set(GetFileUseCase, getFileUseCase);
+    getPlatformElectionMetricsUseCase
+  )
+  Container.set(ListVotersUseCase, listVotersUseCase)
+  Container.set(EndElectionUseCase, endElectionUseCase)
+  Container.set(GetElectionResultsUseCase, getElectionResultsUseCase)
+  Container.set(DeleteElectionUseCase, deleteElectionUseCase)
+  Container.set(UploadUseCase, uploadUseCase)
+  Container.set(GetFileUseCase, getFileUseCase)
 
-  return { app, logger, config, cronService };
-};
+  return { app, logger, config, cronService }
+}

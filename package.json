@@ -4,7 +4,7 @@
 	"version": "1.0.0",
 	"description": "A blockchain-based voting system",
 	"scripts": {
-		"dev": "nx run-many -t dev --parallel 9",
+		"dev": "nx run-many -t dev --all",
 		"build": "nx run-many -t build --parallel 9"
 	},
 	"keywords": [
