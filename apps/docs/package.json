@@ -18,5 +18,9 @@
 		"@types/react-dom": "^18.3.0",
 		"vitepress": "^1.6.3",
 		"vitepress-plugin-d2": "^1.0.4"
-	}
+	},
+  "dependencies": {
+    "@scalar/api-reference": "^1.25.21",
+    "@blockchain-voting-system/docs-openapi": "workspace:^"
+  }
 }
