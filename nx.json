@@ -1,5 +1,12 @@
 {
 	"$schema": "./node_modules/nx/schemas/nx-schema.json",
+	"tasksRunnerOptions": {
+		"default": {
+			"options": {
+				"parallel": 100
+			}
+		}
+	},
 	"targetDefaults": {
 		"build": {
 			"dependsOn": ["^build"],
