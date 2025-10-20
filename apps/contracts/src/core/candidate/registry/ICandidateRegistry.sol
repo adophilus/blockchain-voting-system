@@ -16,20 +16,23 @@ interface ICandidateRegistry {
             uint id,
             string memory name,
             string memory position,
-            string memory cid
+            string memory cid,
+            uint partyId
         );
 
     function registerCandidate(
         string memory _name,
         string memory _position,
-        string memory _cid
+        string memory _cid,
+        uint _partyId
     ) external returns (uint);
 
     function updateCandidate(
         uint _candidateId,
         string memory _name,
         string memory _position,
-        string memory _cid
+        string memory _cid,
+        uint _partyId
     ) external;
 
     function getCandidate(
@@ -41,6 +44,11 @@ interface ICandidateRegistry {
             uint id,
             string memory name,
             string memory position,
-            string memory cid
+            string memory cid,
+            uint partyId
         );
+        
+    function getPartyIdForCandidate(
+        uint _candidateId
+    ) external view returns (uint);
 }

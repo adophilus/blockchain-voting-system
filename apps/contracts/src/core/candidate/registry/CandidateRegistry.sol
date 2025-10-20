@@ -27,13 +27,15 @@ contract CandidateRegistry is ICandidateRegistry {
     function registerCandidate(
         string memory _name,
         string memory _position,
-        string memory _cid
+        string memory _cid,
+        uint _partyId
     ) external onlyAdmin returns (uint) {
         console.log("Got here? 3");
         if (bytes(_name).length == 0) revert EmptyName();
+        if (_partyId == 0) revert InvalidPartyId();
 
         uint currentId = nextCandidateId;
-        candidates[currentId] = Candidate(currentId, _name, _position, _cid);
+        candidates[currentId] = Candidate(currentId, _name, _position, _cid, _partyId);
         nextCandidateId++;
         emit CandidateRegistered(currentId, _name);
         return currentId;
@@ -43,15 +45,18 @@ contract CandidateRegistry is ICandidateRegistry {
         uint _candidateId,
         string memory _name,
         string memory _position,
-        string memory _cid
+        string memory _cid,
+        uint _partyId
     ) external onlyAdmin {
         if (_candidateId == 0 || _candidateId >= nextCandidateId)
             revert InvalidCandidateId();
         if (bytes(_name).length == 0) revert EmptyName();
+        if (_partyId == 0) revert InvalidPartyId();
 
         candidates[_candidateId].name = _name;
         candidates[_candidateId].position = _position;
         candidates[_candidateId].cid = _cid;
+        candidates[_candidateId].partyId = _partyId;
         emit CandidateUpdated(_candidateId, _name);
     }
 
@@ -64,12 +69,21 @@ contract CandidateRegistry is ICandidateRegistry {
             uint id,
             string memory name,
             string memory position,
-            string memory cid
+            string memory cid,
+            uint partyId
         )
     {
         if (_candidateId == 0 || _candidateId >= nextCandidateId)
             revert InvalidCandidateId();
         Candidate memory c = candidates[_candidateId];
-        return (c.id, c.name, c.position, c.cid);
+        return (c.id, c.name, c.position, c.cid, c.partyId);
+    }
+    
+    function getPartyIdForCandidate(
+        uint _candidateId
+    ) external view returns (uint) {
+        if (_candidateId == 0 || _candidateId >= nextCandidateId)
+            revert InvalidCandidateId();
+        return candidates[_candidateId].partyId;
     }
 }
