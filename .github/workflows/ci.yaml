@@ -20,7 +20,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.3
+          version: 10.10.0
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v2
@@ -62,7 +62,7 @@ jobs:
       - name: Install pnpm
         uses: pnpm/action-setup@v4
         with:
-          version: 9.15.3
+          version: 10.10.0
 
       - name: Setup bun
         uses: oven-sh/setup-bun@v2
