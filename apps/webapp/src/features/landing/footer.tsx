@@ -15,11 +15,6 @@ export function Footer() {
 					<p className="text-sm text-gray-400">
 						A research prototype exploring blockchain-based electoral systems
 					</p>
-					<div className="border-t border-gray-800 mt-6 pt-6">
-						<p className="text-xs text-gray-500">
-							© 2024 BlockVote Research Project. Academic Use Only.
-						</p>
-					</div>
 				</div>
 			</div>
 		</footer>

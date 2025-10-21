@@ -36,7 +36,7 @@ function HomePage() {
 							</div>
 							<h1 className="text-4xl md:text-5xl lg:text-6xl font-bold text-gray-900 leading-tight">
 								Blockchain-Based <br />
-								<span className="text-blue-600">Electoral System</span>
+								<span className="text-blue-600">Voting System</span>
 							</h1>
 							<p className="text-lg text-gray-600 md:pr-10">
 								A research prototype exploring the implementation of secure,
@@ -50,7 +50,7 @@ function HomePage() {
 								<div className="flex justify-between items-center mb-8">
 									<div className="flex items-center space-x-3">
 										<Vote className="h-8 w-8 text-blue-600" />
-										<span className="text-xl font-bold">BlockVote</span>
+										<span className="text-xl font-bold">BVS</span>
 									</div>
 									<div className="bg-green-100 text-green-800 px-3 py-1 rounded-full text-sm font-medium">
 										Active
@@ -208,8 +208,8 @@ function HomePage() {
 							Key Features
 						</h2>
 						<p className="text-lg text-gray-600 max-w-3xl mx-auto">
-							BlockVote provides a comprehensive suite of tools for managing
-							secure, transparent elections.
+							BVS provides a comprehensive suite of tools for managing secure,
+							transparent elections.
 						</p>
 					</div>
 
