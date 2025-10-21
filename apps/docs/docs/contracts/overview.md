@@ -27,3 +27,31 @@ Manages the lifecycle of a single election, including its start and end times, p
 ### `VotingSystem.sol`
 
 Serves as the central hub for creating and managing elections and political parties. It acts as a factory for `Election` and `Party` contracts, allowing an administrator to create new elections and parties and retrieve their addresses.
+
+## ZK Privacy Integration
+
+The system integrates Zero-Knowledge proofs for voter privacy using Semaphore:
+
+### `Semaphore Integration`
+- Voters generate ZK proofs to prove eligibility without revealing identity
+- Semaphore groups manage voter anonymity
+- Nullifier system prevents double voting
+
+### `Privacy Guarantees`
+- Votes cannot be linked to specific voters
+- Voter eligibility is proven without revealing identity
+- Unlinkability between votes from the same voter
+
+## Gasless Transaction Architecture
+
+To hide blockchain complexity from voters:
+
+### `Backend Relay`
+- Backend submits transactions to blockchain on behalf of voters
+- Voters don't need wallets or pay gas fees
+- Traditional authentication (email/password) used instead
+
+### `User Experience`
+- Seamless web application experience
+- No wallet installation required
+- Instant vote confirmation
