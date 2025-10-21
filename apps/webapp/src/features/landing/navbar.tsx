@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { Link } from "@tanstack/react-router";
 import { Vote, Menu, X } from "lucide-react";
+import { docsUrl } from "./data";
 
 export function Navbar() {
 	const [isMenuOpen, setIsMenuOpen] = useState(false);
@@ -20,7 +21,9 @@ export function Navbar() {
 					{/* Desktop Navigation - Simplified for academic project */}
 					<nav className="hidden md:flex items-center space-x-8">
 						<a
-							href="https://bvs.magicstudios.fun"
+							href={docsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
 							className="text-gray-600 hover:text-blue-600 transition-colors"
 						>
 							Documentation
@@ -49,7 +52,9 @@ export function Navbar() {
 				<div className="md:hidden bg-white border-t border-gray-100 py-4">
 					<div className="container mx-auto px-4 space-y-3">
 						<a
-							href="https://bvs.magicstudios.fun"
+							href={docsUrl}
+							target="_blank"
+							rel="noopener noreferrer"
 							className="block py-2 text-gray-600 hover:text-blue-600"
 							onClick={() => setIsMenuOpen(false)}
 						>

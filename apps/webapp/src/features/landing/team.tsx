@@ -1,3 +1,23 @@
+type TeamMember = {
+	name: string;
+	image: string;
+};
+
+const teamMembers: TeamMember[] = [
+	{
+		name: "Adolphus Patrick Micheal",
+		image: "https://via.placeholder.com/200",
+	},
+	{
+		name: "Uba Ebube Anthony",
+		image: "https://via.placeholder.com/200",
+	},
+	{
+		name: "Ufot Nissi Edwin",
+		image: "https://via.placeholder.com/200",
+	},
+];
+
 export const Team = () => (
 	<section id="team" className="py-20 px-4 bg-white">
 		<div className="container mx-auto max-w-6xl">
@@ -10,53 +30,18 @@ export const Team = () => (
 			</div>
 
 			<div className="grid md:grid-cols-2 lg:grid-cols-4 gap-8">
-				{/* Team Member 1 */}
-				<div className="text-center">
-					<div className="relative mb-4 mx-auto w-48 h-48 rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
-						<img
-							src="/placeholder.svg?height=200&width=200"
-							alt="Sarah Johnson"
-							className="w-full h-full object-cover"
-						/>
+				{teamMembers.map((member, index) => (
+					<div key={index} className="text-center">
+						<div className="relative mb-4 mx-auto w-48 h-48 rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
+							<img
+								src={member.image}
+								alt={member.name}
+								className="w-full h-full object-cover"
+							/>
+						</div>
+						<h3 className="text-xl font-bold">{member.name}</h3>
 					</div>
-					<h3 className="text-xl font-bold">Sarah Johnson</h3>
-				</div>
-
-				{/* Team Member 2 */}
-				<div className="text-center">
-					<div className="relative mb-4 mx-auto w-48 h-48 rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
-						<img
-							src="/placeholder.svg?height=200&width=200"
-							alt="Michael Okonkwo"
-							className="w-full h-full object-cover"
-						/>
-					</div>
-					<h3 className="text-xl font-bold">Michael Okonkwo</h3>
-				</div>
-
-				{/* Team Member 3 */}
-				<div className="text-center">
-					<div className="relative mb-4 mx-auto w-48 h-48 rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
-						<img
-							src="/placeholder.svg?height=200&width=200"
-							alt="Amina Patel"
-							className="w-full h-full object-cover"
-						/>
-					</div>
-					<h3 className="text-xl font-bold">Amina Patel</h3>
-				</div>
-
-				{/* Team Member 4 */}
-				<div className="text-center">
-					<div className="relative mb-4 mx-auto w-48 h-48 rounded-full overflow-hidden bg-gradient-to-br from-blue-100 to-indigo-100">
-						<img
-							src="/placeholder.svg?height=200&width=200"
-							alt="David Chen"
-							className="w-full h-full object-cover"
-						/>
-					</div>
-					<h3 className="text-xl font-bold">David Chen</h3>
-				</div>
+				))}
 			</div>
 		</div>
 	</section>

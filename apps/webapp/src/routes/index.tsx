@@ -15,11 +15,11 @@ import {
 	Globe,
 } from "lucide-react";
 import { Team } from "@/features/landing/team";
+import { docsUrl } from "@/features/landing/data";
 
 export const Route = createFileRoute("/")({
 	component: HomePage,
 });
-
 
 function HomePage() {
 	return (
@@ -359,7 +359,7 @@ function HomePage() {
 						explore the technical features.
 					</p>
 					<div className="flex flex-wrap justify-center gap-4">
-						<a href="https://bvs.magicstudios.fun">
+						<a href={docsUrl} target="_blank" rel="noopener noreferrer">
 							<Button size="lg" variant="secondary" className="h-12 px-6">
 								View Documentation
 							</Button>
