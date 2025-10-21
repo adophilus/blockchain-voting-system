@@ -18,7 +18,7 @@ namespace Pagination {
       .default(defaults.page.toString()),
     per_page: z
       .string()
-      .pipe(z.coerce.number().max(50).min(1))
+      .pipe(z.coerce.number().max(100).min(1))
       .optional()
       .default(defaults.per_page.toString())
   })

@@ -39,9 +39,9 @@ const loginSchema = z.object({
 function AdminLoginPage() {
 	const navigate = Route.useNavigate();
 
-	// const { status, mutate } = Backend.Client.$api.useMutation(
 	const { status, mutate } = useMutation({
 		mutationFn: async (payload: { email: string; password: string }) => {
+			console.log(payload);
 			const res = await Backend.Client.client.request(
 				"post",
 				"/auth/sign-in/email",
@@ -81,11 +81,7 @@ function AdminLoginPage() {
 		resolver: zodResolver(loginSchema),
 	});
 
-	const onSubmit = async (value: z.infer<typeof loginSchema>) => {
-		mutate({
-			body: value,
-		});
-	};
+	const onSubmit = async (value: z.infer<typeof loginSchema>) => mutate(value);
 
 	const isSubmitting = status === "pending";
 

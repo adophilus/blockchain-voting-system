@@ -3,7 +3,7 @@ import { createClient, createReactQueryClient } from '@blockchain-voting-system/
 
 namespace BackendClient {
   export const client = createClient(env.VITE_BACKEND_URL)
-  export const $api = createReactQueryClient(client)
+  // export const $api = createReactQueryClient(client)
 }
 
 export default BackendClient

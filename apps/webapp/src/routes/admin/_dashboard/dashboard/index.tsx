@@ -1,10 +1,16 @@
-import { createFileRoute } from '@tanstack/react-router'
-import { DashboardOverview } from '@/features/dashboard/overview'
+import { createFileRoute, redirect, useNavigate } from '@tanstack/react-router'
+// import { DashboardOverview } from '@/features/dashboard/overview'
 
 export const Route = createFileRoute('/admin/_dashboard/dashboard/')({
-  component: DashboardOverviewPage
+  component: DashboardOverviewPage,
+  beforeLoad: () => {
+    throw redirect({
+      to: "/admin/dashboard/elections"
+    })
+  }
 })
 
 function DashboardOverviewPage() {
-  return <DashboardOverview />
+  // return <DashboardOverview />
+  return null
 }
