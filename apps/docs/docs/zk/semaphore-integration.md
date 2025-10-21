@@ -1,31 +1,59 @@
 # Semaphore Integration Guide
 
-This guide explains how to integrate Semaphore into the Blockchain Voting System for zero-knowledge voting.
+This guide explains how to integrate Semaphore into the Blockchain Voting System for Zero-Knowledge privacy.
 
 ## What is Semaphore?
 
-Semaphore is a zero-knowledge protocol that allows users to prove their membership in a group and send signals (votes) without revealing their identity.
+Semaphore is a zero-knowledge protocol that enables anonymous signaling in Ethereum smart contracts. It allows users to prove group membership and broadcast signals without revealing their identity.
 
 ## Core Concepts
 
-### Identity
-An identity consists of:
-- **Secret**: Private value known only to the user
-- **Commitment**: Public value derived from the secret
+### Identities
 
-### Group
-A Merkle tree containing identity commitments:
+Each voter has a Semaphore identity consisting of:
+- **Secret**: Private value known only to the voter (two random values)
+- **Commitment**: Public value derived from the secret (stored on-chain)
+
+```typescript
+import { Identity } from '@semaphore-protocol/identity'
+
+// Generate a new identity
+const identity = new Identity()
+
+// Extract commitment (public part stored on-chain)
+const commitment = identity.commitment
+
+// Extract secret (private part - must be securely stored)
+const secret = identity.secret
+```
+
+### Groups
+
+Groups are Merkle trees containing identity commitments:
 - **Members**: Identity commitments stored in leaves
-- **Root**: Represents the entire group
-- **Depth**: Determines maximum group size
+- **Root**: Single hash representing the entire group
+- **Depth**: Determines maximum group size (16, 20, or 32)
 
-### Nullifier
-A value that prevents double signaling:
-- **Nullifier Hash**: Prevents double voting
+```typescript
+import { Group } from '@semaphore-protocol/group'
+
+// Create a new group with depth 20
+const group = new Group(20)
+
+// Add member to group
+group.addMember(identity.commitment)
+```
+
+### Nullifiers
+
+Nullifiers prevent double signaling:
+- **Nullifier Hash**: Unique hash derived from identity and external nullifier
 - **External Nullifier**: Context identifier (e.g., election ID)
+- **Uniqueness**: Each combination prevents double signaling
 
-### Signal
-The message being sent anonymously:
+### Signals
+
+Signals are the messages being sent anonymously:
 - **Content**: Vote choice or other data
 - **Encoding**: Converted to bytes32 for ZK proofs
 
@@ -34,7 +62,7 @@ The message being sent anonymously:
 ### 1. Install Dependencies
 
 ```bash
-pnpm add @semaphore-protocol/identity @semaphore-protocol/proof @semaphore-protocol/group
+pnpm add @semaphore-protocol/identity @semaphore-protocol/group @semaphore-protocol/proof
 ```
 
 ### 2. Generate Identity
@@ -67,7 +95,7 @@ import { generateProof } from '@semaphore-protocol/proof'
 // Generate ZK proof of group membership
 const fullProof = await generateProof(
   identity,
-  groupId,
+  group, // or groupId for on-chain groups
   signal, // e.g., "vote_candidate_1"
   externalNullifier // e.g., "election_123"
 )
@@ -82,6 +110,7 @@ await semaphoreContract.verifyProof(
   fullProof.publicSignals.merkleTreeRoot,
   fullProof.publicSignals.nullifierHash,
   fullProof.publicSignals.signal,
+  externalNullifier,
   fullProof.proof
 )
 ```

@@ -1,6 +1,6 @@
-# Zero-Knowledge (ZK) Integration Overview
+# Zero-Knowledge Integration Overview
 
-This section provides an overview of the Zero-Knowledge (ZK) integration in the Blockchain Voting System. ZK is used to provide voter privacy while maintaining the integrity and transparency of the voting process.
+This section provides an overview of the Zero-Knowledge (ZK) privacy integration in the Blockchain Voting System. ZK is used to ensure voter privacy while maintaining the integrity and transparency of the voting process.
 
 ## What is Zero-Knowledge (ZK)?
 

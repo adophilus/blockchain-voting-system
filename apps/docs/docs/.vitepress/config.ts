@@ -54,6 +54,7 @@ export default defineConfig({
 					{ text: "Semaphore Integration", link: "/zk/semaphore-integration" },
 					{ text: "Gasless Transactions", link: "/zk/gasless-transactions" },
 					{ text: "Integration Plan", link: "/zk/integration-plan" },
+					{ text: "ZK Integration Details", link: "/zk/integration" },
 					{ text: "Developer Guide", link: "/zk/developer-guide" },
 				],
 			},
