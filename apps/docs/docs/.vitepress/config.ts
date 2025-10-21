@@ -32,6 +32,10 @@ export default withMermaid({
 						text: "Component Explanations",
 						link: "/architecture/system-architecture",
 					},
+					{
+						text: "Workflow Diagrams",
+						link: "/architecture/workflow-diagrams",
+					},
 				],
 			},
 			{
