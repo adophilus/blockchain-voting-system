@@ -41,7 +41,7 @@ class BlockchainVotingSystem implements VotingSystem {
 	constructor(
 		private readonly wallet: Wallet,
 		private readonly votingSystemAddress: Address,
-	) { }
+	) {}
 
 	private getAccountAddress(): Address {
 		return this.wallet.getWalletClient().account!.address;
@@ -165,10 +165,10 @@ class BlockchainVotingSystem implements VotingSystem {
 
 	// Candidate Management - performs the same operations as registerCandidateForParty
 	public async registerCandidate(
-		partyId: number,
 		name: string,
 		position: string,
 		cid: string,
+		partyId: number,
 	): Promise<Result<number, RegisterCandidateError>> {
 		try {
 			const walletClient = this.wallet.getWalletClient();
@@ -187,7 +187,7 @@ class BlockchainVotingSystem implements VotingSystem {
 					address: candidateRegistryAddress,
 					abi: candidateRegistryAbi,
 					functionName: "registerCandidate",
-					args: [name, position, cid],
+					args: [name, position, cid, BigInt(partyId)],
 					account,
 				});
 
@@ -270,6 +270,7 @@ class BlockchainVotingSystem implements VotingSystem {
 		name: string,
 		position: string,
 		cid: string,
+		partyId: number,
 	): Promise<Result<void, UpdateCandidateError>> {
 		try {
 			const walletClient = this.wallet.getWalletClient();
@@ -288,7 +289,7 @@ class BlockchainVotingSystem implements VotingSystem {
 				address: candidateRegistryAddress,
 				abi: candidateRegistryAbi,
 				functionName: "updateCandidate",
-				args: [BigInt(candidateId), name, position, cid],
+				args: [BigInt(candidateId), name, position, cid, BigInt(partyId)],
 				account,
 			});
 
@@ -467,7 +468,7 @@ class BlockchainVotingSystem implements VotingSystem {
 			});
 
 			const [, , , , partyId] = candidateData;
-			
+
 			if (!partyId || partyId === 0n) {
 				return Result.err({
 					type: "PartyNotFoundError",
@@ -494,8 +495,11 @@ class BlockchainVotingSystem implements VotingSystem {
 
 			return Result.ok(partyAddress);
 		} catch (e: any) {
-			console.error(`Read contract call failed for getPartyAddressByCandidateId:`, e);
-			
+			console.error(
+				`Read contract call failed for getPartyAddressByCandidateId:`,
+				e,
+			);
+
 			// Determine the specific error type
 			if (e.message && e.message.includes("InvalidCandidateId")) {
 				return Result.err({
@@ -508,7 +512,7 @@ class BlockchainVotingSystem implements VotingSystem {
 					message: "Party not found for candidate",
 				});
 			}
-			
+
 			return Result.err({
 				type: "ContractCallFailedError",
 				message: "Contract call/execution failed",

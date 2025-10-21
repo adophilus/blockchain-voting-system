@@ -208,16 +208,17 @@ export interface VotingSystem {
 
 	// Candidate Management
 	registerCandidate(
-		partyId: number,
 		name: string,
 		position: string,
 		cid: string,
+		partyId: number,
 	): Promise<Result<number, RegisterCandidateError>>;
 	updateCandidate(
 		candidateId: number,
 		name: string,
 		position: string,
 		cid: string,
+		partyId: number
 	): Promise<Result<void, UpdateCandidateError>>;
 	getCandidate(
 		candidateId: number,

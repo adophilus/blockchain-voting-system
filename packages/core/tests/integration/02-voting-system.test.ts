@@ -52,10 +52,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		expect(partyId).toBe(1); // First party gets ID 1
 
 		const result = await votingSystem.registerCandidate(
-			partyId,
 			"John Doe",
 			"President",
 			"QmJohnDoeCid",
+			partyId,
 		);
 		assert(result.isOk, "ERR_OPERATION_FAILED");
 		expect(result.value).toBe(1); // First candidate gets ID 1
@@ -76,20 +76,20 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		const partyId = partyResult.value;
 
 		const registerResult = await votingSystem.registerCandidate(
-			partyId,
 			"Jane Doe",
 			"Vice President",
 			"QmJaneDoeCid",
+			partyId,
 		);
 		assert(registerResult.isOk, "ERR_OPERATION_FAILED");
 		const candidateId = registerResult.value;
 
 		const updateResult = await votingSystem.updateCandidate(
-			partyId,
 			candidateId,
 			"Jane Smith",
 			"Vice President",
 			"QmJaneSmithCid",
+			partyId,
 		);
 		assert(updateResult.isOk, "ERR_OPERATION_FAILED");
 
@@ -229,10 +229,10 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(partyAddress, "ERR_OPERATION_FAILED");
 
 		const candidateResult = await votingSystem.registerCandidate(
-			partyId,
 			"Test Candidate",
 			"President",
 			"QmCandidateCID",
+			partyId,
 		);
 		assert(candidateResult.isOk, "ERR_OPERATION_FAILED");
 		const candidateId = candidateResult.value;
@@ -272,8 +272,9 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			});
 
 		// Add party to election using direct contract call (after election is started)
-		const { request: addPartyRequest } =
-			await deployerWallet.getPublicClient().simulateContract({
+		const { request: addPartyRequest } = await deployerWallet
+			.getPublicClient()
+			.simulateContract({
 				address: electionAddress,
 				abi: electionAbi,
 				functionName: "addParty",
@@ -341,16 +342,16 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 		assert(partyAddress, "ERR_OPERATION_FAILED");
 
 		const candidate1Result = await votingSystem.registerCandidate(
-			partyId,
 			"Candidate D",
 			"Position D",
 			"QmCidD",
+			partyId,
 		);
 		const candidate2Result = await votingSystem.registerCandidate(
-			partyId,
 			"Candidate E",
 			"Position E",
 			"QmCidE",
+			partyId,
 		);
 		assert(candidate1Result.isOk, "ERR_OPERATION_FAILED");
 		assert(candidate2Result.isOk, "ERR_OPERATION_FAILED");
@@ -390,8 +391,9 @@ describe("BlockchainVotingSystem Integration Tests", () => {
 			});
 
 		// Add party to election using direct contract call (after election is started)
-		const { request: addPartyRequest } =
-			await deployerWallet.getPublicClient().simulateContract({
+		const { request: addPartyRequest } = await deployerWallet
+			.getPublicClient()
+			.simulateContract({
 				address: electionAddress,
 				abi: electionAbi,
 				functionName: "addParty",

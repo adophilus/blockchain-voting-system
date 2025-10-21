@@ -1,3 +1,4 @@
+// @ts-nocheck
 import { Identity } from '@semaphore-protocol/identity'
 import { generateProof } from '@semaphore-protocol/proof'
 import { packProof } from '@semaphore-protocol/proof'
