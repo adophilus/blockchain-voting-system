@@ -11,13 +11,18 @@ The Blockchain Voting System follows a layered architecture that separates conce
 │                           FRONTEND LAYER                                  │
 ├─────────────────────────────────────────────────────────────────────────────┤
 │                                                                             │
-│  ┌─────────────────┐    ┌─────────────────┐    ┌─────────────────┐        │
-│  │   Web Browser   │    │   Mobile App    │    │   Admin Portal  │        │
-│  │  (React/Vite)   │    │   (ReactNative) │    │  (React/Admin)  │        │
-│  └─────────────────┘    └─────────────────┘    └─────────────────┘        │
-│           │                       │                       │               │
-│           └───────────────────────┼───────────────────────┘               │
-│                                   │                                       │
+│  ┌─────────────────┐                                                       │
+│  │   Web Browser   │                                                       │
+│  │  (React/Vite)   │                                                       │
+│  └─────────────────┘                                                       │
+│           │                                                                 │
+│           ▼                                                                 │
+│  ┌─────────────────┐                                                       │
+│  │   Admin Portal  │                                                       │
+│  │  (React/Admin)  │                                                       │
+│  └─────────────────┘                                                       │
+│           │                                                                 │
+│           ▼                                                                 │
 │                         ┌─────────▼─────────┐                             │
 │                         │   API Gateway     │                             │
 │                         │   (REST/GraphQL)  │                             │
