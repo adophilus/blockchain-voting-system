@@ -2,9 +2,11 @@ import "../../src/env";
 import { defineConfig } from "vitepress";
 import d2 from "vitepress-plugin-d2";
 import { Layout, Theme, FileType } from "vitepress-plugin-d2/dist/config";
+import { withMermaid } from "vitepress-plugin-mermaid";
 
 // https://vitepress.dev/reference/site-config
-export default defineConfig({
+// export default defineConfig({
+export default withMermaid({
 	title: "Blockchain Voting System",
 	description: "Documentation for the Blockchain Voting System",
 	themeConfig: {
@@ -26,7 +28,10 @@ export default defineConfig({
 				items: [
 					{ text: "Overview", link: "/system-architecture" },
 					{ text: "Detailed Diagram", link: "/architecture/system-diagram" },
-					{ text: "Component Explanations", link: "/architecture/system-architecture" },
+					{
+						text: "Component Explanations",
+						link: "/architecture/system-architecture",
+					},
 				],
 			},
 			{
