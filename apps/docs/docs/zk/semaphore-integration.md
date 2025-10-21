@@ -95,7 +95,7 @@ import { generateProof } from '@semaphore-protocol/proof'
 // Generate ZK proof of group membership
 const fullProof = await generateProof(
   identity,
-  group, // or groupId for on-chain groups
+  groupId,
   signal, // e.g., "vote_candidate_1"
   externalNullifier // e.g., "election_123"
 )
@@ -316,15 +316,15 @@ describe('Semaphore Integration', () => {
 
 ### Caching
 ```typescript
-// Cache frequently used values
-const cache = new Map()
+// Cache generated proofs
+const proofCache = new Map<string, FullProof>()
 
-function getCachedValue(key: string) {
-  return cache.get(key)
+function getProofFromCache(cacheKey: string): FullProof | undefined {
+  return proofCache.get(cacheKey)
 }
 
-function setCachedValue(key: string, value: any) {
-  cache.set(key, value)
+function setProofInCache(cacheKey: string, proof: FullProof): void {
+  proofCache.set(cacheKey, proof)
 }
 ```
 
@@ -361,8 +361,8 @@ worker.onmessage = (event) => {
 
 1. **Enable logging** in development
 2. **Use Semaphore CLI tools** for testing
-3. **Check contract addresses** and ABIs
-4. **Verify network configuration**
+3. **Check browser console** for WebAssembly errors
+4. **Verify network connectivity** to blockchain nodes
 
 ## Resources
 
