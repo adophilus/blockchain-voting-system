@@ -60,11 +60,16 @@ export default defineConfig({
 			},
 			{
 				text: "Technical Information",
-				items: [{ text: "System Architecture", link: "/technical-overview" }],
+				items: [{ text: "Technical Overview", link: "/technical-overview" }],
 			},
 			{
 				text: "Project Report Materials",
-				items: [{ text: "Materials and Methods", link: "/project-report/materials-and-methods" }],
+				items: [
+					{
+						text: "Materials and Methods",
+						link: "/project-report/materials-and-methods",
+					},
+				],
 			},
 			{
 				text: "Further Improvements",
