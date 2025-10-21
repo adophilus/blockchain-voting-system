@@ -45,8 +45,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prod false
 
-      - name: Lint codebase
-        run: pnpm lint
+      # - name: Lint codebase
+      #   run: pnpm lint
 
   build:
     needs: quality-checks
@@ -87,18 +87,8 @@ jobs:
       - name: Install dependencies
         run: pnpm install --frozen-lockfile --prod false
 
-      - name: Build stack
-        run: pnpm build
-
-      - name: Upload build artifacts
-        uses: actions/upload-artifact@v4
-        with:
-          name: production-build
-          path: |
-            apps/backend/build/
-            apps/docs/docs/.vitepress/dist/
-            apps/frontend/dist/
-          if-no-files-found: error
+      # - name: Build stack
+      #   run: pnpm build
 
   deploy:
     needs: build

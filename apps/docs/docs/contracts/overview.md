@@ -30,6 +30,37 @@ Serves as the central hub for creating and managing elections and political part
 
 ## ZK Privacy Integration
 
+The system integrates Zero-Knowledge (ZK) proofs using Semaphore to ensure voter privacy:
+
+### `Semaphore Integration`
+- **Anonymous Voting**: Voters can prove eligibility without revealing identity
+- **Group Membership**: Voters belong to Semaphore groups for each election
+- **Nullifier System**: Prevents double voting while maintaining anonymity
+- **ZK Proof Generation**: Client-side proof generation for voter eligibility
+
+### `Privacy Guarantees`
+- **Voter Anonymity**: Votes cannot be linked to specific voter identities
+- **Unlinkability**: Multiple actions by same voter appear unrelated
+- **Deniability**: Voters cannot prove how they voted
+
+## Gasless Transaction Architecture
+
+To hide blockchain complexity from voters, the system implements a relay architecture:
+
+### `Backend Relayer`
+- **Gas Abstraction**: Backend pays gas fees for voter transactions
+- **Wallet Management**: Backend wallet handles all blockchain interactions
+- **User Experience**: Voters interact with traditional web app interface
+- **Transaction Relay**: Backend submits signed transactions on behalf of voters
+
+### `Authentication Flow`
+- **Traditional Login**: Email/password or social login for voters
+- **ZK Proof Generation**: Client-side generation of eligibility proofs
+- **Backend Submission**: Relay service submits votes to blockchain
+- **Confirmation**: Immediate feedback to voters
+
+## ZK Privacy Integration
+
 The system integrates Zero-Knowledge proofs for voter privacy using Semaphore:
 
 ### `Semaphore Integration`

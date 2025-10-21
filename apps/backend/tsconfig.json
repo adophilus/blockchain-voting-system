@@ -18,14 +18,20 @@
     "noFallthroughCasesInSwitch": true,
     "sourceMap": true,
     "noImplicitAny": true,
-    "types": ["node"],
+    "types": [
+      "node"
+    ],
     "jsx": "react-jsx",
     "baseUrl": ".",
     "paths": {
-      "@/*": ["./src/*"]
+      "@/*": [
+        "./src/*"
+      ]
     }
   },
-  "exclude": ["scripts/cli.ts"],
+  "exclude": [
+    "scripts/cli.ts"
+  ],
   "include": [
     "scripts/**/*.ts",
     "src/**/*.ts",
