@@ -47,6 +47,13 @@ export default defineConfig({
 				],
 			},
 			{
+				text: "Zero-Knowledge (ZK) Integration",
+				items: [
+					{ text: "Overview", link: "/zk/overview" },
+					{ text: "Usage", link: "/zk/usage" },
+				],
+			},
+			{
 				text: "Technical Information",
 				items: [{ text: "System Architecture", link: "/technical-overview" }],
 			},
