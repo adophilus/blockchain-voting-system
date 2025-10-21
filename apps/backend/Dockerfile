@@ -13,7 +13,10 @@ FROM base AS build
 WORKDIR /app
 COPY . .
 RUN ls -lah
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false && pnpm run build
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false \
+  && pnpm build \
+  && pnpm migrate latest \
+  && pnpm tsx ./scripts/create-admin.ts
 
 
 FROM base AS deploy
