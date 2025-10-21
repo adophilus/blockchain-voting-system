@@ -46,6 +46,7 @@ export default withMermaid({
 					{ text: "Flow of Operations", link: "/contracts/tasks" },
 					{ text: "Deployment", link: "/contracts/deployment" },
 					{ text: "Testing", link: "/contracts/testing" },
+					{ text: "Code Explanation", link: "/contracts/code-explanation" },
 				],
 			},
 			{
