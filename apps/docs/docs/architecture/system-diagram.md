@@ -110,14 +110,6 @@ The Blockchain Voting System follows a layered architecture that separates conce
   - Real-time election results display
   - Responsive design for various devices
 
-#### Mobile App
-- **Technology**: React Native (planned)
-- **Purpose**: Mobile voting interface for voters
-- **Features**:
-  - Same functionality as web browser
-  - Native mobile experience
-  - Offline capabilities for some features
-
 #### Admin Portal
 - **Technology**: React with Admin Dashboard components
 - **Purpose**: Election administration interface
