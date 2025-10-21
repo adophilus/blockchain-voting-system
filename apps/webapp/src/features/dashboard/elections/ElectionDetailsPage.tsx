@@ -221,7 +221,7 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 				</CardContent>
 			</Card>
 
-			{/*<Card>
+			<Card>
 				<CardHeader>
 					<CardTitle>Voter Codes</CardTitle>
 				</CardHeader>
@@ -230,18 +230,18 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 						<TableHeader>
 							<TableRow>
 								<TableHead>S/N</TableHead>
-								<TableHead>Voter ID</TableHead>
+								{/*<TableHead>Voter ID</TableHead>*/}
 								<TableHead>Code</TableHead>
-								<TableHead>Status</TableHead>
+								{/*<TableHead>Status</TableHead>*/}
 							</TableRow>
 						</TableHeader>
 						<TableBody>
 							{voters.map((voter, index) => (
 								<TableRow key={voter.id}>
 									<TableCell>{index + 1}</TableCell>
-									<TableCell>{voter.id}</TableCell>
+									{/*<TableCell>{voter.id}</TableCell>*/}
 									<TableCell>{voter.code}</TableCell>
-									<TableCell>
+									{/*<TableCell>
 										<Badge
 											variant={
 												voter.status === "VOTED" ? "default" : "secondary"
@@ -249,13 +249,13 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 										>
 											{voter.status}
 										</Badge>
-									</TableCell>
+									</TableCell>*/}
 								</TableRow>
 							))}
 						</TableBody>
 					</Table>
 				</CardContent>
-			</Card>*/}
+			</Card>
 		</div>
 	);
 }

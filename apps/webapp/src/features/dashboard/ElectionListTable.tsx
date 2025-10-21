@@ -199,7 +199,11 @@ export function ElectionListTable({
 								<TableCell>
 									<DropdownMenu>
 										<DropdownMenuTrigger>
-											<Button variant="ghost" className="h-8 w-8 p-0" onClick={() => console.log("I was clicked :melt")}>
+											<Button
+												variant="ghost"
+												className="h-8 w-8 p-0"
+												onClick={() => console.log("I was clicked :melt")}
+											>
 												<span className="sr-only">Open menu</span>
 												<MoreHorizontal className="h-4 w-4" />
 											</Button>
@@ -215,13 +219,13 @@ export function ElectionListTable({
 											>
 												<BarChart className="mr-2 h-4 w-4" /> View Results
 											</DropdownMenuItem>
-											{election.status === "ONGOING" && (
+											{/*{election.status === "ONGOING" && (
 												<DropdownMenuItem
 													onClick={() => handleEndElection(election.id)}
 												>
 													<Flag className="mr-2 h-4 w-4" /> End
 												</DropdownMenuItem>
-											)}
+											)}*/}
 											<DropdownMenuItem
 												onClick={() => handleCopyLink(election.id)}
 											>
