@@ -22,6 +22,14 @@ export default defineConfig({
 				items: [{ text: "Introduction", link: "/guide/introduction" }],
 			},
 			{
+				text: "System Architecture",
+				items: [
+					{ text: "Overview", link: "/system-architecture" },
+					{ text: "Detailed Diagram", link: "/architecture/system-diagram" },
+					{ text: "Component Explanations", link: "/architecture/system-architecture" },
+				],
+			},
+			{
 				text: "Smart Contracts",
 				items: [
 					{ text: "Overview", link: "/contracts/overview" },
