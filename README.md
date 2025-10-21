@@ -1,6 +1,14 @@
 # Blockchain Voting System
 
-A decentralized voting system built on blockchain technology.
+A decentralized voting system built on blockchain technology with Zero-Knowledge privacy.
+
+## Features
+
+- **Blockchain-Based**: Immutable and transparent voting records
+- **Zero-Knowledge Privacy**: Voter anonymity through Semaphore protocol
+- **Gasless Transactions**: No gas fees for voters
+- **Web2 Experience**: Traditional login without wallet installation
+- **IPFS Integration**: Decentralized storage for election media
 
 ## Development Environment
 
@@ -58,6 +66,21 @@ pnpm dev:contracts
 # Run only the web application development server
 pnpm dev:webapp
 ```
+
+## Zero-Knowledge Integration
+
+This system uses Semaphore for zero-knowledge voter privacy:
+
+- **Voter Anonymity**: Voters can prove eligibility without revealing identity
+- **Double Voting Prevention**: ZK proofs prevent multiple votes
+- **Gasless Experience**: Backend relays transactions to hide blockchain complexity
+
+### ZK Components
+
+1. **Semaphore Contracts**: Handle group membership and ZK proof verification
+2. **Identity Management**: Backend-generated identities for voters
+3. **Proof Generation**: Client or server-side ZK proof creation
+4. **Verification**: On-chain ZK proof validation
 
 ## Foundry
 
