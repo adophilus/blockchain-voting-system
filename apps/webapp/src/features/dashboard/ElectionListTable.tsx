@@ -198,8 +198,8 @@ export function ElectionListTable({
 								</TableCell>
 								<TableCell>
 									<DropdownMenu>
-										<DropdownMenuTrigger asChild>
-											<Button variant="ghost" className="h-8 w-8 p-0">
+										<DropdownMenuTrigger>
+											<Button variant="ghost" className="h-8 w-8 p-0" onClick={() => console.log("I was clicked :melt")}>
 												<span className="sr-only">Open menu</span>
 												<MoreHorizontal className="h-4 w-4" />
 											</Button>
@@ -227,12 +227,12 @@ export function ElectionListTable({
 											>
 												<LinkIcon className="mr-2 h-4 w-4" /> Copy Link
 											</DropdownMenuItem>
-											<DropdownMenuItem
+											{/*<DropdownMenuItem
 												onClick={() => handleDeleteElection(election.id)}
 												disabled={deleteElectionMutation.isPending}
 											>
 												<TrashIcon className="mr-2 h-4 w-4" /> Delete
-											</DropdownMenuItem>
+											</DropdownMenuItem>*/}
 										</DropdownMenuContent>
 									</DropdownMenu>
 								</TableCell>

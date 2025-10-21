@@ -382,7 +382,7 @@ export function CreateElectionForm() {
               name="numberOfVoters"
               render={({ field }) => (
                 <FormItem>
-                  <FormLabel>Number of Voters to Generate</FormLabel>
+                  <FormLabel>Number of Voters codes (zk proofs) to Generate</FormLabel>
                   <FormControl>
                     <Input
                       type="number"

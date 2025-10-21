@@ -9,7 +9,7 @@ import {
 	TableRow,
 } from "@/components/ui/table";
 import { format } from "date-fns";
-import { Edit } from "lucide-react";
+import { EditIcon } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { toast } from "sonner";
 import { Badge } from "@/components/ui/badge";
@@ -174,13 +174,13 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 						<div key={position.id} className="mb-4 border p-4 rounded-md">
 							<h3 className="font-semibold flex items-center justify-between">
 								{position.title}
-								<Button
+								{/*<Button
 									variant="ghost"
 									size="icon"
 									onClick={() => handleEditPosition(position.id)}
 								>
-									<Edit className="h-4 w-4" />
-								</Button>
+									<EditIcon className="h-4 w-4" />
+								</Button>*/}
 							</h3>
 							<p>{position.description}</p>
 							<h4 className="mt-2 font-medium">Candidates:</h4>
@@ -190,7 +190,6 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 										<TableHead>Image</TableHead>
 										<TableHead>Name</TableHead>
 										<TableHead>Bio</TableHead>
-										<TableHead>Actions</TableHead>
 									</TableRow>
 								</TableHeader>
 								<TableBody>
@@ -213,15 +212,6 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 											</TableCell>
 											<TableCell>{candidate.name}</TableCell>
 											<TableCell>{candidate.bio}</TableCell>
-											<TableCell>
-												<Button
-													variant="ghost"
-													size="icon"
-													onClick={() => handleEditCandidate(candidate.id)}
-												>
-													<Edit className="h-4 w-4" />
-												</Button>
-											</TableCell>
 										</TableRow>
 									))}
 								</TableBody>
@@ -231,7 +221,7 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 				</CardContent>
 			</Card>
 
-			<Card>
+			{/*<Card>
 				<CardHeader>
 					<CardTitle>Voter Codes</CardTitle>
 				</CardHeader>
@@ -265,7 +255,7 @@ export function ElectionDetailsPage({ electionId }: ElectionDetailsPageProps) {
 						</TableBody>
 					</Table>
 				</CardContent>
-			</Card>
+			</Card>*/}
 		</div>
 	);
 }
