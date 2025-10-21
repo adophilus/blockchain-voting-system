@@ -49,11 +49,9 @@ export default withMermaid({
 				],
 			},
 			{
-				text: "Web Application",
+				text: "Frontend Interface Design",
 				items: [
-					{ text: "Overview", link: "/webapp/overview" },
-					{ text: "Setup", link: "/webapp/setup" },
-					{ text: "Components", link: "/webapp/components" },
+					{ text: "Interface Design", link: "/frontend/interface-design" },
 				],
 			},
 			{
