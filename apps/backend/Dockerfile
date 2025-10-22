@@ -16,7 +16,7 @@ COPY . .
 
 RUN ./scripts/setup-foundry.sh
 
-RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false && pnpm build:backend
+RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false
 
 
 FROM base AS deploy

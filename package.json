@@ -6,8 +6,7 @@
 	"scripts": {
 		"dev": "nx run-many -t dev --all",
 		"lint": "nx run-many -t lint --all",
-		"build": "nx run-many -t build --verbose",
-		"build:backend": "./scripts/build-backend.sh"
+		"build": "nx run-many -t build --verbose"
 	},
 	"keywords": [
 		"blockchain",
