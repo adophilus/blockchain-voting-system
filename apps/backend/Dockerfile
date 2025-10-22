@@ -24,4 +24,4 @@ COPY --from=build /app ./
 
 EXPOSE $PORT
 
-CMD ["pnpm", "start:backend"]
+CMD ["pnpm", "--filter", "@blockchain-voting-system/backend", "start"]
