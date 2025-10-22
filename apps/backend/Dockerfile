@@ -11,11 +11,7 @@ RUN bun add -g pnpm
 FROM base AS build
 
 WORKDIR /app
-
 COPY . .
-
-RUN ./scripts/setup-foundry.sh
-
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false
 
 
