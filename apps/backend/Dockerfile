@@ -12,6 +12,7 @@ FROM base AS build
 
 WORKDIR /app
 
+RUN ls -lah
 RUN ./scripts/setup-foundry.sh
 
 COPY . .
