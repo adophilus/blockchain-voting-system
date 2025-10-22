@@ -12,7 +12,6 @@ FROM base AS build
 
 WORKDIR /app
 COPY . .
-RUN ls -lah
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false && pnpm build
 
 
