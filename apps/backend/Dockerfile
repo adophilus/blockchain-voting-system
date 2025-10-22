@@ -12,8 +12,7 @@ FROM base AS build
 
 WORKDIR /app
 
-RUN curl -L https://foundry.paradigm.xyz | bash
-RUN foundryup
+RUN ./scripts/setup-foundry.sh
 
 COPY . .
 RUN --mount=type=cache,id=pnpm,target=/pnpm/store pnpm install --frozen-lockfile --prod false && pnpm build:backend
